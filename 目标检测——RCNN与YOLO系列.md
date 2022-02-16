@@ -4,6 +4,16 @@
 
 # 目标检测简介
 
+## 0. 图先来两张
+
+（图片来源：Wu X, Sahoo D, Hoi S C H.Recent advances in deep learning for object detection[J]. Neurocomputing,2020, 396: 39-64.）
+
+![](https://cdn.jsdelivr.net/gh/Damon-X46/ImgHosting/images/20220215_1.jpg)
+
+
+
+![](https://cdn.jsdelivr.net/gh/Damon-X46/ImgHosting/images/20220215_2.jpg)
+
 ## 1. 核心问题
 
 - 分类问题：即图片（或某个区域）中的图像属于哪个类别
