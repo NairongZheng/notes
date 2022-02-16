@@ -15,13 +15,13 @@
 
 - two stage：
 
-- - 先进行区域生成，该区域称为region proposal（RP，一个有可能包含物体的预选框）；再通过卷积神经网络进行样本分类
+  - 先进行区域生成，该区域称为region proposal（RP，一个有可能包含物体的预选框）；再通过卷积神经网络进行样本分类
   - 任务流程：特征提取---生成RP---分类/定位回归
   - 常见two stage：R-CNN、SPP-Net、Fast R-CNN、Faster R-CNN、R-FCN
 
 - one stage：
 
-- - 不用RP，直接在网络中提取特征来预测物体的分类和位置
+  - 不用RP，直接在网络中提取特征来预测物体的分类和位置
   - 任务流程：特征提取---分类/定位回归
   - 常见one stage：OverFeat、YOLOv1、YOLOv2、YOLOv3、SSD、RetinaNet
 
@@ -62,7 +62,7 @@
 
 - 选择搜索流程
 
-- - step0：生成区域集R
+  - step0：生成区域集R
   - step1：计算区域集R里每个相邻区域的相似度$S={s1, s2,…}$
   - step2：找出相似度最高的两个区域，将其合并为新集，添加进R
   - step3：从S中移除所有与step2中有关的子集
@@ -71,7 +71,7 @@
 
 - 选择搜索优点
 
-- - 计算效率优于滑窗法
+  - 计算效率优于滑窗法
   - 由于采用子区域合并策略，所以可以包含各种大小的疑似物体框
   - 合并区域相似的指标多样性，提高了检测物体的概率
 
@@ -114,17 +114,17 @@ $$
 
 - 独立类别的候选区域（category-independent region proposals），生成一组对检测器可用的检测坐标。
 
-- - 常见的候选区生成的方法有很多（objectness、selective search、category-independent object proposals、constrained parametric min-cuts (CPMC) 、multi-scale combinatorial grouping），本文用的是选择搜索。产生了2000个候选区域（region proposal）
+  - 常见的候选区生成的方法有很多（objectness、selective search、category-independent object proposals、constrained parametric min-cuts (CPMC) 、multi-scale combinatorial grouping），本文用的是选择搜索。产生了2000个候选区域（region proposal）
 
 - 使用卷积神经网络从每个区域从提取固定的特征向量。
 
-- - 本文每个区域提取到的固定长度的特征向量是4096，使用的网络是AlexNet
+  - 本文每个区域提取到的固定长度的特征向量是4096，使用的网络是AlexNet
   - 需要注意的是 Alextnet 的输入图像大小是 $227\times227$，而通过 Selective Search 产生的候选区域大小不一，为了与 Alexnet 兼容，R-CNN 采用了非常暴力的手段，那就是无视候选区域的大小和形状，统一变换到 $227\times227$ 的尺寸。有一个细节，在对 Region 进行变换的时候，首先对这些区域进行膨胀处理，在其 box 周围附加了 p 个像素，也就是人为添加了边框，在这里 p=16
   - 在 ImageNet 上先进行预训练，然后利用成熟的权重参数在 PASCAL VOC 数据集上进行 fine-tune
 
 - SVM线性分类器，对特征进行分类
 
-- - 用SVM对每个特征向量进行评分，然后用非极大值抑制
+  - 用SVM对每个特征向量进行评分，然后用非极大值抑制
 
 简单说就是：
 
@@ -177,7 +177,7 @@ SPP-Net在最后一个卷积层后，接入了金字塔池化层，使用这种�
 **而对于SPP-Net，整个过程是：**
 
 - 首先通过选择性搜索，对待检测的图片进行搜索出2000个候选窗口。这一步和R-CNN一样。
--  特征提取阶段。这一步就是和R-CNN最大的区别了，这一步骤的具体操作如下：把整张待检测的图片，输入CNN中，进行一次性特征提取，得到feature maps，<font color='red'>**然后在feature maps中找到各个候选框的区域，再对各个候选框采用金字塔空间池化**</font>，提取出固定长度的特征向量。而R-CNN输入的是每个候选框，然后在进入CNN，因为SPP-Net只需要一次对整张图片进行特征提取，速度会大大提升。
+- 特征提取阶段。这一步就是和R-CNN最大的区别了，这一步骤的具体操作如下：把整张待检测的图片，输入CNN中，进行一次性特征提取，得到feature maps，<font color='red'>**然后在feature maps中找到各个候选框的区域，再对各个候选框采用金字塔空间池化**</font>，提取出固定长度的特征向量。而R-CNN输入的是每个候选框，然后在进入CNN，因为SPP-Net只需要一次对整张图片进行特征提取，速度会大大提升。
 - 最后一步也是和R-CNN一样，采用SVM算法进行特征向量分类识别。
 
 我们知道，在原图中的proposal，经过多层卷积之后，位置还是相对于原图不变的（如下图所示），那现在需要解决的问题就是，<font color='red'>如何能够将原图上的proposal，映射到卷积之后得到的特征图上</font>，因为在此之后我们要对proposal进行金字塔池化。
@@ -220,7 +220,7 @@ R-CNN存在一些问题：
 
 - 简单说ROI pooling就是：
 
-- - 把图片上selective search选出的候选<font color='red'>框映射到**特征图上对应的位置**</font>，这个映射是根据输入图片缩小的尺寸来的；
+  - 把图片上selective search选出的候选<font color='red'>框映射到**特征图上对应的位置**</font>，这个映射是根据输入图片缩小的尺寸来的；
   - 将映射后的区域划分为相同大小的sections（sections数量与输出的维度相同）
   - 对每个sections进行max pooling操作； 这样我们就可以从不同大小的方框得到固定大小的相应 的feature maps。
 
