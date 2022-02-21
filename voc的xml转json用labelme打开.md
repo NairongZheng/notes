@@ -172,7 +172,6 @@ labelme采用json文件格式存储标签，如下：
 import argparse
 import glob
 import os
-from turtle import width
 import xml.etree.ElementTree as ET
 import json
 from tqdm import tqdm
