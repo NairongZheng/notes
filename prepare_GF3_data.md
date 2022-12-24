@@ -1,5 +1,16 @@
 # GF3_yza
 
+## matlab的nmt
+```matlab
+%% 归一化可视
+aaa = x(:,:,100);
+img = aaa;
+rate = 3;
+img(img > rate * mean(img(:))) = rate * mean(img(:));
+img_a = uint8(img / max(img(:)) * 255);
+imshow(img_a);
+```
+
 ## SAR处理
 
 原始 SAR 图像是 single 类型，要用代码将其进行截断拉伸，再归一化。
