@@ -3,8 +3,8 @@ clear;clc;
 
 %% 打开文件
 buildings=imread('D:\code_matlab\play_play\osm_buildings_sub_area1.tif');
-landuse=imread('D:\code_matlab\play_play\osm_landuse_sub_area1.tif',1);
-water=imread('D:\code_matlab\play_play\osm_water_sub_area1.tif',1);
+landuse=imread('D:\code_matlab\play_play\osm_landuse_sub_area1.tif');
+water=imread('D:\code_matlab\play_play\osm_water_sub_area1.tif');
 
 %% 前处理
 
