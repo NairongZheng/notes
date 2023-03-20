@@ -5,7 +5,7 @@
 # Vision Transformer (ViT)
 ## 1. 回顾Transformer (TRM)
 transformer网络结构如下图所示：
-<img src="https://cdn.jsdelivr.net/gh/Damon-X46/ImgHosting/images/20211125_transformer网络结构.jpg" style="zoom: 67%;" />
+<img src="images/20211125/20211125_transformer网络结构.jpg" style="zoom: 67%;" />
 
 1. 左半部分为编码端；右半部分为解码端。（假设汉字翻译成英文）（括号内对应上图操作）。
 2. 编码端输入汉字。转化为数字 (Inputs)，再转化为 token embedding (Input Embedding)，也就是词向量。
@@ -35,7 +35,7 @@ transformer网络结构如下图所示：
 但是上面的方式还是太麻烦，所以一个简单的改进方式：图像化整为零，切分 patch 。
 **也就是说，原来是一个像素点代表一个 token，现在是一大块的 patch 作为一个 token。**
 以下就是 ViT 的网络结构：
-<img src="https://cdn.jsdelivr.net/gh/Damon-X46/ImgHosting/images/20211127_ViT网络结构.jpg"  />
+<img src="images/20211127/20211127_ViT网络结构.jpg"  />
 
 
 
@@ -50,7 +50,7 @@ transformer网络结构如下图所示：
 ### 2.2. patch embedding（结构图的2）
 **那么问题来了**。第二步中，patch 怎么转化成 token embedding 的？？？
 其实第二步又分为两个小步骤：
-<img src="https://cdn.jsdelivr.net/gh/Damon-X46/ImgHosting/images/20211127_ViT_patch拉平.png" style="zoom:80%;" />
+<img src="images/20211127/20211127_ViT_patch拉平.png" style="zoom:80%;" />
 
 
 
@@ -70,7 +70,7 @@ transformer网络结构如下图所示：
 <font color='red'>好了，重点又来了！</font>
 其中的第三个步骤，又要分为几个小步骤，第三个步骤图拿下来：
 
-<img src="https://cdn.jsdelivr.net/gh/Damon-X46/ImgHosting/images/20211127_ViT_位置编码.jpg" style="zoom:80%;" />
+<img src="images/20211127/20211127_ViT_位置编码.jpg" style="zoom:80%;" />
 
 
 
@@ -93,7 +93,7 @@ transformer 中讲过了。对应到图像中，就是告诉模型，哪个 patc
 - 如果是二维的，就是：[1, 1], [1, 2], ...
 - 还有一种相对位置信息（此处略）
 
-<img src="https://cdn.jsdelivr.net/gh/Damon-X46/ImgHosting/images/20211127_ViT_位置编码结果.jpg" style="zoom:80%;" />
+<img src="images/20211127/20211127_ViT_位置编码结果.jpg" style="zoom:80%;" />
 
 
 
@@ -104,7 +104,7 @@ transformer 中讲过了。对应到图像中，就是告诉模型，哪个 patc
 ### 2.4. Encoder（结构图的4）
 ViT 中使用的 Encoder 其实和原始 TRM 中的 Encoder 是不太一样的，ViT中的 Encoder 如下图所示：
 
-<img src="https://cdn.jsdelivr.net/gh/Damon-X46/ImgHosting/images/20211127_ViT_Encoder.jpg" style="zoom:67%;" />
+<img src="images/20211127/20211127_ViT_Encoder.jpg" style="zoom:67%;" />
 
 
 
