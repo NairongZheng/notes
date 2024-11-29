@@ -14,7 +14,7 @@
 
 transformer网络结构如下图所示：
 
-<img src="images/20211125/20211125_transformer网络结构.jpg" style="zoom: 67%;" />
+<img src="../images/20211125/20211125_transformer网络结构.jpg" style="zoom: 67%;" />
 
 - 注意！！！！！！！！！！
 - transformer的输入是有两个的，一个在Encoder， 一个在Decoder（机器翻译是这样）
@@ -27,7 +27,7 @@ transformer网络结构如下图所示：
 
 TRM一开始是在机器翻译中被提出的，整个过程可以概括为下图：
 
-<img src="images/20211125/20211125_TRM1.png" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_TRM1.png" style="zoom: 50%;" />
 
 不用管里面怎么做，总之经过TRM这个黑盒的操作，“我爱你”就变成了“I LOVE YOU”。
 
@@ -37,7 +37,7 @@ TRM一开始是在机器翻译中被提出的，整个过程可以概括为下�
 
 1. 输入没有发生变化，输出也没有发生变化，把TRM分成两个部分，Encoders和Decoders：
 
-<img src="images/20211125/20211125_TRM2.png" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_TRM2.png" style="zoom: 50%;" />
 
 - 也就是说“我爱你”作为输入，经过Encoders，然后Encoders输出再作为Decoders的输入，流出来，就变成“I LOVE YOU”
 
@@ -45,7 +45,7 @@ TRM一开始是在机器翻译中被提出的，整个过程可以概括为下�
 
 2. Encoders和Decoders就是由n个Encoder和n个Decoder组成的：
 
-<img src="images/20211125/20211125_TRM3.png" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_TRM3.png" style="zoom: 50%;" />
 
 - 也就是流经多个Encoder和多个Decoder，就可以把“我爱你”变成“I LOVE YOU”
 - 上图二者的个数都是6，这个数字可以自己定
@@ -71,7 +71,7 @@ TRM一开始是在机器翻译中被提出的，整个过程可以概括为下�
 
 Encoder可以划分为三部分，如下图所示：
 
-<img src="images/20211125/20211125_TRM_Encoder.png" style="zoom: 33%;" />
+<img src="../images/20211125/20211125_TRM_Encoder.png" style="zoom: 33%;" />
 
 ### 2.2. 输入部分
 
@@ -86,13 +86,13 @@ Embedding是NLP里面简单的入门知识
 - 可以理解成图像中，用(255, 0, 0)代表红色，然后再用0代表(255, 0, 0)，然后再onehot，用000001之类的代表0
 - 就是把一个字，用计算机能理解的语言代替
 
-<img src="images/20211125/20211125_Embedding.png" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_Embedding.png" style="zoom: 50%;" />
 
 #### 2.2.2. 位置嵌入 / 位置编码
 
 1. 为什么需要位置编码？这里从RNN引出举例
 
-<img src="images/20211125/20211125_RNN.png" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_RNN.png" style="zoom: 50%;" />
 
 
 
@@ -127,11 +127,11 @@ $$
 - 2i就是偶数位，2i+1就是奇数位
 - 在位置2i处，使用sin；在位置2i+1处，使用cos
 
-<img src="images/20211125/20211125_位置编码.png" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_位置编码.png" style="zoom: 50%;" />
 
 3. 得到位置编码之后，把位置编码和Embedding相加，得到一个512维的向量，作为整个transformer中Encoder的输入
 
-<img src="images/20211125/20211125_位置编码和Embedding.png" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_位置编码和Embedding.png" style="zoom: 50%;" />
 
 4. 为什么位置编码会有用？
 
@@ -171,7 +171,7 @@ $$
 
 （用一个婴儿在看一张报纸的图片举例，图片就不放了）
 
-<img src="images/20211125/20211125_QKV1.png" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_QKV1.png" style="zoom: 50%;" />
 
 - 左上、左下、右上、右下、V1、V2、V3、V4、婴儿。都是拿来举例的，就是QKV，向量
 - 婴儿分别个左上、左下、右上、右下，做点乘。**得到的数值越大，说明距离越近，越相似，越关注，就是越相关呗。**
@@ -179,7 +179,7 @@ $$
 
 （详见下图解析）
 
-<img src="images/20211125/20211125_QKV2.png" style="zoom: 33%;" />
+<img src="../images/20211125/20211125_QKV2.png" style="zoom: 33%;" />
 
 - 把Q和K1、K2、K3、K4做F函数变换。也就是“爱”和“我”，“不”，“爱”，“你”做F函数变换
 - F函数变换可以有几种操作，一般用点乘
@@ -208,7 +208,7 @@ V=Linear(X_{embedding})=X_{embedding}W_V
 $$
 接下来就是多头注意力机制，（这几步的）流程图如下：
 
-<img src="images/20211125/20211125_TRM_MSHA1.png" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_TRM_MSHA1.png" style="zoom: 50%;" />
 
 进行MHSA，我们要定义一个<font color='red'>超参数h</font>，也就是head的数量，注意，embedding dimension必须整除于h，因为要把它分成h份。
 
@@ -230,14 +230,14 @@ $$
 
 我们拿出一组来解释（QKV的计算）：
 
-<img src="images/20211125/20211125_TRM_MSHA2.png" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_TRM_MSHA2.png" style="zoom: 50%;" />
 
 - 如上图所示，先计算Q与K的转置的点积。（点积的几何意义上面解释了）
 - 点击的结果就是生成**注意力矩阵**。<font color='red'>**注意力矩阵的第一行就是第一个字c1与这六个字分别的相关程度**</font>。
 - 然后用SoftMax进行归一化，这样<font color='red'>**每个字跟其他所有字的注意力权重的和为1**</font>
 - 接着用注意力矩阵给V加权，见下图
 
-<img src="images/20211125/20211125_TRM_MSHA3.png" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_TRM_MSHA3.png" style="zoom: 50%;" />
 
 上图中我们从注意力矩阵中取出一行（和为1）然后依次点乘V的列，矩阵V的每一行代表着每个字向量的数学表达。上图的操作正是用注意力权重进行这些数学表达的加权线性组合，从而<font color='red'>**使每个字向量都含有当前句子内所有字向量的信息**</font>。
 
@@ -245,7 +245,7 @@ $$
 
 在上面的self attention的计算过程中，我们通常采用mini batch来计算，也就是<font color='red'>一次计算多句话</font>，也就是$X\in [batch\ size, sequence\ length]$，sequence length 是句长。而一个mini batch是有多个不等长的句子组成的，我们就需要按照这个mini batch中最大的句长对剩余的句子进行补齐长度，一般使用0来填充，也就是padding。
 
-<img src="images/20211125/20211125_TRM_MSHA4.png" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_TRM_MSHA4.png" style="zoom: 50%;" />
 
 但是在这时进行SoftMax就会产生问题。SoftMax函数如下：
 $$
@@ -270,7 +270,7 @@ $$
 
 
 
-<img src="images/20211125/20211125_LayNorm_copy.jpg" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_LayNorm_copy.jpg" style="zoom: 50%;" />
 
 #### 2.4.1. 残差
 
@@ -291,7 +291,7 @@ $$
 
 
 
-<img src="images/20211125/20211125_LayerNorm.png" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_LayerNorm.png" style="zoom: 50%;" />
 
 - 这边用班级同学的例子来解释
 - 每一列代表不同的样本，也就是同学（小明、小红、......）
@@ -342,16 +342,16 @@ $$
 
 Decoder可以划分为两部分，如下所示：
 
-<img src="images/20211125/20211125_TRM_Decoder.png" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_TRM_Decoder.png" style="zoom: 50%;" />
 
 ### 3.2. Decoder中的多头注意力机制
 
 注意，Decoder中的多头注意力机制多了一个**Masked**，为什么要masked呢？
 
 <center class="half">
-    <img src="images/20211125/20211125_Decoder_Masked1.png" style="zoom:50%;" />
-    <img src="images/20211125/20211125_Decoder_Masked2.png" style="zoom: 50%;" />
-    <img src="images/20211125/20211125_Decoder_Masked3.png" style="zoom: 50%;" />
+    <img src="../images/20211125/20211125_Decoder_Masked1.png" style="zoom:50%;" />
+    <img src="../images/20211125/20211125_Decoder_Masked2.png" style="zoom: 50%;" />
+    <img src="../images/20211125/20211125_Decoder_Masked3.png" style="zoom: 50%;" />
 </center>
 
 - Masked操作就是把当前词及其之后的全部都不看！！！
@@ -397,7 +397,7 @@ sentences = ['ich mochte ein bier P', 'S i want a beer', 'i want a beer E']
 
   2. 抽离出来，放到机器翻译中来看：
 
-<img src="images/20211125/20211125_TRM_code1.png" style="zoom:50%;" />
+<img src="../images/20211125/20211125_TRM_code1.png" style="zoom:50%;" />
 
 3. “我爱你”是编码端的输入，“S I LOUE YOU”是解码端的输入
 
@@ -419,7 +419,7 @@ sentences = ['ich mochte ein bier P', 'S i want a beer', 'i want a beer E']
   2. E代表end
   3. P代表的是一个pad字符（因为一个batch中句子长度可能不一样，所以就要规定一个最大长度max length，大于的就截断，小于的就使用特殊字符来填充，也就是P，如下图：）
 
-<img src="images/20211125/20211125_TRM_code2_copy.jpg" style="zoom: 50%;" />
+<img src="../images/20211125/20211125_TRM_code2_copy.jpg" style="zoom: 50%;" />
 
 
 

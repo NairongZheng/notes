@@ -1,0 +1,9 @@
+# ai_related
+1. 目标检测——RCNN与YOLO系列
+2. 目标检测——R2CNN与SCRDet
+3. ViT
+4. transformer
+5. swin_transformer
+6. 机器学习
+7. 机器学习2
+8. 白话强化学习笔记

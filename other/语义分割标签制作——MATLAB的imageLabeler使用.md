@@ -12,17 +12,17 @@
 
 在MATLAB的命令行窗口输入imageLabeler，即可自动打开该工具，或者在MATLAB菜单的“APP”中也可以找到。imageLabeler界面如下所示：
 
-![](images/20220301/20220301_imageLabeler界面.jpg)
+![](../images/20220301/20220301_imageLabeler界面.jpg)
 
 ## 加载图片
 
-![](images/20220301/20220301_导入图像.jpg)
+![](../images/20220301/20220301_导入图像.jpg)
 
 ## 添加标签
 
 根据你的任务划分类别，然后进行添加。语义分割的标签格式要选择Pixel label
 
-![](images/20220301/20220301_类别添加.jpg)
+![](../images/20220301/20220301_类别添加.jpg)
 
 添加之后，左边的工具栏就会出现添加的类别及对应的颜色。标注的时候可以选择切换。
 
@@ -34,7 +34,7 @@
 
 解决这个问题可以将图像切割成小图标注，再拼接，或者下采样等方法。
 
-![](images/20220301/20220301_标注.jpg)
+![](../images/20220301/20220301_标注.jpg)
 
 ## 标签导出
 
@@ -44,9 +44,9 @@
 - Export Labels-->To File：保存gTruth.mat文件和PixelLabelData标签文件，里面是一张肉眼看着的黑图，因为像素值都是0，1，2等很小的值
 - 最好都保存到同一个文件夹里
 
-![](images/20220301/20220301_保存1.jpg)
+![](../images/20220301/20220301_保存1.jpg)
 
-![](images/20220301/20220301_保存2.png)
+![](../images/20220301/20220301_保存2.png)
 
 保存后的文件夹目录如下：
 
@@ -71,7 +71,7 @@ try
 - ImageFilenames：imageLabelingSession.ImageFilenames就是图像的绝对路径
 - FileName：这个imageLabelingSession.mat的绝对路径
 
-![](images/20220301/20220301_session.jpg)
+![](../images/20220301/20220301_session.jpg)
 
 ### gTruth.mat和PixelLabelData文件夹
 
@@ -86,7 +86,7 @@ PixelLabelData文件夹里存放的就是标签图像。是png格式。命名是
 - LabelData：gTruth.LabelData.PixelLabelData中存储的就是标签图像的绝对路径，同样也是一个$N\times1$的cell数组，刚好和上面的PixelLabelData文件夹里的一一对应
 - （这里只用一张图做示例，所以每个字段里面只有一个）
 
-![](images/20220301/20220301_gTruth.jpg)
+![](../images/20220301/20220301_gTruth.jpg)
 
 
 
@@ -94,19 +94,19 @@ PixelLabelData文件夹里存放的就是标签图像。是png格式。命名是
 
 第二次标注直接Load--->Session，选择保存了的imageLabelSession.mat文件。
 
-![](images/20220301/20220301_第二次标注.jpg)
+![](../images/20220301/20220301_第二次标注.jpg)
 
 # 更换路径之后的继续标注
 
 有时候，需要换电脑标注，或者移动了路径，或者更改了原来的名字，都会导致加载Session的时候报错。
 
-![](images/20220301/20220301_session报错1.jpg)
+![](../images/20220301/20220301_session报错1.jpg)
 
 这是因为Session文件中的FileName存储了自己的位置，现在位置变了，自己都找不到了，所以没办法加载。可以将imageLabelingSession中的FileName改成这个session新的位置，直接将.mat加载到MATLAB的工作区，就可以直接改，图见《输出文件解释---imageLabelingSession.mat》。
 
 改完后再次在imageLabeler中加载Session还是会出现以下错误：
 
-![](images/20220301/20220301_session报错2.jpg)
+![](../images/20220301/20220301_session报错2.jpg)
 
 这是因为imageLabelingSession.mat中的ImageFilenames中存储的是原图的位置，这个位置也是原来的位置，没有更新，所以找不到。
 
@@ -132,7 +132,7 @@ alternativePaths = {[currentPathDataSource newPathDataSource]};
 unresolvedPaths = changeFilePaths(gTruth,alternativePaths);
 ```
 
-![](images/20220301/20220301_修改1.jpg)
+![](../images/20220301/20220301_修改1.jpg)
 
 ## 修改LabelData
 
@@ -146,7 +146,7 @@ alternativePaths = {[currentPathPixels newPathPixels]};
 unresolvedPaths = changeFilePaths(gTruth,alternativePaths);
 ```
 
-![](images/20220301/20220301_修改2.jpg)
+![](../images/20220301/20220301_修改2.jpg)
 
 
 
@@ -156,7 +156,7 @@ unresolvedPaths = changeFilePaths(gTruth,alternativePaths);
 
 然后要把工作区的gTruth另存为，替换掉原来的gTruth。
 
-![](images/20220301/20220301_另存为.jpg)
+![](../images/20220301/20220301_另存为.jpg)
 
 ## 加载图像和标签
 
@@ -166,11 +166,11 @@ unresolvedPaths = changeFilePaths(gTruth,alternativePaths);
 
 只要将gTruth.mat导入就可以显示：
 
-![](images/20220301/20220301_导入标签.jpg)
+![](../images/20220301/20220301_导入标签.jpg)
 
 如果加载的gTruth是原来的没修改的，就会出现以下错误：
 
-![](images/20220301/20220301_报错3.png)
+![](../images/20220301/20220301_报错3.png)
 
 所以说，修改完之后，记得要另存为，把原来的替换掉。那如果不替换的话，Import Labels的时候可以选择直接从工作区载入。
 
