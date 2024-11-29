@@ -1,0 +1,10 @@
+# dev_related
+1. WSL
+2. op_and_cmd：一些操作与命令
+3. vim配置
+4. ssh
+5. gitbook_and_github
+6. git
+7. ansible_test
+8. docker
+9. python
