@@ -1,4 +1,13 @@
-[toc]
+- [安装](#安装)
+  - [安装npm与nodejs](#安装npm与nodejs)
+  - [安装gitbook](#安装gitbook)
+- [github与gitbook设置](#github与gitbook设置)
+  - [github初始化仓库](#github初始化仓库)
+  - [gitbook设置](#gitbook设置)
+  - [本地编译gitbook](#本地编译gitbook)
+  - [发布到github pages](#发布到github-pages)
+
+
 参考链接：[https://einverne.github.io/gitbook-tutorial/](https://einverne.github.io/gitbook-tutorial/)
 
 # 安装

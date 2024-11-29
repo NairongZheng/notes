@@ -1,4 +1,7 @@
-[toc]
+- [linux](#linux)
+- [windows的mobaXterm](#windows的mobaxterm)
+
+
 # linux
 
 1. 创建文件`~/.vimrc`（里面有些地方可以改的，看看注释）

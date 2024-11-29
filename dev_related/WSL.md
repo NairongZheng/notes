@@ -1,4 +1,25 @@
-[toc]
+- [参考链接](#参考链接)
+- [WSL安装配置](#wsl安装配置)
+  - [本地启动WSL功能](#本地启动wsl功能)
+  - [下载并安装WSL](#下载并安装wsl)
+  - [WSL设置](#wsl设置)
+    - [多个版本选择](#多个版本选择)
+    - [WSL设置账号密码](#wsl设置账号密码)
+    - [WSL路径](#wsl路径)
+- [Docker与Anaconda](#docker与anaconda)
+  - [Docker安装](#docker安装)
+  - [容器环境配置与制作镜像](#容器环境配置与制作镜像)
+    - [正常配置](#正常配置)
+    - [使用Dockerfile配置](#使用dockerfile配置)
+  - [上传镜像](#上传镜像)
+- [“远程”连接相关（重要！）](#远程连接相关重要)
+  - [WSL配置](#wsl配置)
+  - [容器配置](#容器配置)
+  - [Xshell连接WSL](#xshell连接wsl)
+  - [VSCode连接WSL](#vscode连接wsl)
+  - [VSCode连接WSL里/远程服务器上的docker容器](#vscode连接wsl里远程服务器上的docker容器)
+  - [一些问题](#一些问题)
+
 
 # 参考链接
 
