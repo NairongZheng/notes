@@ -165,7 +165,7 @@
 
 ### 区别与联系
 
-| 特性 | AlphaGo                  | AlphaZero                                |
+| 特性     | AlphaGo                  | AlphaZero                                |
 | -------- | ------------------------ | ---------------------------------------- |
 | 数据来源 | 人类棋谱 + 自我对弈      | 仅自我对弈                               |
 | 学习方式 | 监督学习 + 强化学习      | 纯强化学习                               |
@@ -301,10 +301,10 @@ $$
 即，任何一个玩家单独改变自己的策略都不会带来更高的收益。
 
 例子：囚徒困境[^8]
-|           | **坦白（B）** | **沉默（S）** |
-| --------- | --------- | --------- |
-| **坦白（B）** | -5, -5    | 0, -10    |
-| **沉默（S）** | -10, 0    | -1, -1    |
+|               | **坦白（B）** | **沉默（S）** |
+| ------------- | ------------- | ------------- |
+| **坦白（B）** | -5, -5        | 0, -10        |
+| **沉默（S）** | -10, 0        | -1, -1        |
 
 1. 为何双坦白（B, B）是纳什均衡：
    1. 玩家一：无论玩家二选择坦白还是沉默，玩家一的最优策略都是坦白。
@@ -342,11 +342,11 @@ $$
 所以在第二局中，玩家选择石头、剪刀和布这三个策略的概率分别为$0$、$\frac{2}{3}$、$\frac{1}{3}$。**因此，玩家趋向于在第二局中选择出剪刀这个策略**。
 加入在第二局中，玩家A选择剪刀，玩家B选择石头。那么玩家A每一轮遗憾值及累加值如下：
 
-| 每轮遗憾值\策略 | 石头 | 剪刀 | 布   |
-| --------------- | ---- | ---- | ---- |
-| 第一轮遗憾值    | 0    | 2    | 1    |
-| 第二轮遗憾值    | 1    | 0    | 2    |
-| 累加            | 1    | 2    | 3    |
+| 每轮遗憾值\策略 | 石头 | 剪刀 | 布  |
+| --------------- | ---- | ---- | --- |
+| 第一轮遗憾值    | 0    | 2    | 1   |
+| 第二轮遗憾值    | 1    | 0    | 2   |
+| 累加            | 1    | 2    | 3   |
 
 从上表可知：
 - 从上表可知，在第三局时，玩家A选择石头、剪刀和布的概率分别为$\frac{1}{6}$、$\frac{2}{6}$、$\frac{3}{6}$
@@ -382,6 +382,213 @@ $$
    2. ...
 
 
+# 强化学习基础
+### V值
+**一个状态的V值，就是这个状态下的所有动作的Q值，在策略下的期望**。
+$$
+v_{\pi}(s)=\sum_{a\in{A}}\pi(a|s)q_{\pi}(s,a)
+$$
+
+- $v_{\pi}(s)$：$V$值
+- $\pi(a|s)$：策略
+- $q_{\pi}(s,a)$：$Q$值
+
+
+
+### Q值
+$$
+q_{\pi}(s,a)=R_s^a+\gamma\sum_{s'}P_{ss^,}^av_{\pi}(s')
+$$
+
+- $q_{\pi}(s,a)$：$Q$值
+- $R_s^a$：奖励
+- $\gamma$：折扣率
+- $P_{ss^,}^a$：状态转移概率
+- $v_{\pi}(s^,)$：$V$值
+- 这里不需要关注策略，这里是**环境的状态转移概率**决定的。
+- 当选择A，并转移到新的状态时，就能获得奖励，必须把这个**奖励也算上！**
+
+### 从V到V
+
+把公式代进去就可以了。
+$$
+v_{\pi}(s)=\sum_{a\in{A}}\pi(a|s)(R_s^a+\gamma\sum_{s^,\in{S}}P_{ss'}^av_{\pi}(s'))
+$$
+
+### 蒙特卡罗MC更新公式
+
+$$
+V(S_t){\leftarrow}V(S_t)+\alpha[G_t-V(S_t)]
+$$
+
+- $G_t$：新来的$G$
+- 右边的$V(S_t)$：原来的平均值
+
+蒙特卡罗有一些缺点：
+
+- 相对动态规划，会有点不那么准。因为蒙特卡罗每一次的路径都是不一样的。
+- 如果环境的状态空间非常大，或者最终状态只有非常小的概率达到。那么蒙特卡罗算法将会很难处理。
+
+### 时序差分TD估算状态V值
+
+$$
+V(S_t){\leftarrow}V(S_t)+\alpha[R_{t+1}+{\gamma}V(S_{t+1})-V(S_t)]
+$$
+
+与MC的区别：
+
+- MC公式里更新目标是$G_t$。
+- TD公式里更新目标换成$R_{t+1}+{\gamma}V(S_{t+1})$。
+
+TD更厉害的是，在很多时候，并不需要一直到最后，可以先用后面的估算，然后调整当前状态。
+
+### SARSA
+在**相同策略**下产生的动作$A_{t+1}$
+$$
+Q(S,A){\leftarrow}Q(S,A)+\alpha[R+{\gamma}Q(S',A')-Q(S,A)]
+$$
+注意，这里的$A_{t+1}$是在同一策略产生的。也就是说，$S_t$选$A_t$的策略和$S_{t+1}$选$A_{t+1}$是同一个策略。**这也是SARSA和Qlearning的唯一区别**。
+
+### Qlearning
+
+$$
+Q(S,A){\leftarrow} Q(S,A)+\alpha[R+{\gamma} \mathop{\max}\limits_{\alpha} Q(S',A')-Q(S,A)]
+$$
+
+道理其实也很简单：因为需要找的是能获得最多奖励的动作，Q值就代表我们能够获得今后奖励的期望值。所以我们只会选择Q值最大的，也只有最大Q值能够代表V值。
+
+
+### 策略梯度（Policy Gradient）
+
+期望[^13]：$E(x)_{x\sim{p(x)}}=\sum\limits_x{x*p(x)}\approx{\frac{1}{n}\sum\limits_{i=1}^{n}{x}\quad{_{x\sim{p(x)}}}}$
+目标：训练一个Policy神经网络$\pi$，在所有trajectory中，得到的Reward/Return最大。$E(R(\tau))_{\tau\sim{P_{\theta}(\tau)}}=\sum\limits_{\tau}R(\tau)P_{\theta}(\tau)$
+
+搞个推导：
+
+$$
+\begin{align*}
+\nabla{E(R(\tau))_{\tau\sim{P_{\theta}(\tau)}}} &= \nabla{\sum\limits_{\tau}R(\tau)P_{\theta}(\tau)} \\
+&= \sum\limits_{\tau}R(\tau)\nabla{P_{\theta}(\tau)} \\
+&= \sum\limits_{\tau}R(\tau)\nabla{P_{\theta}(\tau)}\frac{P_{\theta}(\tau)}{P_{\theta}(\tau)} \\
+&= \textcolor{#8C98DC}{\sum\limits_{\tau}P_{\theta}(\tau)}R(\tau)\frac{\nabla{P_{\theta}(\tau)}}{P_{\theta}(\tau)} \\
+&\approx{\frac{1}{N}\sum\limits_{n=1}^N{R(\tau^n)}\frac{\nabla{P_{\theta}(\tau^n)}}{P_{\theta}(\tau^n)}} \\
+&= \frac{1}{N}\sum\limits_{n=1}^N{R(\tau^n)} \nabla\log{P_{\theta}(\tau^n)} \quad{\tau\sim{P_{\theta}(\tau)}} \\
+&= {\frac{1}{N}} {\sum\limits_{n=1}^N} {R(\tau^n)} {\nabla\log} {\prod\limits_{t=1}^{T_n} {P_{\theta} (a_n^t|s_n^t)}} \\
+&= {\frac{1}{N}} {\sum\limits_{n=1}^N} {R(\tau^n)} {\sum\limits_{t=1}^{T_n}} {\nabla\log} {P_{\theta} (a_n^t|s_n^t)} \\
+&= {\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} {R(\tau^n)} {\nabla\log} {P_{\theta} (a_n^t|s_n^t)}
+\end{align*}
+$$
+
+去掉求导：
+
+$$
+{\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} {R(\tau^n)} {\log} {P_{\theta} (a_n^t|s_n^t)}
+$$
+
+由两部分构成：
+
+- ${R(\tau^n)}$：trajectory得到的return
+- ${\log} {P_{\theta} (a_n^t|s_n^t)}$：每一步根据当前state做出action的概率然后求对数
+
+由于$\log$函数单调递增，所以上面的表达式的意义是：
+- 如果一个trajectory得到的return是大于0的，那么就增大这个trajectory里所有状态下采取当前action的概率
+- 如果一个trajectory得到的return是小于0的，那么就减小这个trajectory里所有状态下采取当前action的概率
+
+定义loss如下：
+$$
+Loss={-\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} \textcolor{#8C98DC}{R(\tau^n)} {\log} \textcolor{#D26D6D}{P_{\theta} (a_n^t|s_n^t)}
+$$
+
+### AC?
+
+**上面推导最后的公式有可以改进的地方**：
+- 是否增大或减少在状态$s$下做动作$a$的概率，应该看做了这个动作之后到游戏结束累积的reward，而不是整个trajectory累积的reward。因为一个动作只能影响它之后的reward而不能影响它之前的reward。
+- 但是可能只影响后面几步，也就是有衰减。
+
+$$
+\begin{align*}
+&= {\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} \textcolor{#8C98DC}{R(\tau^n)} {\nabla\log} {P_{\theta} (a_n^t|s_n^t)} {\quad} \textcolor{#8C98DC}{{R(\tau^n)} {\rightarrow} {\sum\limits_{t'=t}^{T_n}} {\gamma^{t'-t}} {r_{t'}^n}=R_t^n} \\
+&= {\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} \textcolor{#8C98DC}{R_t^n} {\nabla\log} {P_{\theta} (a_n^t|s_n^t)} \\
+&= {\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} {({R_t^n}-\textcolor{red}{B(s_n^t)})} {\nabla\log} {P_{\theta} (a_n^t|s_n^t)} \quad\text{(缓解正值陷阱)} \\
+\end{align*}
+$$
+
+
+### PPO
+
+${R_t^n}$每次都是一次随机采样，方差很大，训练不稳定。
+动作-价值函数：$Q_{\theta}(s,a)$，在state s下，做出Action a，期望的回报。
+状态-价值函数：$V_{\theta}(s)$，在state s下，期望的回报。
+**优势函数**：${A_{\theta}(s,a)}=Q_{\theta}(s,a)-V_{\theta}(s)$，在state s下，做出Action a，比其他动作能带来多少优势。
+
+最后公式就变成：
+$$
+{\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} {{A_{\theta}(s_n^t,a_n^t)}} {\nabla\log} {P_{\theta} (a_n^t|s_n^t)}
+$$
+
+优势函数怎么计算？
+
+$$
+\begin{align*}
+A_{\theta}(s_t,a) &= \textcolor{#8C98DC}{Q_{\theta}(s_t,a)}-V_{\theta}(s_t) \\
+&= \textcolor{#8C98DC}{{r_t}+\gamma*{V_{\theta}(S_{t+1})}}-V_{\theta}(s_t) \\
+\end{align*}
+$$
+
+可以有多步采样，一般采用GAE采样[^13]
+GAE通过给优势函数进行一次采样，两次采样，...，并分配不同权重，将他们的和表示最终的优势函数。
+
+$$
+\begin{align*}
+A_{\theta}^{GAE}(s_t,a) &= (1-{\lambda})({A_{\theta}^1}+{\lambda}*{A_{\theta}^2}+{\lambda}*{A_{\theta}^3}+...) \\
+&= ... \\
+&= \sum\limits_{b=0}^{\infty}{(\gamma\lambda)^b}{\delta_{t+b}^V}
+\end{align*}
+$$
+
+
+**现在，公式变成**：
+$$
+{\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} {{A_{\theta}^{GAE}(s_n^t,a_n^t)}} {\nabla\log} {P_{\theta} (a_n^t|s_n^t)}
+$$
+
+
+重要性采样：
+$$
+\begin{align*}
+E(f(x))_{x\sim{p(x)}} &= {\sum\limits_x} {f(x)*p(x)} \\
+&= {\sum\limits_x} {f(x)*p(x)} \frac{q(x)}{q(x)} \\
+&= {\sum\limits_x} f(x) \frac{p(x)}{q(x)} q(x) \\
+&= E(f(x)\frac{p(x)}{q(x)})_{x\sim{q(x)}} \\
+&\approx \frac{1}{N} \sum\limits_{n=1}^N {f(x)\frac{p(x)}{q(x)}} _{x\sim{q(x)}}
+\end{align*}
+$$
+
+on-policy变成off-policy：
+$$
+\begin{align*}
+&= {\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} {{A_{\theta}^{GAE}(s_n^t,a_n^t)}} {\nabla\log} {P_{\theta} (a_n^t|s_n^t)} \\
+&= {\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} {{A_{\theta'}^{GAE}(s_n^t,a_n^t)}} \frac{P_{\theta} (a_n^t|s_n^t)}{P_{\theta'} (a_n^t|s_n^t)} {\nabla\log} {P_{\theta} (a_n^t|s_n^t)} \\
+&= {\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} {{A_{\theta'}^{GAE}(s_n^t,a_n^t)}} \frac{{\nabla} {P_{\theta} (a_n^t|s_n^t)}}{P_{\theta'} (a_n^t|s_n^t)} \\
+\end{align*}
+$$
+
+**所以PPO的Loss**为：
+$$
+Loss=-{\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} {{A_{\theta'}^{GAE}(s_n^t,a_n^t)}} \frac{{P_{\theta} (a_n^t|s_n^t)}}{P_{\theta'} (a_n^t|s_n^t)}
+$$
+
+
+为了避免分布相差太大，可以加上KL散度或者用clip
+
+$$
+\begin{align*}
+Loss_{ppo} &= -{\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} {{A_{\theta'}^{GAE}(s_n^t,a_n^t)}} \frac{{P_{\theta} (a_n^t|s_n^t)}}{P_{\theta'} (a_n^t|s_n^t)} + \textcolor{#8C98DC}{\beta{KL}(P_{\theta},P_{\theta'})} \\
+Loss_{ppo2} &= -{\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} \min (\textcolor{#D26D6D}{{{A_{\theta'}^{GAE}(s_n^t,a_n^t)}} \frac{{P_{\theta} (a_n^t|s_n^t)}}{P_{\theta'} (a_n^t|s_n^t)}},\textcolor{#8C98DC}{clip(\frac{{P_{\theta} (a_n^t|s_n^t)}}{P_{\theta'} (a_n^t|s_n^t)},1-\epsilon,1+\epsilon){A_{\theta'}^{GAE}(s_n^t,a_n^t)}})
+\end{align*}
+$$
+
+
 [^1]: 余超,刘宗凯,胡超豪,等.非完美信息博弈综述:对抗求解方法与对比分析[J].计算机学报,2024,47(09):2211-2246.
 [^2]: [https://www.everlovegames.cn/article/slaythespire](https://www.everlovegames.cn/article/slaythespire)
 [^3]: [https://zhuanlan.zhihu.com/p/639686443](https://zhuanlan.zhihu.com/p/639686443)
@@ -394,3 +601,4 @@ $$
 [^10]: Silver D, Schrittwieser J, Simonyan K, et al. Mastering the game of go without human knowledge[J]. nature, 2017, 550(7676): 354-359.
 [^11]: Vinyals O, Babuschkin I, Czarnecki W M, et al. Grandmaster level in StarCraft II using multi-agent reinforcement learning[J]. nature, 2019, 575(7782): 350-354.
 [^12]: [https://www.youtube.com/watch?v=ARzK4XSH2Qc](https://www.youtube.com/watch?v=ARzK4XSH2Qc)
+[^13]: [PG、PPO](https://www.bilibili.com/video/BV1iz421h7gb)
