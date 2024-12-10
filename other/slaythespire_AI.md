@@ -1,3 +1,39 @@
+- [乱讲轻喷](#乱讲轻喷)
+- [夹带私货](#夹带私货)
+  - [slay the spire](#slay-the-spire)
+    - [玩法简介](#玩法简介)
+    - [简单分析](#简单分析)
+  - [骰子浪游者](#骰子浪游者)
+- [完美信息博弈](#完美信息博弈)
+  - [棋盘游戏](#棋盘游戏)
+  - [AlphaGo与AlphaZero](#alphago与alphazero)
+    - [AlphaGo](#alphago)
+    - [AlphaZero](#alphazero)
+    - [区别与联系](#区别与联系)
+  - [蒙特卡洛树搜索算法](#蒙特卡洛树搜索算法)
+    - [选择](#选择)
+    - [扩展](#扩展)
+    - [模拟](#模拟)
+    - [反向传播](#反向传播)
+- [非完美信息博弈](#非完美信息博弈)
+  - [博弈状态定义](#博弈状态定义)
+  - [策略的定义](#策略的定义)
+  - [纳什均衡](#纳什均衡)
+  - [遗憾最小化（Regret Minimization）](#遗憾最小化regret-minimization)
+  - [Counterfactual Regret Minimization](#counterfactual-regret-minimization)
+  - [TODO](#todo)
+- [不忘初心](#不忘初心)
+- [强化学习基础](#强化学习基础)
+    - [V值](#v值)
+    - [Q值](#q值)
+    - [从V到V](#从v到v)
+    - [蒙特卡罗MC更新公式](#蒙特卡罗mc更新公式)
+    - [时序差分TD估算状态V值](#时序差分td估算状态v值)
+    - [SARSA](#sarsa)
+    - [Qlearning](#qlearning)
+    - [策略梯度（Policy Gradient）](#策略梯度policy-gradient)
+    - [AC?](#ac)
+    - [PPO](#ppo)
 
 # 乱讲轻喷
 
@@ -5,7 +41,7 @@
 非完美信息博弈[^1]：博弈的参与者在决策时无法完全掌握所有相关信息，如对手的隐藏策略、私密状态。（石头简单布、德州扑克、斗地主、lol、金铲铲）
 
 # 夹带私货
-## slay the spire[^2]
+## slay the spire
 ### 玩法简介
 <div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
     <img src="../images/202241203/20241206_slaythespire_3.png" alt="Image 1" style="width: 80%; height: auto;">
@@ -24,8 +60,8 @@
 <br>
 <br>
 
-### 简单分析[^2][^3]
-**一、卡组设计**
+### 简单分析
+**一、卡组设计**[^2][^3]
 <div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
     <img src="../images/202241203/20241206_slaythespire_6.png" alt="Image 1" style="width: 60%; height: auto;">
     <img src="../images/202241203/20241206_slaythespire_5.png" alt="Image 2" style="width: 25%; height: auto;">
@@ -40,18 +76,29 @@
    3. 发育维度：加强防御和攻击维度的维度，属于**辅助**维度。
    4. slay the spire会考验玩家牌组的每一个维度。如第一层中的三个精英怪：乐加、地精小红、哨卫三柱，就分别考验防御维度、攻击维度、发育维度的能力
 4. **卡牌平衡**：每张卡牌都是标准值上进行某种偏移得到的，偏移方式有3种
-   1. <span style="color: #E0E0E0;">增加正面效果，减少资源价值。如顺劈斩资源价值为1费打7，小于标准值1费打11，原因是增加了正面效果：对敌方全体生效。</span>
-   2. <span style="color: #E0E0E0;">增加负面效果，提高资源价值。如硬撑资源价值为1费叠15，高于1费叠9的标准值，但会向牌组里增加两张伤口，污染牌库。</span>
-   3. <span style="color: #E0E0E0;">增加触发条件，提高资源价值。如交锋资源价值为0费打14，甚至高于了1费的标准值。但其的触发条件“手中每张都是攻击牌时才可打出”，使玩家若想打出这种手牌，需要进行一定的布局。</span>
+   1. 增加正面效果，减少资源价值。<span style="color: #BACEDA;">如顺劈斩资源价值为1费打7，小于标准值1费打11，原因是增加了正面效果：对敌方全体生效。</span>
+   2. 增加负面效果，提高资源价值。<span style="color: #BACEDA;">如硬撑资源价值为1费叠15，高于1费叠9的标准值，但会向牌组里增加两张伤口，污染牌库。</span>
+   3. 增加触发条件，提高资源价值。<span style="color: #BACEDA;">如交锋资源价值为0费打14，甚至高于了1费的标准值。但其的触发条件“手中每张都是攻击牌时才可打出”，使玩家若想打出这种手牌，需要进行一定的布局。</span>
+
+<div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
+    <img src="../images/202241203/20241210_slaythespire_9.png" alt="Image 1" style="width: 80%; height: auto;">
+</div>
+
+<br>
+
 5. **协同效应**：由于严格的平衡控制，slay the spire中的大多数单卡的强度都被控制在标准值附近。**相似的强度很容易使玩家缺失成长感，甚至会减少策略性——毕竟都差不多，随便选就好了**。如果说为了卡牌平衡进行的标准值偏移是**上锁**，那么协同效应就是对应的**解锁**。（**正向叠加、反向互补**）
-   1. <span style="color: #E0E0E0;">抵消卡牌的负面效果：如坚毅的负面效果“消耗一张手牌”，和硬撑的负面效果“伤口”，就可以相互抵消。从而完全吃到标准值偏移时提高资源价值的红利，使卡牌强度超出标准值。</span>
-   2. <span style="color: #E0E0E0;">达到卡牌的触发条件：如撕裂的增益需要由主动扣血来触发，而御血术就是最一个主动扣血的卡牌。因此，可以使用御血术来触发撕裂，使卡牌强度超出标准值。</span>
-   3. <span style="color: #E0E0E0;">放大卡牌的正面效果：如重刃的正面增益“受到力量的加成*3”, 使得其可以与任何提供力量的卡牌形成协同效应，从而放大正面增益，使卡牌强度超出标准值。</span>
+   1. 抵消卡牌的负面效果：<span style="color: #BACEDA;">如坚毅的负面效果“消耗一张手牌”，和硬撑的负面效果“伤口”，就可以相互抵消。从而完全吃到标准值偏移时提高资源价值的红利，使卡牌强度超出标准值。</span>
+   2. 达到卡牌的触发条件：<span style="color: #BACEDA;">如撕裂的增益需要由主动扣血来触发，而御血术就是最一个主动扣血的卡牌。因此，可以使用御血术来触发撕裂，使卡牌强度超出标准值。</span>
+   3. 放大卡牌的正面效果：<span style="color: #BACEDA;">如重刃的正面增益“受到力量的加成*3”, 使得其可以与任何提供力量的卡牌形成协同效应，从而放大正面增益，使卡牌强度超出标准值。</span>
 
 <div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
     <img src="../images/202241203/20241206_slaythespire_7.png" alt="Image 1" style="width: 80%; height: auto;">
 </div>
-
+<br>
+<div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
+    <img src="../images/202241203/20241210_slaythespire_10.png" alt="Image 1" style="width: 80%; height: auto;">
+</div>
+<br>
 这样的设计大大增加了牌组构筑的灵活度，同样也降低了游戏的运气成分，让玩家几乎不可能凑不出协同效应，区别只在于强度。
 
 **二、地图、房间、路线设计**
@@ -114,11 +161,11 @@
     <img src="../images/202241203/20241203_Dots_and_Boxes_7.png" alt="Image 7" style="width: 22%; height: auto;">
 </div>
 
-## AlphaGo与AlphaZero[^5][^6]
+## AlphaGo与AlphaZero
 
 ### AlphaGo
 
-**一、AlphaGo总体流程：**
+**一、AlphaGo总体流程：**[^5][^6]
 1. **输入棋盘状态**：将当前的棋盘状态输入到神经网络。
 2. **策略网络预测落子概率**：策略网络输出每个位置作为下一步的概率分布。
 3. **价值网络评估棋局胜率**：价值网络对当前棋盘状态进行评估，预测当前玩家的胜率。
@@ -156,7 +203,7 @@
 
 
 ### AlphaZero
-**一、AlphaZero总体流程：**
+**一、AlphaZero总体流程：**[^5][^6]
 1. **初始化**: AlphaZero通过随机初始化策略网络和价值网络的参数开始训练。初始时，网络对局面的评估几乎没有知识。
 2. **自我对弈**: AlphaZero会通过自我对弈的方式进行学习。在每一局游戏中，AlphaZero使用策略网络来选择动作，并通过蒙特卡洛树搜索（MCTS）来决定最优动作路径。
 3. **蒙特卡洛树搜索(MCTS)**: 在自我对弈过程中，AlphaZero通过MCTS进行搜索。MCTS利用当前策略网络和价值网络的输出，来探索最可能的游戏发展路径，并根据这些路径的预期胜率来选择最佳行动。
@@ -164,7 +211,7 @@
 
 
 ### 区别与联系
-
+二者的区别与联系[^5]：
 | 特性     | AlphaGo                  | AlphaZero                                |
 | -------- | ------------------------ | ---------------------------------------- |
 | 数据来源 | 人类棋谱 + 自我对弈      | 仅自我对弈                               |
@@ -175,7 +222,8 @@
 | 复杂性   | 依赖大量数据和阶段性训练 | 流程简化，依赖自我对弈循环优化           |
 
 
-## 蒙特卡洛树搜索算法[^7]
+## 蒙特卡洛树搜索算法
+蒙特卡洛树搜索算法[^7]
 探索与利用：Exploration and Exploitation
 UCB：Upper Confidence Bounds（一种探索与利用算法）
 $$
@@ -269,7 +317,8 @@ def backpropogate(self, node, reward):
 
 在非完美信息博弈中，由于无法观测到对手私有信息，玩家无法区分具有相同公共信息和玩家私有信息的历史，从而不同玩家视角下的博弈树是不同的。
 
-## 博弈状态定义[^9]
+## 博弈状态定义
+博弈状态定义[^9]：
 - 假设有有限$N$个玩家
 - 博弈进行过程中的所有历史动作，记录在有限集合$H$中。因为在博弈进行过程中，动作会组成一个序列，所以$H$是这种序列的集合。
 - 博弈过程中的终止状态记作$Z$
@@ -356,8 +405,8 @@ $$
 ## Counterfactual Regret Minimization
 虚拟遗憾最小化/反现实遗憾最小化[^9]
 
-## TODO[^11]
-
+## TODO
+......[^11]
 
 # 不忘初心
 参考视频[^12]
@@ -587,6 +636,26 @@ Loss_{ppo} &= -{\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} {{A
 Loss_{ppo2} &= -{\frac{1}{N}} {\sum\limits_{n=1}^N} {\sum\limits_{t=1}^{T_n}} \min (\textcolor{#D26D6D}{{{A_{\theta'}^{GAE}(s_n^t,a_n^t)}} \frac{{P_{\theta} (a_n^t|s_n^t)}}{P_{\theta'} (a_n^t|s_n^t)}},\textcolor{#8C98DC}{clip(\frac{{P_{\theta} (a_n^t|s_n^t)}}{P_{\theta'} (a_n^t|s_n^t)},1-\epsilon,1+\epsilon){A_{\theta'}^{GAE}(s_n^t,a_n^t)}})
 \end{align*}
 $$
+
+
+PPO小总结：
+虽然是基于PG，但是通过多种技术设计有效提升了探索效率，不需要等到每次走到终止状态才更新策略。以下是PPO如何解决这个问题的关键点：
+1. 使用Advantage估计：
+   1. 引入了优势函数，而不是直接依赖完整的回报$G_t$。优势函数可以通过时间差分（TD）方法估计
+   2. 这种方法仅需要从一部分时间步中采样，而不需要完整地走到终止状态。
+2. 分批采样 (Batch Sampling)：
+   1. PPO使用分批采样（Mini-Batch Sampling），从多个并行环境中收集片段（Trajectories），而不是一次性采集完整的回合。
+   2. 比如，可以设置一个时间步限制（如trajectory_len=128步），在达到该步数时就开始进行更新，而不需要等到所有环境都到达终止状态。
+3. 经验回放与重复更新：
+   1. PPO不像Vanilla Policy Gradient（VPG）那样只使用采样到的数据进行一次更新，而是对同一批数据进行多次更新。这种数据重用的方式显著提高了采样效率。
+   2. 一般采用K次更新循环（如 4 次），每次对小批量数据进行更新。
+4. 多环境并行采样：
+   1. PPO通常结合多线程或多进程架构，通过多个环境并行运行，快速收集大量样本。
+   2. 通过分布式采样大幅提高探索效率，同时减少单环境中的探索偏差。
+5. Clip 技术提升稳定性：
+   1. PPO的Clip策略保证了每次更新策略不会偏离原始策略太多，减少了过大的策略变动可能导致的不稳定性。
+   2. 这种稳定性允许PPO更高效地使用采样数据进行策略更新，而不必完全依赖于长时间的终止探索。
+
 
 
 [^1]: 余超,刘宗凯,胡超豪,等.非完美信息博弈综述:对抗求解方法与对比分析[J].计算机学报,2024,47(09):2211-2246.
