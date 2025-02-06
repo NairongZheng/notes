@@ -6,6 +6,7 @@
   - [网络端口操作](#网络端口操作)
   - [ssh操作](#ssh操作)
   - [vim操作](#vim操作)
+  - [screen操作](#screen操作)
   - [其他操作](#其他操作)
 - [windows操作相关](#windows操作相关)
   - [网络端口操作](#网络端口操作-1)
@@ -113,6 +114,14 @@
    2. `Ctrl-w -`：减少当前分屏的高度。
    3. `Ctrl-w >`：增加当前分屏的宽度。
    4. `Ctrl-w <`：减少当前分屏的宽度。
+
+## screen操作
+1. 创建screen：`screen -S <screen_name>`
+2. 退出screen：`Ctrl+a+d`
+3. 查看screen：`screen -ls`
+4. 进入已有screen：`screen -r <screen_name>`
+5. 断开并保留screen：`screen -d <screen_name>`，若要强制进入别人正在查看的screen可以先用这个命令断开
+6. 删除screen：`kill -9 <screen_pid>` && `screen -wipe`
 
 ## 其他操作
 
