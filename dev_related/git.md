@@ -1,5 +1,5 @@
 - [git命令](#git命令)
-  - [其他操作](#其他操作)
+  - [配置相关](#配置相关)
   - [仓库相关](#仓库相关)
   - [分支相关](#分支相关)
 - [rebase和merge应用示例](#rebase和merge应用示例)
@@ -36,33 +36,26 @@
 
 # git命令
 
-## 其他操作
+## 配置相关
 
-1. [权限/系统等问题导致的diff](https://www.jianshu.com/p/3b8ba804c47b)：
+1. 在`~/.bashrc`中配置`git-log`：`alias git-log='git log --pretty=oneline --all --graph --abbrev-commit'`
+   1. `-all`：显示所有分支
+   2. `-pretty=oneline`：将提交信息显示为一行
+   3. `-abbrev-commit`：是的输出的commit更简短
+   4. `-graph`：以图的形式显示
+2. 查看当前仓库配置：`git config --local --list`
+3. 查看全局配置：`git config --global --list`
+4. 查看所有配置（包括系统级、全局级和本地仓库级）：`git config --list --show-origin`
+   1. 这个命令会列出 所有级别的 Git 配置，并显示它们存储在哪个配置文件中。
+   2. 本地配置（仓库级）：存储在仓库中的 `.git/config` 文件中，优先级最高，会覆盖其他级别的设置。
+   3. 全局配置（用户级）：存储在用户主目录下的 `.gitconfig` 文件中，优先级低于本地配置，但高于系统配置。
+   4. 系统配置：存储在系统级别的配置文件中（例如 `/etc/gitconfig`），优先级最低。
+5. 查看某个特定配置：`git config [--global || --local] <setting name such as core.fileMode>`
+6. 删除某个配置项（单个最先匹配）：`git config --local --unset <配置项>`
+7. 删除某个配置项（所有）：`git config --local --unset-all <配置项>`
+8. [忽略文件权限导致的diff](https://www.jianshu.com/p/3b8ba804c47b)：`git config [--global || --local] core.filemode false`
+9. 忽略系统换行导致的diff：`git config [--global || --local] core.autocrlf true`
 
-```bash
-# 具体命令可以使用的时候查，可以参考下面的
-
-# 当文件夹更改权限（以下命令）或者更改系统时候，git可能会出现很多diff
-sudo chmod -R 777 file
-sudo chown -R <username>:<username> file
-# 若不想管理权限导致的diff可以用下面这条命令
-git config --add core.filemode false
-# 系统换行导致的diff可以使用下面命令取消
-git config --global core.autocrlf true
-```
-
-2. git log设置
-
-```bash
-# 在~/.bashrc中添加以下内容
-alias git-log='git log --pretty=oneline --all --graph --abbrev-commit'
-# 然后执行source ~/.bashrc生效
-# -all：显示所有分支
-# -pretty=oneline：将提交信息显示为一行
-# -abbrev-commit：是的输出的commit更简短
-# -graph：以图的形式显示
-```
 
 ## 仓库相关
 
