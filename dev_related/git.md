@@ -2,6 +2,7 @@
   - [配置相关](#配置相关)
   - [仓库相关](#仓库相关)
   - [分支相关](#分支相关)
+  - [标签相关](#标签相关)
 - [rebase和merge应用示例](#rebase和merge应用示例)
   - [1. main分支和dev分支同时开发](#1-main分支和dev分支同时开发)
   - [2. 将dev分支自己的记录rebase](#2-将dev分支自己的记录rebase)
@@ -38,23 +39,26 @@
 
 ## 配置相关
 
-1. 在`~/.bashrc`中配置`git-log`：`alias git-log='git log --pretty=oneline --all --graph --abbrev-commit'`
+1. git log显示格式：在`~/.bashrc`中配置`git-log`：`alias git-log='git log --pretty=oneline --all --graph --abbrev-commit'`
    1. `-all`：显示所有分支
    2. `-pretty=oneline`：将提交信息显示为一行
    3. `-abbrev-commit`：是的输出的commit更简短
    4. `-graph`：以图的形式显示
-2. 查看当前仓库配置：`git config --local --list`
-3. 查看全局配置：`git config --global --list`
-4. 查看所有配置（包括系统级、全局级和本地仓库级）：`git config --list --show-origin`
-   1. 这个命令会列出 所有级别的 Git 配置，并显示它们存储在哪个配置文件中。
-   2. 本地配置（仓库级）：存储在仓库中的 `.git/config` 文件中，优先级最高，会覆盖其他级别的设置。
-   3. 全局配置（用户级）：存储在用户主目录下的 `.gitconfig` 文件中，优先级低于本地配置，但高于系统配置。
-   4. 系统配置：存储在系统级别的配置文件中（例如 `/etc/gitconfig`），优先级最低。
-5. 查看某个特定配置：`git config [--global || --local] <setting name such as core.fileMode>`
-6. 删除某个配置项（单个最先匹配）：`git config --local --unset <配置项>`
-7. 删除某个配置项（所有）：`git config --local --unset-all <配置项>`
-8. [忽略文件权限导致的diff](https://www.jianshu.com/p/3b8ba804c47b)：`git config [--global || --local] core.filemode false`
-9. 忽略系统换行导致的diff：`git config [--global || --local] core.autocrlf true`
+2. 配置：
+   1. [忽略文件权限导致的diff](https://www.jianshu.com/p/3b8ba804c47b)：`git config [--global || --local] core.filemode false`
+   2. 忽略系统换行导致的diff：`git config [--global || --local] core.autocrlf true`
+3. 查看配置：
+   1. 查看当前仓库配置：`git config --local --list`
+   2. 查看全局配置：`git config --global --list`
+   3. 查看某个特定配置：`git config [--global || --local] <setting name such as core.fileMode>`
+   4. 查看所有配置（包括系统级、全局级和本地仓库级）：`git config --list --show-origin`
+      1. 这个命令会列出 所有级别的 Git 配置，并显示它们存储在哪个配置文件中。
+      2. 本地配置（仓库级）：存储在仓库中的 `.git/config` 文件中，优先级最高，会覆盖其他级别的设置。
+      3. 全局配置（用户级）：存储在用户主目录下的 `.gitconfig` 文件中，优先级低于本地配置，但高于系统配置。
+      4. 系统配置：存储在系统级别的配置文件中（例如 `/etc/gitconfig`），优先级最低。
+4. 删除配置：
+   1. 删除某个配置项（单个最先匹配）：`git config --local --unset <配置项>`
+   2. 删除某个配置项（所有）：`git config --local --unset-all <配置项>`
 
 
 ## 仓库相关
@@ -67,26 +71,57 @@
 
 ## 分支相关
 
-1. 查看远端所有分支：`git branch -r`
-2. 查看所有分支：`git branch -a`
-3. 查看本地分支与远端分支的追踪关系：`git branch -vv`（只能追踪一个，所以如果有多个远端仓库关联，也只显示一个）
-4. 设置本地分支与远端分支关联追踪：`git branch --set-upstream-to=<remote_name>/<remote_branch_name> <local_branch_name>`
-5. 删除本地分支：`git branch -d <branch_name>`
-6. 删除远端分支：`git push <remote_name> --delete <branch_name>`
-7. 重命名本地分支：`git branch -m <old_branch_name> <new_branch_name>`
-8. 重命名远端分支：先删除远端分支，重命名本地分支，再推送本地分支
-9. 合并分支：`git merge [--no-commit] <branch_name>`
-10. 推送分支到指定远端仓库：`git push <remote_name> <local_branch_name>`
-11. 推送分支到所有远端仓库：`git push --all`（好像不好使？）
-12. 获取追踪的远端分支信息：`git fetch <remote_name> <remote_branch_name>`
-13. 获取所有远端仓库的所有分支信息：`git fetch --all`
-14. 拉取远端分支：`git pull <remote_name> <remote-branch-name>:<local-branch-name>`
-15. 恢复删除的分支：
-    1. 用`git reflog`查找要恢复的分支的hash
-    2. 然后`git checkout -b <branch-name> <reflog-hash>`
-16. 回退：
+1. 查看分支：
+   1. 查看所有分支：`git branch -a`
+   2. 查看远端所有分支：`git branch -r`
+   3. 查看本地分支与远端分支的追踪关系：`git branch -vv`（只能追踪一个，所以如果有多个远端仓库关联，也只显示一个）
+2. 设置本地分支与远端分支关联追踪：`git branch --set-upstream-to=<remote_name>/<remote_branch_name> <local_branch_name>`
+3. 推送分支：
+   1. 推送分支到指定远端仓库：`git push <remote_name> <local_branch_name>`
+   2. 推送分支到所有远端仓库：`git push --all`（好像不好使？）
+4. 重命名分支：
+   1. 重命名本地分支：`git branch -m <old_branch_name> <new_branch_name>`
+   2. 重命名远端分支：先删除远端分支，重命名本地分支，再推送本地分支
+5. 删除分支：
+   1. 删除本地分支：`git branch -d <branch_name>`
+   2. 删除远端分支：`git push <remote_name> --delete <branch_name>`
+6. 检出/切换分支：
+   1. 检出到现有分支：`git checkout <branch_name>`
+   2. 检出新的分支：`git checkout -b <new_branch_name> <base_branch_or_tag_version>`
+7. 获取分支：
+   1. 拉取远端分支：`git pull <remote_name> <remote-branch-name>:<local-branch-name>`
+   2. 更新追踪的远端分支信息：`git fetch <remote_name> <remote_branch_name>`
+   3. 更新所有远端仓库的所有分支信息：`git fetch --all`
+8. 合并分支：
+   1. `git merge [--no-commit] <branch_name>`
+   2. 这里merge的时候，需要选择好分支，使用前面配置的`git-log`是一目了然的。是合并更新下来的`origin/branch_name`（远端的）还是`branch_name`（本地的），如果多人开发的话，大概率远端跟本地是不同步的，且很有可能是有冲突的。具体怎么做还是看开发需求。
+   3. 详细流程可以查看[这里](#rebase和merge应用示例)
+9. 恢复删除的分支：
+   1. 用`git reflog`查找要恢复的分支的hash
+   2. 然后`git checkout -b <branch-name> <reflog-hash>`
+10. 回退：
     1. 回退并保留更改：`git reset <hash>`
     2. 回退并清空暂存区和工作区：`git reset --hard <hash>`
+
+
+## 标签相关
+
+1. 创建附注标签：
+   1. 从HEAD：`git tag -a <tag_version> -m <"message">`
+   2. 从某个特定commit：`git tag -a <tag_version> <commit_id> -m <"message">`
+2. 查看标签：
+   1. 查看所有标签：`git tag`
+   2. 查看标签信息：`git show <tag_version>`
+3. 推送标签：
+   1. 推送单个标签：`git push <remote_name> <tag_version>`
+   2. 推送所有标签：`git push <remote_name> --tags`
+4. 删除标签：
+   1. 删除本地标签：`git tag -d <tag_version>`
+   2. 删除远程标签：`git push <remote_name> --delete <tag_version>`
+5. 检出标签：
+   1. Git 标签不是分支，无法直接切换到标签进行开发，而是进入“分离 HEAD”状态：`git checkout <tag_version>`
+   2. 基于某个标签创建新分支：`git checkout -b <new_branch_name> <tag_version>`
+
 
 # rebase和merge应用示例
 
@@ -291,7 +326,7 @@ git-log
 
 先将main分支最新修改进行拉取（多人开发的话，每次都要拉一下保持最新）：`git fetch origin main`
 
-将main分支合并到dev分支：`git merge main`
+将main分支合并到dev分支：`git merge origin/main`
 
 处理完冲突之后，进行提交并推送。此时git log如下：
 
@@ -308,7 +343,7 @@ git-log
 
 ### 3.2. 将dev分支merge到主分支
 
-切换到main分支，并将dev分支merge到main分支：`git merge dev`
+切换到main分支（已经跟origin/main同步后），将dev分支merge到main分支：`git merge dev`
 
 这边的例子比较简单，可以直接merge，没有冲突也没有更改，可以直接推送。此时git log如下：
 
