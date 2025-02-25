@@ -3,6 +3,7 @@
   - [仓库相关](#仓库相关)
   - [分支相关](#分支相关)
   - [标签相关](#标签相关)
+  - [子模块相关](#子模块相关)
 - [rebase和merge应用示例](#rebase和merge应用示例)
   - [1. main分支和dev分支同时开发](#1-main分支和dev分支同时开发)
   - [2. 将dev分支自己的记录rebase](#2-将dev分支自己的记录rebase)
@@ -115,12 +116,27 @@
 3. 推送标签：
    1. 推送单个标签：`git push <remote_name> <tag_version>`
    2. 推送所有标签：`git push <remote_name> --tags`
-4. 删除标签：
+4. 获取标签：
+   1. 更新远端标签到本地：`git fetch --tags`
+5. 删除标签：
    1. 删除本地标签：`git tag -d <tag_version>`
    2. 删除远程标签：`git push <remote_name> --delete <tag_version>`
-5. 检出标签：
+6. 检出标签：
    1. Git 标签不是分支，无法直接切换到标签进行开发，而是进入“分离 HEAD”状态：`git checkout <tag_version>`
    2. 基于某个标签创建新分支：`git checkout -b <new_branch_name> <tag_version>`
+
+
+## 子模块相关
+
+1. 添加子模块：`git submodule add <repository_url> [path]`
+   1. `repository_url`：子模块的 Git 仓库地址。
+   2. `path`（可选）：子模块存放的目录，默认是和仓库同名的文件夹。
+2. 初始化并拉取子模块：
+   1. 初始化子模块（仅需运行一次）：`git submodule init`
+   2. 拉取子模块内容：`git submodule update`
+   3. 如果要递归更新所有子模块，使用：`git submodule update --init --recursive`
+3. 查看子模块状态：`git submodule status`
+4. 子模块更新：子模块的更新同步等都跟普通仓库一样即可。
 
 
 # rebase和merge应用示例
