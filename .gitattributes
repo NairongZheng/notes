@@ -1,0 +1,19 @@
+
+* text=auto
+
+# 确保脚本文件（如 Shell、Python、Perl 等）使用 LF
+*.sh text eol=lf
+*.py text eol=lf diff=python # git diff的时候用python语法高亮
+*.cc text eol=lf diff=cpp # git diff的时候用cpp语法高亮
+*.pl text eol=lf
+
+# Windows 执行文件不转换换行符
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 二进制文件保持原样，不转换换行符
+*.jpg binary
+*.png binary
+*.zip binary
+*.exe binary
+*.dll binary

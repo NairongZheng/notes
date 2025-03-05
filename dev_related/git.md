@@ -1,5 +1,6 @@
 - [git命令](#git命令)
   - [配置相关](#配置相关)
+    - [换行符说明与配置](#换行符说明与配置)
   - [仓库相关](#仓库相关)
   - [分支相关](#分支相关)
   - [标签相关](#标签相关)
@@ -47,11 +48,7 @@
    4. `-graph`：以图的形式显示
 2. 配置：
    1. [忽略文件权限导致的diff](https://www.jianshu.com/p/3b8ba804c47b)：`git config [--global || --local] core.filemode false`
-   2. 忽略系统换行导致的diff：`git config [--global || --local] core.autocrlf true`
-   3. 正常用linux开发都是将换行设置为lf：
-      1. 设置默认为lf换行：`git config [--global || --local] core.eol lf`
-      2. 设置不自动转换：`git config [--global || --local] core.autocrlf false`
-      3. 这样Git不会更改文件换行符，并且不会追踪这些修改。
+   2. [处理系统换行导致的diff](#换行符说明与配置)
 3. 查看配置：
    1. 查看当前仓库配置：`git config --local --list`
    2. 查看全局配置：`git config --global --list`
@@ -64,6 +61,48 @@
 4. 删除配置：
    1. 删除某个配置项（单个最先匹配）：`git config --local --unset <配置项>`
    2. 删除某个配置项（所有）：`git config --local --unset-all <配置项>`
+
+
+### 换行符说明与配置
+
+最好是仓库中直接用`.gitattributes`文件来控制（该文件不止可以控制换行符，用处很广泛）
+
+[参考链接1!!!](https://juejin.cn/post/6942320745494085669)
+
+[参考链接2!!!](https://www.jianshu.com/p/fa4d5963b6c8)
+
+[官方示例](https://github.com/gitattributes/gitattributes)
+
+
+```bash
+* text=auto
+
+# 确保脚本文件（如 Shell、Python、Perl 等）使用 LF
+*.sh text eol=lf
+*.py text eol=lf diff=python # git diff的时候用python语法高亮
+*.cc text eol=lf diff=cpp # git diff的时候用cpp语法高亮
+*.pl text eol=lf
+
+# Windows 执行文件不转换换行符
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 二进制文件保持原样，不转换换行符
+*.jpg binary
+*.png binary
+*.zip binary
+*.exe binary
+*.dll binary
+```
+
+
+或者设置`core.autocrlf`：
+1. 在`Linux/macOS`上：`git config [--global || --local] core.autocrlf input`
+   1. 拉取代码时不修改文件中的换行符（保持仓库中的LF）。
+   2. 提交时强制转换CRLF为LF，确保仓库内的文件始终为LF。
+2. 在`Windows`上：`git config [--global || --local] core.autocrlf true`
+   1. 拉取代码时将LF转换为CRLF（适应Windows）。
+   2. 提交代码时自动转换CRLF为LF（保持仓库统一）。
 
 
 ## 仓库相关
