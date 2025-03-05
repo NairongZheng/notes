@@ -48,6 +48,10 @@
 2. 配置：
    1. [忽略文件权限导致的diff](https://www.jianshu.com/p/3b8ba804c47b)：`git config [--global || --local] core.filemode false`
    2. 忽略系统换行导致的diff：`git config [--global || --local] core.autocrlf true`
+   3. 正常用linux开发都是将换行设置为lf：
+      1. 设置默认为lf换行：`git config [--global || --local] core.eol lf`
+      2. 设置不自动转换：`git config [--global || --local] core.autocrlf false`
+      3. 这样Git不会更改文件换行符，并且不会追踪这些修改。
 3. 查看配置：
    1. 查看当前仓库配置：`git config --local --list`
    2. 查看全局配置：`git config --global --list`
@@ -69,6 +73,7 @@
 3. 新建关联远端仓库：`git remote add <another_remote_name> <another_remote_url>`
 4. 删除远端仓库关联：`git remote remove <remote_name>`
 5. 查看本地仓库所有记录：`git reflog`（记录了本地仓库中 HEAD 和分支的移动记录，包括提交、合并、分支创建和删除等操作）
+6. 克隆仓库：`git clone [-b branch_name] <remote_url> <file_name>`
 
 ## 分支相关
 
@@ -128,7 +133,7 @@
 
 ## 子模块相关
 
-1. 添加子模块：`git submodule add <repository_url> [path]`
+1. 添加子模块：`git submodule add <repository_url> [path]`，会自动创建`.gitmodules`文件并写入内容
    1. `repository_url`：子模块的 Git 仓库地址。
    2. `path`（可选）：子模块存放的目录，默认是和仓库同名的文件夹。
 2. 初始化并拉取子模块：
@@ -136,7 +141,14 @@
    2. 拉取子模块内容：`git submodule update`
    3. 如果要递归更新所有子模块，使用：`git submodule update --init --recursive`
 3. 查看子模块状态：`git submodule status`
-4. 子模块更新：子模块的更新同步等都跟普通仓库一样即可。
+4. 远端子模块更新到本地：
+   1. 方法一（推荐）：`git submodule update --remote`，会把**所有**子模块的`HEAD`更新到远程仓库的`origin/`里的默认分支
+   2. 方法二：手动进入子模块的目录更新，更新同步等都跟普通仓库一样即可。
+5. 删除子模块：
+   1. 取消子模块的关联：`git submodule deinit -f <path/to/submodule>`
+   2. 删除子模块的文件：`rm -rf <path/to/submodule>`
+   3. 从`Git`配置中移除子模块：`git rm -f <path/to/submodule>`，这会从主仓库的`Git`记录中删除子模块，`.gitmodules`中的内容也会相应删除，需要打开检查一下，还有的话可以手动删除。
+   4. 提交更改
 
 
 # rebase和merge应用示例

@@ -119,9 +119,23 @@
 1. 创建screen：`screen -S <screen_name>`
 2. 退出screen：`Ctrl+a+d`
 3. 查看screen：`screen -ls`
-4. 进入已有screen：`screen -r <screen_name>`
-5. 断开并保留screen：`screen -d <screen_name>`，若要强制进入别人正在查看的screen可以先用这个命令断开
-6. 删除screen：`kill -9 <screen_pid>` && `screen -wipe`
+4. 查看是否在screen中：`echo $STY`，非空则表示在screen中
+5. 进入已有screen：`screen -r <screen_name>`
+6. 断开并保留screen：`screen -d <screen_name>`，若要强制进入别人正在查看的screen可以先用这个命令断开
+7. 删除screen：`kill -9 <screen_pid>` && `screen -wipe`
+8. 关闭所有会话：`screen -X quit`
+9. 解决screen屏闪与鼠标滚轮不可用问题：
+
+```bash
+# 在~/.screenrc中添加以下内容，然后关闭所有会话再重启
+# 避免闪屏
+vbell off
+defscrollback 10000
+# 启用鼠标支持
+termcapinfo xterm* ti@:te@
+mousetrack on
+```
+
 
 ## 其他操作
 
