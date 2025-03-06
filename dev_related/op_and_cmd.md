@@ -22,11 +22,20 @@
 1. 安装ping等工具：`sudo apt-get install iputils-ping`
 2. 安装网络工具（如ifconfig）：`sudo apt-get install net-tools`
 3. 安装telnet：`apt-get install telnet`
-4. 设置终端提示符样式（`~/.bashrc`里）：`PS1="\e[1;37m[\e[m\e[1;32m\u\e[m\e[1;33m@\e[m\e[1;35m\h\e[m:\e[m\$PWD\e[m\e[1;37m]\e[m\e[1;36m\e[m$ "`
-5. 禁止分页显示（`~/.bashrc`里，失效的时候要重新`source ~/.bashrc`一下）：
-   1. `export PAGER=cat`
-   2. `export MANPAGER=cat`
-   3. `export GIT_PAGER=cat`
+4. `~/.bashrc`部分配置：
+
+```bash
+# 设置终端提示符样式
+PS1="\n\e[1;37m[\e[m\e[1;32m\u\e[m\e[1;33m@\e[m\e[1;35m\h\e[m:\e[m\$PWD\e[m\e[1;37m]\e[m\e[1;36m\e[m\n$ "
+# 禁止分页显示
+export PAGER=cat
+export MANPAGER=cat
+export GIT_PAGER=cat
+# 设置编码
+export LANG=C.UTF-8 # zh_CN.UTF-8为中文，en_US.UTF-8为英文
+export LC_ALL=C.UTF-8
+```
+
 
 ## 查看信息
 
@@ -36,6 +45,9 @@
 4. linux查看当前文件夹中各文件大小：`du -sh ./*`或者用`ls -lh`
 5. 查案磁盘使用情况：`df -h`
 6. 查看内存：`free -h`
+7. 查看系统系统区域设置（语言、字符编码、日期格式等）：`locale`
+8. 查看系统支持语言：`locale -a`
+9. 查看系统时间：`date`
 
 ## 用户管理
 
@@ -124,7 +136,7 @@
 6. 断开并保留screen：`screen -d <screen_name>`，若要强制进入别人正在查看的screen可以先用这个命令断开
 7. 删除screen：`kill -9 <screen_pid>` && `screen -wipe`
 8. 关闭所有会话：`screen -X quit`
-9. 解决screen屏闪与鼠标滚轮不可用问题：
+9. 配置`~/.screenrc`（screen屏闪、鼠标滚轮、语言支持等）：
 
 ```bash
 # 在~/.screenrc中添加以下内容，然后关闭所有会话再重启
@@ -134,6 +146,8 @@ defscrollback 10000
 # 启用鼠标支持
 termcapinfo xterm* ti@:te@
 mousetrack on
+# 设置编码为UTF-8
+defutf8 on
 ```
 
 
