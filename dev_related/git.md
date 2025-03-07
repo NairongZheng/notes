@@ -5,6 +5,7 @@
   - [分支相关](#分支相关)
   - [标签相关](#标签相关)
   - [子模块相关](#子模块相关)
+  - [其他操作](#其他操作)
 - [rebase和merge应用示例](#rebase和merge应用示例)
   - [1. main分支和dev分支同时开发](#1-main分支和dev分支同时开发)
   - [2. 将dev分支自己的记录rebase](#2-将dev分支自己的记录rebase)
@@ -188,6 +189,18 @@
    2. 删除子模块的文件：`rm -rf <path/to/submodule>`
    3. 从`Git`配置中移除子模块：`git rm -f <path/to/submodule>`，这会从主仓库的`Git`记录中删除子模块，`.gitmodules`中的内容也会相应删除，需要打开检查一下，还有的话可以手动删除。
    4. 提交更改
+
+
+## 其他操作
+
+1. 放弃本地未提交的修改：
+   1. 撤销**所有**未提交的更改：`git checkout -- .`
+   2. 放弃**所有**已`git add`但未`commit`的修改：`git reset --hard`
+   3. 放弃某个文件的修改：`git checkout -- <filename>`
+2. 放弃`Git Merge`：
+   1. 中止正在进行的合并：`git merge --abort`
+   2. 如果`--abort`无效：`git reset --hard HEAD`
+   3. 回退到`merge`之前的提交：`git reset --hard <之前的 commit ID>`
 
 
 # rebase和merge应用示例
