@@ -5,11 +5,15 @@
 
 
 # 其他命令
-1. 启动docker服务：`service docker start`
+1. 启动docker服务：`systemctl start docker`
 2. 重启docker服务：`systemctl restart docker`
-3. 查看docker磁盘使用情况：`docker system df`
-4. 清理build缓存：`docker builder prune`
-5. 查看容器/镜像的详细信息：`docker inspect [container_name|image_id]`
+3. 停止docker服务：`systemctl stop docker`
+4. 检查docker状态：`systemctl status docker`
+5. 设置docker开机自启：`systemctl enable docker`
+6. 取消docker开机自启：`systemctl disenable docker`
+7. 查看docker磁盘使用情况：`docker system df`
+8. 清理build缓存：`docker builder prune`
+9. 查看容器/镜像的详细信息：`docker inspect [container_name|image_id]`
 
 # 容器相关命令
 

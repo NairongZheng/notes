@@ -11,7 +11,13 @@
 [参考链接1](https://blog.csdn.net/wang_qiu_hao/article/details/127902007)
 
 # 一些命令
-1. 重启ssh服务：`/etc/init.d/ssh restart`（`/etc/ssh/sshd_config`）
+1. ssh服务：
+   1. 启动ssh服务：`sudo systemctl start ssh`
+   2. 停止ssh服务：`sudo systemctl stop ssh`
+   3. 重启ssh服务：`sudo systemctl restart ssh`
+   4. 查看ssh服务状态：`sudo systemctl status ssh`
+   5. 设置ssh开机自启：`sudo systemctl enable ssh`
+   6. 取消ssh开机自启：`sudo systemctl disable ssh`
 2. 已有私钥生成公钥：`ssh-keygen -y -f ${/path/to/private_key} > ${/path/to/gen_pub_key} -C <some tag such as email>`
    1. `-y`：从私钥提取公钥
 3. 生成密钥对：`ssh-keygen -t rsa [-f </path/to/private_key> | -C <some tag such as email>]`
