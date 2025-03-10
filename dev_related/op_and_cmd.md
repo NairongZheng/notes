@@ -4,8 +4,6 @@
   - [用户管理](#用户管理)
   - [文件操作](#文件操作)
   - [网络端口操作](#网络端口操作)
-  - [ssh操作](#ssh操作)
-  - [vim操作](#vim操作)
   - [screen操作](#screen操作)
   - [其他操作](#其他操作)
 - [windows操作相关](#windows操作相关)
@@ -35,7 +33,6 @@ export GIT_PAGER=cat
 export LANG=C.UTF-8 # zh_CN.UTF-8为中文，en_US.UTF-8为英文
 export LC_ALL=C.UTF-8
 ```
-
 
 ## 查看信息
 
@@ -100,32 +97,6 @@ export LC_ALL=C.UTF-8
    1. 将输出的结果询问gpt是什么意思，给出以下回答
    2. 总的来说，输出显示了防火墙的配置情况，但并没有明确指出是否有针对公网 IP 地址的特定配置。要确保公网可以访问到指定端口，你需要确保在相应的链（比如 INPUT 链）中有允许公网 IP 地址访问指定端口的规则。
 5. 测试能否连上某ip跟port：`telnet <ip> <port>`
-
-## ssh操作
-
-1. 重启ssh服务：`/etc/init.d/ssh restart`（`/etc/ssh/sshd_config`）
-2. 生成密钥对：`ssh-keygen -t rsa [-f </path/to/private_key> | -C <some tag such as email>]`
-3. 连接命令：
-   1. 密码登录（可选为指定算法）：`ssh <user_name>@<remote_ip> -p <remote_port> [-o HostKeyAlgorithms=+ssh-rsa]` 
-   2. 密钥登录（直接登跳板机啥也没有）：`ssh <user_name>@<remote_ip> -p <remote_port> -i <private_key_path>`
-   3. 密钥通过跳板机登录开发机：`ssh <user_name>@<dev_ip> -i <private_key_path> -o ProxyCommand="ssh <user_name>@<jumpserver_ip> -p <jumpserver_port> -i <private_key_path> -q -W <dev_ip>:<dev_port>"`
-
-## vim操作
-
-1. 分屏打开另一个文件
-   1. 垂直分屏：`:vsplit <filename> | :vsp <filename>`
-   2. 水平分屏：`:split <filename> | :sp <filename>`
-2. 切换分屏
-   1. `Ctrl-w w` 或者 `Ctrl-w Ctrl-w`：在不同的分屏之间循环切换。
-   2. `Ctrl-w h`：切换到左边的分屏。
-   3. `Ctrl-w j`：切换到下面的分屏。
-   4. `Ctrl-w k`：切换到上面的分屏。
-   5. `Ctrl-w l`：切换到右边的分屏。
-3. 调整分屏大小
-   1. `Ctrl-w +`：增加当前分屏的高度。
-   2. `Ctrl-w -`：减少当前分屏的高度。
-   3. `Ctrl-w >`：增加当前分屏的宽度。
-   4. `Ctrl-w <`：减少当前分屏的宽度。
 
 ## screen操作
 1. 创建screen：`screen -S <screen_name>`

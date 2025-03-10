@@ -1,6 +1,23 @@
+- [CMD](#cmd)
 - [linux](#linux)
 - [windows的mobaXterm](#windows的mobaxterm)
 
+# CMD
+
+1. 分屏打开另一个文件
+   1. 垂直分屏：`:vsplit <filename> | :vsp <filename>`
+   2. 水平分屏：`:split <filename> | :sp <filename>`
+2. 切换分屏
+   1. `Ctrl-w w` 或者 `Ctrl-w Ctrl-w`：在不同的分屏之间循环切换。
+   2. `Ctrl-w h`：切换到左边的分屏。
+   3. `Ctrl-w j`：切换到下面的分屏。
+   4. `Ctrl-w k`：切换到上面的分屏。
+   5. `Ctrl-w l`：切换到右边的分屏。
+3. 调整分屏大小
+   1. `Ctrl-w +`：增加当前分屏的高度。
+   2. `Ctrl-w -`：减少当前分屏的高度。
+   3. `Ctrl-w >`：增加当前分屏的宽度。
+   4. `Ctrl-w <`：减少当前分屏的宽度。
 
 # linux
 

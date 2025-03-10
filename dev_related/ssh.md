@@ -1,4 +1,4 @@
-- [一些命令](#一些命令)
+- [CMD](#cmd)
 - [MobaXterm配置](#mobaxterm配置)
   - [通过跳板机](#通过跳板机)
   - [直接连接开发机](#直接连接开发机)
@@ -10,7 +10,7 @@
 
 [参考链接1](https://blog.csdn.net/wang_qiu_hao/article/details/127902007)
 
-# 一些命令
+# CMD
 1. ssh服务：
    1. 启动ssh服务：`sudo systemctl start ssh`
    2. 停止ssh服务：`sudo systemctl stop ssh`
