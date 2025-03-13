@@ -6,12 +6,14 @@
   - [网络端口操作](#网络端口操作)
   - [screen操作](#screen操作)
   - [其他操作](#其他操作)
+  - [文本处理命令](#文本处理命令)
   - [Linux用户和组管理](#linux用户和组管理)
     - [用户管理](#用户管理)
     - [组管理](#组管理)
     - [权限管理](#权限管理)
 - [windows操作相关](#windows操作相关)
   - [windows目录结构](#windows目录结构)
+  - [查看信息](#查看信息-1)
   - [网络端口操作](#网络端口操作-1)
   - [其他操作](#其他操作-1)
 - [环境相关](#环境相关)
@@ -151,6 +153,83 @@ defutf8 on
 ## 其他操作
 
 1. [重定向输出到黑洞](https://blog.csdn.net/longgeaisisi/article/details/90519690)：`/dev/null 2>&1`
+
+## 文本处理命令
+
+**查看文件内容**
+
+```bash
+# cat：显示文件内容，-n带行号
+cat [-n] <filename>
+# head：查看文件前n行（默认前10行）
+head [-n] <filename>
+# tail：查看文件后n行
+tail [-n] <filename>
+tail [-f] <filename> # 实时查看文件内容（适用于不断刷新的日志文件）
+# less：分页查看文件，空格可以翻页（非常非常好用）
+less <filename>
+```
+
+**sed文本流编辑**
+
+```bash
+sed [-i] 's/<old_content>/<new_content>/g' <filename>
+    # -i：直接修改文件（没有-i则仅显示结果，不修改文件）
+    # s：替换文本（默认替换每行第一个匹配）
+    # g：行内全面替换
+sed [-i] '/<content>/d' <filename>
+    # -i：直接修改文件（没有-i则仅显示结果，不修改文件）
+    # d：删除行
+```
+
+**awk处理结构化文本**
+
+```bash
+# 按列提取数据（空格或制表符分隔）
+awk '{print $1}' <filename>  # 显示第一列
+awk '{print $1, $3}' <filename>  # 显示第一列和第三列
+# 查找包含 "<content>" 的行，并显示第二列
+awk '/<content>/ {print $2}' <filename>
+```
+
+**cut按列提取文本**
+
+```bash
+cut -d ":" -f1,3 <filename>
+    # -d：使用":"作为分隔符
+    # -f：指定提取列数，第一列与第三列
+```
+
+**wc统计文件内容**
+
+```bash
+# 统计行数、单词数、字符数
+wc <filename>
+# 仅统计行数
+wc -l <filename>
+# 仅统计单词数
+wc -w <filename>
+# 仅统计字符数
+wc -c <filename>
+```
+
+**tee将输出同时写入文件和终端**
+
+```bash
+# 将命令结果保存到文件，同时显示在终端
+ls -l | tee <save_filename>
+```
+
+**综合使用案例**
+
+```bash
+# kill包含<content>的进程
+ps aux | grep <content> | awk '{print $2}' | xargs kill -9
+    # ps aux：获取所有进程
+    # grep <content>：获取包含<content>的进程
+    # awk '{print $2}'：获取这些进程的pid
+    # xargs kill -9：将这些进程的pid作为kill -9的参数
+```
 
 ## Linux用户和组管理
 
@@ -351,6 +430,10 @@ C:\                      # 系统盘（默认），存储 Windows 操作系统�
 ├── Recycle Bin\          # 回收站，存放被删除但未永久清除的文件
 └── Temp\                 # 系统级临时文件（可与 `C:\Windows\Temp` 不同）
 ```
+
+## 查看信息
+
+1. 查看系统详细信息：`systeminfo`
 
 ## 网络端口操作
 
