@@ -1,4 +1,8 @@
 - [CMD](#cmd)
+- [ssh config配置](#ssh-config配置)
+  - [config文件基本结构](#config文件基本结构)
+  - [config文件进阶使用](#config文件进阶使用)
+  - [SCP服务器间拷贝文件](#scp服务器间拷贝文件)
 - [MobaXterm配置](#mobaxterm配置)
   - [通过跳板机](#通过跳板机)
   - [直接连接开发机](#直接连接开发机)
@@ -29,6 +33,98 @@
    2. 密钥登录：`ssh <user_name>@<remote_ip> -p <remote_port> -i <private_key_path>`
    3. 密钥通过跳板机登录开发机：`ssh <user_name>@<dev_ip> -i <private_key_path> -o ProxyCommand="ssh <user_name>@<jumpserver_ip> -p <jumpserver_port> -i <private_key_path> -q -W <dev_ip>:<dev_port>"`
    4. 使用第三种有可能需要先在远程主机的`authorized_keys`中添加客户端的公钥
+
+# ssh config配置
+
+## config文件基本结构
+
+```bash
+# 文件路径：~/.ssh/config
+Host <server_name>
+    HostName <域名或IP>
+    User <user_name>
+    Port <remote_port>
+    IdentityFile <private_key_path>
+
+# Host：指定一个SSH连接的别名，可以是多个，用空格隔开
+# HostName：远程主机的域名或IP地址
+# User：登录的用户名
+# Port：SSH服务器的端口，默认是22
+# IdentityFile：指定私钥文件的路径，默认是~/.ssh/id_rsa
+```
+
+上面的内容就等价于：`ssh <user_name>@<remote_ip> -p <remote_port> -i <private_key_path>`。
+
+配置完之后就只要`ssh <server_name>`即可连上。
+
+## config文件进阶使用
+
+**通配符匹配多个主机**
+
+```bash
+Host Server*
+    User <user_name>
+    Port <remote_port>
+    ServerAliveInterval 180 # 表示在建立连接后，每180秒客户端会向服务器发送一个心跳，避免用户长时间没操作连接中断
+
+Host <server_name_1>
+    HostName <域名或IP_1>
+
+Host <server_name_2>
+    HostName <域名或IP_2>
+
+Host <server_name_3>
+    HostName <域名或IP_3>
+
+# 第一段表示所有名字为Server开头的服务器，他们的用户名都是<user_name>，端口都是<remote_port>，同时都有保持连接的心跳。
+# 然后下面列了3台服务器，只需要指定它们的IP地址。
+```
+
+**多文件管理**
+
+1. 新建配置文件`~/.ssh/config-cluster-shanghai`，在其中编写ssh的配置。
+2. 在`~/.ssh/config`的开头加入`Include config-cluster-shanghai`即可。
+3. 也可以使用通配符，如：`Include config-*`，这样`~/.ssh/`目录下的所有`config-`开头的文件都会被引用到。
+
+
+**跳板机**
+
+需要先登录跳板机再通过跳板机访问内部机器的，可以参考以下配置：
+
+```bash
+# 跳板机配置
+Host <Jumper_name>
+    HostName <域名或IP>
+    User <user_name>
+    Port <port>
+    IdentityFile <private_key_path>
+
+# 开发机配置（ssh版本7.3+）
+Host <server_name>
+    HostName <域名或IP>
+    User <user_name>
+    Port <port>
+    IdentityFile <private_key_path>
+    ProxyJump <Jumper_name>
+
+# 开发机配置（ssh版本7.3以下）
+Host <server_name>
+    HostName <域名或IP>
+    User <user_name>
+    Port <port>
+    IdentityFile <private_key_path>
+    ProxyCommand C:\Windows\System32\OpenSSH\ssh.exe -q -W %h:%p <Jumper_name>
+```
+
+## SCP服务器间拷贝文件
+
+```bash
+# 要求Server1可以直接访问Server2
+scp <Server1>:</path/to/file_source> <Server2>:</path/to/file_destination>
+# 若Server1不可直接访问Server2，用本机转发，只需要增加一个参数-3表示用本地机器当转发机
+scp -3 <Server1>:</path/to/file_source> <Server2>:</path/to/file_destination>
+```
+
 
 # MobaXterm配置
 
