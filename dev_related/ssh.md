@@ -1,7 +1,8 @@
 - [CMD](#cmd)
 - [ssh config配置](#ssh-config配置)
-  - [config文件基本结构](#config文件基本结构)
-  - [config文件进阶使用](#config文件进阶使用)
+  - [ssh config文件基本结构](#ssh-config文件基本结构)
+  - [ssh config文件进阶使用](#ssh-config文件进阶使用)
+  - [ssh config文件配置后的测试](#ssh-config文件配置后的测试)
   - [SCP服务器间拷贝文件](#scp服务器间拷贝文件)
 - [MobaXterm配置](#mobaxterm配置)
   - [通过跳板机](#通过跳板机)
@@ -16,10 +17,10 @@
 
 # CMD
 1. ssh服务：
-   1. 启动ssh服务：`sudo systemctl start ssh`
-   2. 停止ssh服务：`sudo systemctl stop ssh`
-   3. 重启ssh服务：`sudo systemctl restart ssh`
-   4. 查看ssh服务状态：`sudo systemctl status ssh`
+   1. 启动ssh服务：`sudo systemctl start ssh`（老版用`service ssh start`）
+   2. 停止ssh服务：`sudo systemctl stop ssh`（老版用`service ssh stop`）
+   3. 重启ssh服务：`sudo systemctl restart ssh`（老版用`service ssh restart`）
+   4. 查看ssh服务状态：`sudo systemctl status ssh`（老版用`service ssh status`）
    5. 设置ssh开机自启：`sudo systemctl enable ssh`
    6. 取消ssh开机自启：`sudo systemctl disable ssh`
 2. 已有私钥生成公钥：`ssh-keygen -y -f ${/path/to/private_key} > ${/path/to/gen_pub_key} -C <some tag such as email>`
@@ -36,7 +37,7 @@
 
 # ssh config配置
 
-## config文件基本结构
+## ssh config文件基本结构
 
 ```bash
 # 文件路径：~/.ssh/config
@@ -57,7 +58,7 @@ Host <server_name>
 
 配置完之后就只要`ssh <server_name>`即可连上。
 
-## config文件进阶使用
+## ssh config文件进阶使用
 
 **通配符匹配多个主机**
 
@@ -114,6 +115,82 @@ Host <server_name>
     Port <port>
     IdentityFile <private_key_path>
     ProxyCommand C:\Windows\System32\OpenSSH\ssh.exe -q -W %h:%p <Jumper_name>
+```
+
+**ssh直接访问开发机中的容器**
+
+如果需要用ssh直接访问开发机中的容器（一般不这么做），可以在容器中的`/etc/ssh/sshd_config`添加如下内容：
+
+```bash
+# 容器中的/etc/ssh/sshd_config
+# 假如容器启动命令中的端口映射有 -p 60011:60011 -p 4611:22
+# 那么ssh访问容器时，若sshd_config中设置了以下两个端口，那么均可用
+Port 60011 # 让容器的SSH服务器监听60011端口。
+Port 22 # 让容器的SSH服务器监听22端口。可以多个，只要在创建容器时做了端口映射开放了的就可以
+PermitRootLogin yes # 允许root用户通过SSH登录。
+PasswordAuthentication yes
+```
+
+容器中做了以上相应添加后需**重启ssh服务**：`systemctl restart ssh`（老版用`service ssh restart`）
+
+重启后可以查看是否真的有在设置的端口监听ssh服务：`netstat -tulnp | grep sshd`
+
+然后只需要在本地的ssh config中添加以下内容，就可以直接通过ssh访问容器：
+
+```bash
+# 跳板机配置
+Host <Jumper_name>
+    HostName <域名或IP>
+    User <user_name>
+    Port <port>
+    IdentityFile <private_key_path>
+
+# 开发机配置（ssh版本7.3+）
+Host <server_name>
+    HostName <域名或IP>
+    User <user_name>
+    Port <port>
+    IdentityFile <private_key_path>
+    ProxyJump <Jumper_name>
+
+# 容器配置
+Host <server_docker_name>
+    HostName <域名或IP> # 就是开发机的ip
+    User root # 因为容器默认都是root用户运行
+    ProxyJump <Jumper_name>
+    Port 4611 # 这边访问开发机的4611就会映射到容器的22，容器的22在sshd_config中被设置为监听ssh服务
+    # Port 60011 # 若容器是用以上的配置，那么60011也可
+```
+
+## ssh config文件配置后的测试
+
+**测试本地的ssh配置**
+
+```bash
+ssh -T <server_name>
+# 有时候会卡住是因为`-T`选项禁用了伪终端TTY，可以选择用：
+ssh -T <server_name> 'pwd'
+ssh -T <server_name> 'ls'
+```
+
+**使用-v选项查看ssh连接日志**
+
+```bash
+ssh -v <server_name>
+ssh -vvv <server_name> # 更详细的日志
+```
+
+**手动测试每一层连接（本地->跳板机->开发机->容器）**
+
+```bash
+# 1. 测试本地能否连接跳板机
+ssh <Jumper_name>
+# 2. 测试能否在本地通过跳板机连到开发机
+ssh <server_name>
+# 3. 测试能否直接从本地连接开发机上的容器
+ssh <server_docker_name>
+# 其中3也可以在开发机上运行以下命令来测试
+ssh root@localhost -p <port>
 ```
 
 ## SCP服务器间拷贝文件
