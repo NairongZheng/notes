@@ -98,7 +98,7 @@ Host <server_name_3>
 
 **跳板机**
 
-需要先登录跳板机再通过跳板机访问内部机器的，可以参考以下配置：
+需要先登录跳板机再通过跳板机访问内部机器的，可以参考以下配置（其中的私钥可以不同）：
 
 ```bash
 # 跳板机配置
@@ -106,14 +106,14 @@ Host <Jumper_name>
     HostName <域名或IP>
     User <user_name>
     Port <port>
-    IdentityFile <private_key_path>
+    IdentityFile <private_key_path> # 相应公钥要保存到跳板机的~/.ssh/authorized_keys中
 
 # 开发机配置（ssh版本7.3+）
 Host <server_name>
     HostName <域名或IP>
     User <user_name>
     Port <port>
-    IdentityFile <private_key_path>
+    IdentityFile <private_key_path> # 相应公钥要保存到开发机的~/.ssh/authorized_keys中
     ProxyJump <Jumper_name>
 
 # 开发机配置（ssh版本7.3以下）
@@ -121,7 +121,7 @@ Host <server_name>
     HostName <域名或IP>
     User <user_name>
     Port <port>
-    IdentityFile <private_key_path>
+    IdentityFile <private_key_path> # 相应公钥要保存到开发机的~/.ssh/authorized_keys中
     ProxyCommand C:\Windows\System32\OpenSSH\ssh.exe -q -W %h:%p <Jumper_name>
 ```
 
@@ -151,14 +151,14 @@ Host <Jumper_name>
     HostName <域名或IP>
     User <user_name>
     Port <port>
-    IdentityFile <private_key_path>
+    IdentityFile <private_key_path> # 相应公钥要保存到跳板机的~/.ssh/authorized_keys中
 
 # 开发机配置（ssh版本7.3+）
 Host <server_name>
     HostName <域名或IP>
     User <user_name>
     Port <port>
-    IdentityFile <private_key_path>
+    IdentityFile <private_key_path> # 相应公钥要保存到开发机的~/.ssh/authorized_keys中
     ProxyJump <Jumper_name>
 
 # 容器配置
@@ -341,7 +341,16 @@ ssh -L 8080:localhost:12312 -J damonzheng@jumpserver damonzheng@zn-dev01-1
 
 通过vscode连接上要转发的服务所在的位置（开发机或者容器），然后在下面的`端口`选项中添加转发端口，将服务运行的端口输入即可。
 
-比如开发机上的容器运行了一个服务在12312端口，那么转发之后，在本地访问`localhost:12312`即可。省得自己输入命令。
+比如开发机上的容器运行了一个服务在12312端口，那么转发之后，在本地访问`localhost:12312`即可。省得自己输入命令。如下图所示：
+
+![vscode端口转发](../images/2025/20250325_vscode端口转发.png)
+
+这个方法其实跟自己用命令行转发是一样的，也可以用以下命令查看正在监听的端口：
+
+```bash
+C:\Users\95619> netstat -ano | findstr LISTENING | findstr :12312
+  TCP    127.0.0.1:12312        0.0.0.0:0              LISTENING       28956
+```
 
 
 ## 远程端口转发
