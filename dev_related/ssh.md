@@ -4,6 +4,14 @@
   - [ssh config文件进阶使用](#ssh-config文件进阶使用)
   - [ssh config文件配置后的测试](#ssh-config文件配置后的测试)
   - [SCP服务器间拷贝文件](#scp服务器间拷贝文件)
+- [ssh端口转发](#ssh端口转发)
+  - [本地端口转发](#本地端口转发)
+    - [本地直接运行的服务](#本地直接运行的服务)
+    - [将开发机上的服务转发到本地机器](#将开发机上的服务转发到本地机器)
+    - [将开发机上容器内的服务转发到本地机器](#将开发机上容器内的服务转发到本地机器)
+    - [使用vscode进行本地端口转发](#使用vscode进行本地端口转发)
+  - [远程端口转发](#远程端口转发)
+  - [端口转发总结](#端口转发总结)
 - [MobaXterm配置](#mobaxterm配置)
   - [通过跳板机](#通过跳板机)
   - [直接连接开发机](#直接连接开发机)
@@ -201,6 +209,181 @@ scp <Server1>:</path/to/file_source> <Server2>:</path/to/file_destination>
 # 若Server1不可直接访问Server2，用本机转发，只需要增加一个参数-3表示用本地机器当转发机
 scp -3 <Server1>:</path/to/file_source> <Server2>:</path/to/file_destination>
 ```
+
+
+# ssh端口转发
+
+以下内容都默认配置好了ssh config文件。
+
+假设现在的机器情况如下（跟前面ssh config介绍一样）：
+1. 本地：windows
+2. 远程：一台通过跳板机管理的开发机。开发机上还运行了容器。
+
+## 本地端口转发
+
+需要在本地访问开发机上的服务，或者容器内的服务。需要用到本地端口转发。
+
+
+### 本地直接运行的服务
+
+假设现在有一个http服务的python代码如下：
+
+```python
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Hello, this is a simple HTTP server running on Windows on port 8080!"
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)
+```
+
+在本地windows运行之后，可以在`http://localhost:8080`上查看到内容
+
+### 将开发机上的服务转发到本地机器
+
+假设现在**在开发机上**运行了以下代码：
+
+```python
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Hello, this is a simple HTTP server running on dev machine on port 60011!"
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=60011)
+```
+
+想要在本地机器上访问这个服务，假如可以直接访问这个开发机的公网ip，那么使用`<dev_pub_ip>:60011`即可访问。
+
+当然，也可以通过ssh转发端口。**在本地Windows运行**以下命令：
+
+
+```bash
+ssh -L <local_port>:<dev_host>:<dev_port> -J <user_name>@<Jumper_name> <user_name>@<server_name> [-N -f]
+# -L：本地端口转发
+# <dev_host>：这边可以用localhost代表开发机的回环地址
+# -N：不执行远程命令，仅用于端口转发
+# -f：后台运行
+
+# 如下，将开发机上的60011端口转发到本地的8080端口：
+ssh -L 8080:localhost:60011 -J damonzheng@jumpserver damonzheng@zn-dev01-1 # 会直接进入远程终端命令行
+```
+
+运行之后，仍然可以在`http://localhost:8080`上查看到内容，但是这个服务是运行在开发机上的，不是在本地了。
+
+可以在本地Windows的cmd使用命令查看到转发的端口：
+
+```bash
+(base) PS C:\Users\95619> netstat -ano | findstr LISTENING | findstr :8080
+  TCP    127.0.0.1:8080         0.0.0.0:0              LISTENING       20372
+  TCP    [::1]:8080             [::]:0                 LISTENING       20372
+# 同一个进程（PID 20371）同时监听了127.0.0.1:8080（IPv4）和 [::1]:8080（IPv6）
+# Windows默认会同时监听 IPv4 和 IPv6。
+```
+
+### 将开发机上容器内的服务转发到本地机器
+
+假设现在**在开发机上的容器内**运行了以下代码：
+
+```python
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Hello, this is a simple HTTP server running on dev container on port 12311!"
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=12311)
+```
+
+本质上都是一样的，只不过多了一层而已。这时候需要将容器内的端口映射到开发机的端口，然后再将开发机的端口转发到本地。
+
+
+有两种情况：
+
+**情况一**
+
+假如是容器启动的时候有做端口映射，且刚好服务运行在这个端口，那么直接在本地Windows使用上面类似的命令即可。
+
+```bash
+ssh -L <local_port>:<dev_host>:<dev_port> -J <user_name>@<Jumper_name> <user_name>@<server_name> [-N -f]
+# 如下：
+ssh -L 8080:localhost:12311 -J damonzheng@jumpserver damonzheng@zn-dev01-1
+```
+
+**情况二**
+
+假如运行的端口是没有映射出来的，那么需要做两层端口转发。
+
+```bash
+# 1. 在开发机将容器内服务的端口转发出来，假设把容器的12311转发到开发机的12312
+ssh -L <dev_port>:<container_host>:<container_port> root@<container_ip> [-N -f]
+ssh -L 12312:localhost:12311 root@<容器ip> # 容器ip可以用docker exec -it <container_name> ifconfig查看
+# 2. 再在本地Windows将开发机的12312端口转发到windows的8080
+ssh -L <local_port>:<dev_host>:<dev_port> -J <user_name>@<Jumper_name> <user_name>@<server_name> [-N -f]
+ssh -L 8080:localhost:12312 -J damonzheng@jumpserver damonzheng@zn-dev01-1
+```
+
+运行之后，仍然可以在`http://localhost:8080`上查看到内容，但是这个服务是运行在开发机上容器内的，不是在本地，也不是在开发机上。
+
+### 使用vscode进行本地端口转发
+
+其实不管是开发机还是开发机上的容器，只要ssh能连接上的，都可以通过vscode来转发。
+
+通过vscode连接上要转发的服务所在的位置（开发机或者容器），然后在下面的`端口`选项中添加转发端口，将服务运行的端口输入即可。
+
+比如开发机上的容器运行了一个服务在12312端口，那么转发之后，在本地访问`localhost:12312`即可。省得自己输入命令。
+
+
+## 远程端口转发
+
+假如本地Windows运行了一个[服务](#本地直接运行的服务)，需要让开发机访问到，这时候需要远程端口转发（**很少用吧**）。
+
+在windows的cmd中执行：
+
+```bash
+ssh -R <dev_port>:<local_host>:<local_port> -J <user_name>@<Jumper_name> <user_name>@<server_name> [-N -f]
+ssh -R 12312:127.0.0.1:8080 -J damonzheng@jumpserver damonzheng@zn-dev01-1
+```
+
+然后在开发机上`curl -X GET localhost:12312`就可以访问到windows上的服务。
+
+这边有一个要注意的。就是：
+
+windows上服务的运行是在`0.0.0.0:8080`，也就是IPv4的地址。所以远程端口转发中需要用`127.0.0.1`而不是`localhost`，因为`localhost`可能会解析为IPv6的地址，那么就会导致访问失败。
+
+服务运行起来之后在windows查看监听状态就知道了：
+
+```bash
+C:\Users\95619>netstat -ano | findstr LISTENING | findstr :8080
+  TCP    0.0.0.0:8080           0.0.0.0:0              LISTENING       37156
+```
+
+可见，windows服务是运行在IPv4地址上，假如转发的时候使用`localhost`，而`localhost`被解析为IPv6的地址，那么就会导致转发失败。
+
+
+## 端口转发总结
+
+- 本地端口转发：将远程主机的某个端口转发到本地机器的某个端口。
+- 远程端口转发：将本地机器的某个端口转发到远程主机的某个端口。
+- 我的理解是，只要ssh能连接的上的，无论是开发机还是开发机上的容器，都可以转发成功！
+
+要注意其中的`<*_host>`要使用`localhost`还是使用`127.0.0.1`，主要看服务监听的是IPv4还是IPv6的地址。
+
+也跟linux或者windows有关，可能也跟防火墙规则有关系？反正意思是那么个意思吧。
+
+有问题可以在端口转发命令中加上`-v`查看日志。
+
+最后，还要特别关注所有例子中`localhost`代表的是什么！！！
 
 
 # MobaXterm配置
