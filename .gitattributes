@@ -3,9 +3,13 @@
 
 # 确保脚本文件（如 Shell、Python、Perl 等）使用 LF
 *.sh text eol=lf
-*.py text eol=lf diff=python # git diff的时候用python语法高亮
-*.cc text eol=lf diff=cpp # git diff的时候用cpp语法高亮
+*.py text eol=lf diff=python
+*.cc text eol=lf
 *.pl text eol=lf
+
+# Git diff 语法高亮（也可以写在上面同一行，用空格分隔）
+*.py diff=python
+*.cc diff=cpp
 
 # Windows 执行文件不转换换行符
 *.bat text eol=crlf
