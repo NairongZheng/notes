@@ -108,12 +108,13 @@
 
 ## 仓库相关
 
-1. 查看远端仓库：`git remote -v`
-2. 重命名仓库：`git remote rename <old_remote_name> <new_remote_name>`（一般默认都叫`origin`）
-3. 新建关联远端仓库：`git remote add <another_remote_name> <another_remote_url>`
-4. 删除远端仓库关联：`git remote remove <remote_name>`
-5. 查看本地仓库所有记录：`git reflog`（记录了本地仓库中 HEAD 和分支的移动记录，包括提交、合并、分支创建和删除等操作）
-6. 克隆仓库：`git clone [-b branch_name] <remote_url> <file_name>`
+1. 初始化仓库：`git init --initial-branch=<init_branch_name>`（默认是`master`，现多用`main`）
+2. 新建关联远端仓库：`git remote add <another_remote_name> <another_remote_url>`（一般默认都叫`origin`）
+3. 查看远端仓库：`git remote -v`
+4. 重命名仓库：`git remote rename <old_remote_name> <new_remote_name>`（一般默认都叫`origin`）
+5. 删除远端仓库关联：`git remote remove <remote_name>`
+6. 查看本地仓库所有记录：`git reflog`（记录了本地仓库中 HEAD 和分支的移动记录，包括提交、合并、分支创建和删除等操作）
+7. 克隆仓库：`git clone [-b branch_name] <remote_url> <file_name>`
 
 ## 分支相关
 
