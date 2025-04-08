@@ -106,6 +106,10 @@ export LC_ALL=C.UTF-8
    2. 服务器下载到本地：`sz filename` && `ctrl + 鼠标右键` && `Receive file using Z-modem`
    3. 中途取消操作：`ctrl + x`按4到5次
 5. 查看md5值：`md5sum <filename>`
+6. 文件加解密（采用[gpg](./gpg.md)）：
+   1. 安装gpg：`sudo apt install gnupg`
+   2. 加密文件：`gpg -c ${filename}`，输入两次密码，生成`${filename.gpg}`
+   3. 解密文件：`gpg -d ${filename.gpg} > ${filename}`
 
 ## 网络端口操作
 
