@@ -5,6 +5,7 @@
   - [分支相关](#分支相关)
   - [标签相关](#标签相关)
   - [子模块相关](#子模块相关)
+  - [git lfs](#git-lfs)
   - [其他操作](#其他操作)
 - [rebase和merge应用示例](#rebase和merge应用示例)
   - [1. main分支和dev分支同时开发](#1-main分支和dev分支同时开发)
@@ -74,15 +75,21 @@
 
 [官方示例](https://github.com/gitattributes/gitattributes)
 
+[huggingface示例](https://huggingface.co/datasets/damonzheng/AIR-MDSAR-Map/blob/main/.gitattributes)
+
 
 ```bash
 * text=auto
 
 # 确保脚本文件（如 Shell、Python、Perl 等）使用 LF
 *.sh text eol=lf
-*.py text eol=lf diff=python # git diff的时候用python语法高亮
-*.cc text eol=lf diff=cpp # git diff的时候用cpp语法高亮
+*.py text eol=lf diff=python
+*.cc text eol=lf
 *.pl text eol=lf
+
+# Git diff 语法高亮（也可以写在上面同一行，用空格分隔）
+*.py diff=python
+*.cc diff=cpp
 
 # Windows 执行文件不转换换行符
 *.bat text eol=crlf
@@ -190,6 +197,43 @@
    2. 删除子模块的文件：`rm -rf <path/to/submodule>`
    3. 从`Git`配置中移除子模块：`git rm -f <path/to/submodule>`，这会从主仓库的`Git`记录中删除子模块，`.gitmodules`中的内容也会相应删除，需要打开检查一下，还有的话可以手动删除。
    4. 提交更改
+
+
+## git lfs
+
+注意！！！一旦用了 LFS，切换普通 Git 有点麻烦（要手动迁移）。
+而且不同平台都有容量限制、带宽限制，需要收费。
+超过这个额度后，就会收到错误提示，比如 403 Forbidden、This repository is over its data quota.
+
+**安装及初始化**
+
+```bash
+# 安装
+apt install git-lfs
+# 初始化（进行一次即可在~/.gitconfig中添加配置）
+git lfs install
+# ...
+```
+
+**新git仓库**
+
+新git仓库用lfs管理大文件，需要做以下设置
+
+```bash
+# 使用git lfs track命令配置需要用lfs管理的文件，如mp4（强烈建议用.gitattributes文件配置）
+git lfs track "*.mp4"
+```
+
+**将原有仓库的大文件改用lfs管理**
+
+原有仓库要改成lfs管理大文件比较麻烦，因为`.gitattributes`只会管理新增的文件，原来就有的大文件，需要手动修改记录
+
+```bash
+# 重写已经管理了的大文件，如jpg、png、npy、zip
+git lfs migrate import --include="*.jpg,*.png,*.npy,*.zip"
+# 查看是否修改成功（列出来的说明已被管理）
+git lfs ls-files
+```
 
 
 ## 其他操作
