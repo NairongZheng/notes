@@ -12,7 +12,7 @@
 4. 检查docker状态：`systemctl status docker`
 5. 设置docker开机自启：`systemctl enable docker`
 6. 取消docker开机自启：`systemctl disenable docker`
-7. 查看docker磁盘使用情况：`docker system df`
+7. 查看docker磁盘使用情况：`docker system df [-v]`
 8. 清理build缓存：`docker builder prune`
 9. 查看容器/镜像的详细信息：`docker inspect [container_name|image_id]`
 

@@ -105,12 +105,12 @@ ps aux|grep docker
 
 ```bash
 apt-get update
-apt-get install sudo
-apt-get install wget
-apt-get install vim
-apt-get install ssh
-apt-get install screen
-apt-get install git
+apt-get install -y sudo
+apt-get install -y wget
+apt-get install -y vim
+apt-get install -y ssh
+apt-get install -y screen
+apt-get install -y git
 ```
 
 **（2）Anaconda安装**
@@ -136,6 +136,8 @@ docker cp /opt/Anaconda3-2023.09-0-Linux-x86_64.sh <container_name>:/opt
 
 ```bash
 sh Anaconda3-2023.09-0-Linux-x86_64.sh
+# 自动化？
+# bash Anaconda3-2023.09-0-Linux-x86_64.sh -b -p /opt/anaconda3
 ```
 
 注意：

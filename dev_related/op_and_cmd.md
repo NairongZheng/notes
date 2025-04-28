@@ -55,9 +55,9 @@
 
 ## 安装与设置
 
-1. 安装ping等工具：`sudo apt-get install iputils-ping`
-2. 安装网络工具（如ifconfig）：`sudo apt-get install net-tools`
-3. 安装telnet：`apt-get install telnet`
+1. 安装ping等工具：`sudo apt-get install -y iputils-ping`
+2. 安装网络工具（如ifconfig）：`sudo apt-get install -y net-tools`
+3. 安装telnet：`apt-get install -y telnet`
 4. `~/.bashrc`部分配置：
 
 ```bash
@@ -74,61 +74,140 @@ export LC_ALL=C.UTF-8
 
 ## 查看信息
 
-1. 查看linux版本等信息：`cat /etc/os-release`
-2. 查看当前使用的shell：`echo $SHELL`或者`echo $0`
-3. 查看当前shell的PID：`echo $$`
-4. linux查看当前文件夹中各文件大小：`du -sh ./*`或者用`ls -lh`
-5. 查案磁盘使用情况：`df -h`
-6. 查看内存：`free -h`
-7. 查看系统系统区域设置（语言、字符编码、日期格式等）：`locale`
-8. 查看系统支持语言：`locale -a`
-9. 查看系统时间：`date`
+**查看系统相关信息**
+
+```bash
+# 1. 查看linux版本等信息：cat /etc/os-release
+# 2. 查看当前使用的shell：echo $SHELL 或者 echo $0
+# 3. 查看当前shell的PID：echo $$
+# 4. 查看内存：free -h
+# 5. 查看系统系统区域设置（语言、字符编码、日期格式等）：locale
+# 6. 查看系统支持语言：locale -a
+# 7. 查看系统时间：date
+```
+
+
+**查看文件系统的磁盘空间使用情况 df (Disk Free)**
+
+```bash
+df -h
+    # -h：以人类可读的格式显示（GB、MB、KB）。
+    # -T：显示文件系统的类型。
+    # -a：显示所有文件系统，包括那些 0 字节的。
+    # -l：只显示本地文件系统，不包括网络挂载的。
+    # -i：显示 inode 使用情况，而不是磁盘空间。
+df -h ${file_path}
+    # 可以直接查看这个文件/目录属于哪个空间
+```
+
+**查看文件或目录占用的磁盘空间 du (Disk Usage)**
+
+```bash
+du -sh ./*
+    # -h：以人类可读的格式显示。
+    # -s：只显示每个文件或目录的总计，而不列出子目录。
+    # -a：显示所有文件和目录的大小，而不是仅显示目录。
+    # -c：显示总和。
+    # -d N：显示 N 层目录的大小。
+    # --max-depth=N：限制递归的深度，N 是递归的层数。
+    # -x：只计算同一个文件系统中的文件，不跨文件系统。
+```
 
 
 ## 文件操作
 
-1. 文件解压
-   1. zip文件解压：`unzip <filename>`
-   2. tar文件解压：`tar -xvf <filename>`
-   3. tar.gz文件解压：`tar -zxvf <filename>`
-   4. rar文件解压：`unrar x <filename>`
-   5. 7z文件解压：`7za x <filename>`
-2. 文件复制
-   1. 复制文件夹并排除特定子文件夹：`rsync -av --exclude="<subfolder1>" --exclude="<subfolder2>" --exclude="<subfolder3>" <source_dir> <destination_dir>`
-   2. 例如：`rsync -av --exclude="*.T" --exclude="znr" --exclude=".git" ../up/bwy_v4/bwy ./`
-   3. 其中，`-a`表示归档模式，表示递归复制并保持文件属性。`-v`表示详细模式，显示复制过程中的详细信息。
-3. 文件传输（scp）
-   1. 本地传到服务器：`scp -P <port> <filepath_windows> root@<remote_ip>:<filepath_linux>`
-   2. 服务器传到本地：`scp -P <port> root@<remote_ip>:<filepath_linux> <filepath_windows>`
-   3. 注意，因为开发机有防火墙之类的东西，所以没办法上传成功。要用这种方法传的话，需要在docker开个端口，可以直接用ssh连接docker，往docker映射到开发机的路径传就可以。所以上面的命令用的是root，而不是username
-4. 文件传输（sz/rz，mobaxterm为例）
-   1. 本地上传到服务器：`rz` && `ctrl + 鼠标右键` && `Send file using Z-modem` && `选择文件`
-   2. 服务器下载到本地：`sz filename` && `ctrl + 鼠标右键` && `Receive file using Z-modem`
-   3. 中途取消操作：`ctrl + x`按4到5次
-5. 查看md5值：`md5sum <filename>`
-6. 文件加解密（采用[gpg](./gpg.md)）：
-   1. 安装gpg：`sudo apt install gnupg`
-   2. 加密文件：`gpg -c ${filename}`，输入两次密码，生成`${filename.gpg}`
-   3. 解密文件：`gpg -d ${filename.gpg} > ${filename}`
+**文件解压**
+
+```bash
+# 1. zip文件解压：unzip <filename>
+# 2. tar文件解压：tar -xvf <filename>
+# 3. tar.gz文件解压：tar -zxvf <filename>
+# 4. rar文件解压：unrar x <filename>
+# 5. 7z文件解压：7za x <filename>
+```
+
+**文件复制**
+
+```bash
+# 复制文件夹并排除特定子文件夹
+rsync -av --exclude="<subfolder1>" --exclude="<subfolder2>" <source_dir> <destination_dir>
+    # -a：归档模式，表示递归复制并保持文件属性
+    # -v：详细模式，显示复制过程中的详细信息
+# 如：rsync -av --exclude="*.T" --exclude="znr" --exclude=".git" ../up/bwy_v4/bwy ./
+```
+
+**文件传输scp**
+
+具体查看[ssh配置部分](./ssh.md/#scp服务器间拷贝文件)
+
+```bash
+# 本地传到服务器：
+scp -P <port> <filepath_windows> root@<remote_ip>:<filepath_linux>
+# 服务器传到本地：
+scp -P <port> root@<remote_ip>:<filepath_linux> <filepath_windows>
+```
+
+**文件传输sz/rz**
+
+以mobaXterm为例：
+
+```bash
+# 1. 本地上传到服务器：`rz` && `ctrl + 鼠标右键` && `Send file using Z-modem` && `选择文件`
+# 2. 服务器下载到本地：`sz filename` && `ctrl + 鼠标右键` && `Receive file using Z-modem`
+# 3. 中途取消操作：`ctrl + x`按4到5次
+```
+
+**文件校验**
+
+```bash
+md5sum <filename>       # md5
+sha256sum <filename>    # sha256
+```
+
+**文件加密**
+
+具体查看[gpg文件加密](./gpg.md)
+
+```bash
+# 1. 安装gpg：`sudo apt install gnupg`
+# 2. 加密文件：`gpg -c ${filename}`，输入两次密码，生成`${filename.gpg}`
+# 3. 解密文件：`gpg -d ${filename.gpg} > ${filename}`
+```
+
+**查找文件**
+
+```bash
+find ${base_path} -name ${file_name} [options]
+    # -name：按文件名匹配查找
+    # -size：查找特定大小的文件。例如，-size +10M 查找大于 10MB 的文件，-size -10M 查找小于 10MB 的文件
+    # -iname：不区分大小写进行查找
+    # -type：按照文件类型查找。
+        # -type f：文件
+        # -type d：目录
+        # -type l：符号链接文件
+    # -perm：查找特定权限文件，如 -perm 755
+    # -user：查找指定用户文件
+    # -ls：列出详细信息
+```
 
 ## 网络端口操作
 
-1. 查看本机ip：`ifconfig`
-2. 查看所有端口使用情况：`netstat -tunlp`
-   1. -t (tcp) 仅显示tcp相关选项
-   2. -u (udp)仅显示udp相关选项
-   3. -n 拒绝显示别名，能显示数字的全部转化为数字
-   4. -l 仅列出在Listen(监听)的服务状态
-   5. -p 显示建立相关链接的程序名
-3. 查看某端口监听状态：`lsof -i -P -n | grep LISTEN`
-   1. -i：显示与网络相关的文件
-   2. -P：显示端口号而不是服务名（ssh就是22之类的）
-   3. -n：不解析主机名（localhost就显示127.0.0.1之类的）
-   4. 在端口占用的时候可以直接用`lsof -i:<port>`查看该端口情况
-4. 查看防火墙规则：`iptables -L`
-   1. 将输出的结果询问gpt是什么意思，给出以下回答
-   2. 总的来说，输出显示了防火墙的配置情况，但并没有明确指出是否有针对公网 IP 地址的特定配置。要确保公网可以访问到指定端口，你需要确保在相应的链（比如 INPUT 链）中有允许公网 IP 地址访问指定端口的规则。
-5. 测试能否连上某ip跟port：`telnet <ip> <port>`
+```bash
+# 查看本机ip：ifconfig
+# 查看端口使用情况：netstat -tunlp
+    # -t：(tcp) 仅显示tcp相关选项
+    # -u：(udp)仅显示udp相关选项
+    # -n：拒绝显示别名，能显示数字的全部转化为数字
+    # -l：仅列出在Listen(监听)的服务状态
+    # -p：显示建立相关链接的程序名
+# 查看端口监听状态：lsof -i -P -n | grep LISTEN
+    # -i：显示与网络相关的文件
+    # -P：显示端口号而不是服务名（ssh就是22之类的）
+    # -n：不解析主机名（localhost就显示127.0.0.1之类的）
+# 查看具体某端口状态：lsof -i:<port>
+# 查看防火墙规则：iptables -L
+# 测试能否连上某<ip:port>：telnet <ip> <port>
+```
 
 ## screen操作
 1. 创建screen：`screen -S <screen_name>`

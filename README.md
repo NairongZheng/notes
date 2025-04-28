@@ -4,4 +4,5 @@
 
 1. ai_related：ai相关
 2. dev_related：开发过程中的笔记
-3. other：以前的一些笔记
+3. install_related：安装或编译某些软件工具等
+4. other：以前的一些笔记
