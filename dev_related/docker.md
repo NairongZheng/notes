@@ -3,13 +3,14 @@
 - [容器相关命令](#容器相关命令)
 - [镜像相关命令](#镜像相关命令)
 - [volume相关](#volume相关)
+- [network相关](#network相关)
 
 
 # 其他命令
-1. 启动docker服务：`systemctl start docker`
-2. 重启docker服务：`systemctl restart docker`
-3. 停止docker服务：`systemctl stop docker`
-4. 检查docker状态：`systemctl status docker`
+1. 启动docker服务：`systemctl start docker`（老版用`service docker start`）
+2. 重启docker服务：`systemctl restart docker`（老版用`service docker restart`）
+3. 停止docker服务：`systemctl stop docker`（老版用`service docker stop`）
+4. 检查docker状态：`systemctl status docker`（老版用`service docker status`）
 5. 设置docker开机自启：`systemctl enable docker`
 6. 取消docker开机自启：`systemctl disenable docker`
 7. 查看docker磁盘使用情况：`docker system df [-v]`
@@ -26,16 +27,20 @@ sudo docker run --gpus all -it -d -rm \
                 -v <host_path:container_path> \
                 -e <var_name=val_value> \
                 --net=host \
+                --network <network_name> \
+                --ip <custom_ip> \
                 --shm-size=10gb \
                 --name <container_name> <image_name:image_tag> [/bin/bash]
 # --gpus all：允许容器使用所有gpu
 # -it：交互模式
 # -d：后台运行
 # -rm：运行结束删除
-# -p：端口映射
+# -p：端口映射（有-p就不能有--net=host）
 # -v：数据卷映射
 # -e：环境变量
-# --net=host：让容器使用宿主机的网络，而不是创建一个独立的Docker网络。（与-p字段是冲突的）
+# --net=host：容器直接使用宿主机的网络。（与-p、--network等字段是冲突）
+# --network：采用哪个docker网络，允许同一个网络间的容器互相通信
+# --ip：固定ip（必须跟--network配合使用）
 # --shm-size=10gb：共享内存大小设置为10GB。适用于TensorFlow、PyTorch等需要大共享内存的深度学习任务，否则默认/dev/shm只有64MB，可能导致OOM（内存不足）。
 # --name：容器名称
 ```
@@ -121,3 +126,23 @@ docker commit -a "damonzheng" \
 | **性能**         | 一般比 bind mount 更快（尤其是 Linux）                       | 性能略低，受文件系统影响           |
 | **便携性**       | 高，可在不同主机间迁移（配合 `volume inspect` + tar）        | 低，依赖宿主机目录结构             |
 | **典型用途**     | 数据持久化、数据库卷、配置存储                               | 本地开发时同步代码、调试数据       |
+
+
+# network相关
+
+1. **创建network**：`docker network create <network_name>`
+2. **查看所有network**：`docker network ls`
+3. **查看network详细信息**：`docker network inspect <network_name>`
+4. **将容器连接到network**：`docker network connect <network_name> <container_name_or_id>`
+5. **将容器从指定network断开**：`docker network disconnect <network_name> <container_name_or_id>`
+6. **删除network**：`docker network rm <network_name>`
+
+
+使用docker network的好处：
+
+1. 容器自动内网互通：同一个 network 下的容器，自动能用 容器名当域名互相访问，不用记 IP 地址
+2. 自定义IP段：自定义网络时可以指定 IP 段、子网掩码，方便跟现有基础设施融合
+3. 隔离性更强：不同的 network 之间 默认互相隔离，安全性高，防止容器乱串
+4. 支持多网卡容器：一个容器可以连到多个 network，相当于多块网卡，复杂应用（如代理服务器）必备
+5. 跨主机扩展：使用 Swarm / Kubernetes，可以把 network 跨宿主机打通，做跨机集群
+6. 内建负载均衡：多个容器用同一个名字（服务名）注册时，docker network 会自动轮询负载均衡请求（bridge overlay支持）

@@ -7,8 +7,9 @@
 - [打镜像](#打镜像)
 
 
-[参开链接1](https://blog.csdn.net/qq_43893755/article/details/135339396)
-[参开链接2](https://www.cnblogs.com/AnkleBreaker-ZHX/p/17982844)
+[参考链接1](https://blog.csdn.net/qq_43893755/article/details/135339396)
+
+[参考链接2](https://www.cnblogs.com/AnkleBreaker-ZHX/p/17982844)
 
 # 基础环境配置
 

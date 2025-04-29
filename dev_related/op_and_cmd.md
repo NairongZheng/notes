@@ -55,10 +55,27 @@
 
 ## 安装与设置
 
-1. 安装ping等工具：`sudo apt-get install -y iputils-ping`
-2. 安装网络工具（如ifconfig）：`sudo apt-get install -y net-tools`
-3. 安装telnet：`apt-get install -y telnet`
-4. `~/.bashrc`部分配置：
+**安装**
+
+```bash
+apt install -y curl                 # curl
+apt install -y wget                 # wget
+apt install -y vim                  # vim
+apt install -y git                  # git
+apt install -y ssh                  # ssh
+apt install -y screen               # screen
+apt install -y htop                 # htop
+apt install -y lsof                 # lsof
+apt install -y netcat               # netcat(nc)
+apt install -y telnet               # telnet
+apt install -y iputils-ping         # ping等工具
+apt install -y net-tools            # ifconfig、netstat等
+apt install -y iproute2             # 网络工具如ip（iproute2已取代了net-tools）
+```
+
+**配置**
+
+`~/.bashrc`部分配置：
 
 ```bash
 # 设置终端提示符样式
@@ -192,21 +209,57 @@ find ${base_path} -name ${file_name} [options]
 
 ## 网络端口操作
 
+**查看网络信息**
+
 ```bash
-# 查看本机ip：ifconfig
-# 查看端口使用情况：netstat -tunlp
+ip [OPTIONS] addr      # 查看ip地址信息
+ip [OPTIONS] link      # 查看网卡信息
+    # -br[ief]：简洁版
+```
+
+每种 IP/网卡通常代表什么：
+
+| 接口名                    | 作用说明                                                     |
+| ------------------------- | ------------------------------------------------------------ |
+| `lo`                      | 本地回环接口，127.0.0.1，供本机自己通信用。                  |
+| `eth0`, `ens33`, `ens160` | 有线网卡（物理或虚拟机的），通常连接局域网/互联网。          |
+| `wlan0`                   | 无线网卡（Wi-Fi）。                                          |
+| `docker0`                 | Docker 默认创建的网桥网络，容器用来和宿主机通信。            |
+| `br-xxxxxxx`              | 用户创建的 Docker 自定义 bridge 网络。                       |
+| `vethxxxxx`               | Docker 容器内部的虚拟网卡，一般是 veth 对，连接容器和 bridge。 |
+| `virbr0`                  | KVM 虚拟机系统使用的虚拟桥接网卡。                           |
+| `tun0`, `tap0`            | VPN 创建的虚拟网络接口，比如 OpenVPN。                       |
+
+
+**查看端口使用情况**
+
+```bash
+netstat -tunlp
     # -t：(tcp) 仅显示tcp相关选项
     # -u：(udp)仅显示udp相关选项
     # -n：拒绝显示别名，能显示数字的全部转化为数字
     # -l：仅列出在Listen(监听)的服务状态
     # -p：显示建立相关链接的程序名
-# 查看端口监听状态：lsof -i -P -n | grep LISTEN
+```
+
+**查看端口监听状态**
+
+```bash
+# 查看端口监听状态
+lsof -i -P -n | grep LISTEN
     # -i：显示与网络相关的文件
     # -P：显示端口号而不是服务名（ssh就是22之类的）
     # -n：不解析主机名（localhost就显示127.0.0.1之类的）
-# 查看具体某端口状态：lsof -i:<port>
-# 查看防火墙规则：iptables -L
-# 测试能否连上某<ip:port>：telnet <ip> <port>
+
+# 查看具体某端口状态
+lsof -i:<port>
+```
+
+**其他**
+
+```bash
+iptables -L             # 查看防火墙规则
+telnet <ip> <port>      # 测试能否连上某<ip:port>
 ```
 
 ## screen操作
