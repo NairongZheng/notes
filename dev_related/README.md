@@ -8,4 +8,5 @@
 7. ansible_test
 8. docker
 9. python
-10. gpg：文件加解密
+10. shell：shell脚本
+11. gpg：文件加解密
