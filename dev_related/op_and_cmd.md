@@ -25,32 +25,35 @@
 ## Linux目录结构
 
 ```plaintext
-/               # 根目录，所有文件和目录的起始点
-├── bin/        # 基本二进制命令，所有用户都可用的工具（如 ls, cp, mv 等）
-├── boot/       # 启动文件，包含内核和启动加载程序的配置文件（如 vmlinuz, grub）
-├── dev/        # 设备文件，代表硬件设备（如 /dev/sda, /dev/null）
-├── etc/        # 系统配置文件，存储系统的配置文件（如 /etc/passwd, /etc/fstab）
-├── home/       # 用户家目录，每个用户的个人文件（如 /home/username）
-├── lib/        # 系统共享库文件，供程序运行时使用（如 libc.so, libm.so）
-├── lost+found/ # 文件系统恢复目录，用于存放 fsck 恢复的文件
-├── media/      # 可移动设备挂载点（如 USB, CD/DVD 挂载）
-├── mnt/        # 临时挂载点，用于系统管理员挂载外部文件系统
-├── opt/        # 第三方应用程序，通常为不依赖包管理器的安装软件
-├── proc/       # 虚拟文件系统，包含内核和进程信息（如 /proc/cpuinfo, /proc/[pid]）
-├── root/       # root 用户的家目录，系统管理员的个人文件
-├── run/        # 运行时数据，存储系统当前会话的临时文件（如 PID 文件、锁文件）
-├── sbin/       # 系统管理命令，供管理员（root 用户）使用（如 fsck, shutdown）
-├── srv/        # 服务数据，存储由系统提供的服务的数据（如 /srv/ftp, /srv/http）
-├── sys/        # 虚拟文件系统，提供系统硬件信息和内核参数
-├── tmp/        # 临时文件，存储临时数据，系统重启时会清空
-├── usr/        # 用户级程序和数据，包含大部分应用程序和共享文件
-│   ├── bin/    # 用户命令二进制文件，用户程序（如 /usr/bin/ls, /usr/bin/gcc）
-│   ├── lib/    # 用户程序的库文件（如 /usr/lib/libc.so）
-│   ├── share/  # 共享文件，如文档、图标等（如 /usr/share/man）
-├── var/        # 可变数据，存储日志、缓存、邮件队列等数据
-│   ├── log/    # 日志文件（如 /var/log/syslog）
-│   ├── spool/  # 打印队列或邮件队列（如 /var/spool/mail）
-│   └── cache/  # 应用程序缓存（如 /var/cache/apt）
+/                       # 根目录，所有文件和目录的起始点
+├── bin/                # 基本二进制命令，所有用户都可用的工具（如 ls, cp, mv 等）
+├── boot/               # 启动文件，包含内核和启动加载程序的配置文件（如 vmlinuz, grub）
+├── dev/                # 设备文件，代表硬件设备（如 /dev/sda, /dev/null）
+├── etc/                # 系统配置文件，存储系统的配置文件（如 /etc/passwd, /etc/fstab）
+├── home/               # 用户家目录，每个用户的个人文件（如 /home/username）
+├── lib/                # 系统共享库文件，供程序运行时使用（如 libc.so, libm.so）
+├── lost+found/         # 文件系统恢复目录，用于存放 fsck 恢复的文件
+├── media/              # 可移动设备挂载点（如 USB, CD/DVD 挂载）
+├── mnt/                # 临时挂载点，用于系统管理员挂载外部文件系统
+├── opt/                # 第三方应用程序，通常为不依赖包管理器的安装软件
+├── proc/               # 虚拟文件系统，包含内核和进程信息（如 /proc/cpuinfo, /proc/[pid]）
+├── root/               # root 用户的家目录，系统管理员的个人文件
+├── run/                # 运行时数据，存储系统当前会话的临时文件（如 PID 文件、锁文件）
+├── sbin/               # 系统管理命令，供管理员（root 用户）使用（如 fsck, shutdown）
+├── srv/                # 服务数据，存储由系统提供的服务的数据（如 /srv/ftp, /srv/http）
+├── sys/                # 虚拟文件系统，提供系统硬件信息和内核参数
+├── tmp/                # 临时文件，存储临时数据，系统重启时会清空
+├── usr/                # 用户级程序和数据，包含大部分应用程序和共享文件
+│   ├── bin/            # 用户命令二进制文件，会被包管理器（apt、dnf、yum等）管理的用户程序（如 /usr/bin/ls, /usr/bin/gcc）
+│   ├── lib/            # 用户程序的库文件（如 /usr/lib/libc.so）
+│   ├── share/          # 共享文件，如文档、图标等（如 /usr/share/man）
+│   ├── local/          # 本地安装的软件目录，不由系统包管理器如apt等控制（如源码安装的软件）
+│   │   ├── bin/        # 用户手动编译/安装的可执行文件目录，优先级通常高于 /usr/bin（如 /usr/local/bin/myapp）
+│   │   ├── lib/        # 用户手动安装程序的库文件（如 /usr/local/lib/libmylib.so）
+├── var/                # 可变数据，存储日志、缓存、邮件队列等数据
+│   ├── log/            # 日志文件（如 /var/log/syslog）
+│   ├── spool/          # 打印队列或邮件队列（如 /var/spool/mail）
+│   └── cache/          # 应用程序缓存（如 /var/cache/apt）
 ```
 
 ## 安装与设置
@@ -71,6 +74,7 @@ apt install -y telnet               # telnet
 apt install -y iputils-ping         # ping等工具
 apt install -y net-tools            # ifconfig、netstat等
 apt install -y iproute2             # 网络工具如ip（iproute2已取代了net-tools）
+apt install -y cloc                 # 统计代码量的工具
 ```
 
 **配置**
@@ -89,6 +93,14 @@ export LANG=C.UTF-8 # zh_CN.UTF-8为中文，en_US.UTF-8为英文
 export LC_ALL=C.UTF-8
 ```
 
+**环境变量语法**
+
+```bash
+# export PATH=$PATH:<new_path>    # 无引号，带空格路径会出错
+# export PATH=$PATH:"<new_path>"  # 没错，但是自定义的在最后，使用的时候还是用到了前面的版本
+export PATH="<new_path>:$PATH"    # 推荐将自定义工具路径加到 PATH 前面
+```
+
 ## 查看信息
 
 **查看系统相关信息**
@@ -102,7 +114,6 @@ export LC_ALL=C.UTF-8
 # 6. 查看系统支持语言：locale -a
 # 7. 查看系统时间：date
 ```
-
 
 **查看文件系统的磁盘空间使用情况 df (Disk Free)**
 
@@ -138,6 +149,33 @@ tree
     # -d：只显示目录，不显示文件
     # -a：显示所有文件和目录，包括隐藏文件
     # -f：显示完整路径（从根目录开始的路径）。
+```
+
+**查看代码量**
+
+```bash
+cloc <proj_path>
+
+# 显示类似如下（语言/文件数/空行数/注释行数/实际代码行数）：
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JSON                            86            986              0         343291
+Python                         180           6545           9527          87289
+HTML                             1            749             10           4117
+Markdown                         4            199              0           3215
+C++                              4            176             54            850
+Protocol Buffers                 9            126             67            558
+C                                1            114             58            499
+CMake                            9             64             26            334
+Bourne Shell                    17             37             35            127
+C/C++ Header                     2             20              0            118
+make                             1             54             50            101
+DOS Batch                        1              9              3             12
+INI                              2              2              0              5
+-------------------------------------------------------------------------------
+SUM:                           317           9081           9830         440516
+-------------------------------------------------------------------------------
 ```
 
 ## 文件操作
@@ -293,7 +331,6 @@ mousetrack on
 # 设置编码为UTF-8
 defutf8 on
 ```
-
 
 ## 其他操作
 
@@ -548,43 +585,44 @@ sudo chown [-R] <new_owner>:<new_group> <file_or_dir>
 # windows操作相关
 
 ## windows目录结构
+
 ```plaintext
-C:\                      # 系统盘（默认），存储 Windows 操作系统和应用程序
-├── Program Files\        # 默认安装目录，存放 64 位应用程序（如 C:\Program Files\Google\Chrome）
-├── Program Files (x86)\  # 存放 32 位应用程序（仅在 64 位 Windows 上存在）
-├── Windows\              # 操作系统核心目录，包含 Windows 组件、配置和驱动
-│   ├── System32\         # 64 位系统核心文件，存储 DLL、EXE、驱动程序（如 cmd.exe, notepad.exe）
-│   ├── SysWOW64\         # 32 位系统核心文件，仅在 64 位 Windows 上存在
-│   ├── WinSxS\           # Windows 组件存储，管理不同版本的 DLL 以防止冲突
-│   ├── Temp\             # 系统临时文件，程序运行时的缓存文件
-│   ├── Fonts\            # 存放系统字体文件（如 Arial.ttf, SimSun.ttc）
-│   ├── Resources\        # 主题文件、界面资源（如壁纸、音效）
-│   ├── Logs\             # 系统日志文件
-│   ├── INF\              # 驱动安装信息文件
-│   ├── Tasks\            # 计划任务存储目录
-│   ├── SoftwareDistribution\ # Windows 更新文件缓存
-│   └── Web\              # Edge 浏览器相关文件和壁纸存储
-├── Users\                # 用户目录，存放用户的个人数据
-│   ├── Administrator\    # 管理员账户目录
-│   ├── Default\          # 默认用户配置模板，新建用户时会复制该目录
-│   ├── Public\           # 共享文件夹，所有用户可访问
-│   ├── [用户名]\         # 个人用户目录
-│   │   ├── Desktop\      # 桌面文件
-│   │   ├── Documents\    # 文档目录
-│   │   ├── Downloads\    # 下载目录
-│   │   ├── Pictures\     # 图片目录
-│   │   ├── Videos\       # 视频目录
-│   │   ├── Music\        # 音乐目录
-│   │   ├── AppData\      # 应用程序数据（用户级）
-│   │   │   ├── Local\    # 本地应用数据（如缓存文件）
-│   │   │   ├── LocalLow\ # 低权限应用数据
-│   │   │   └── Roaming\  # 可同步的用户数据（网络账户时可同步）
-├── ProgramData\          # 公共应用数据（类似 Linux 的 `/var` 目录）
-├── PerfLogs\             # 性能日志文件
-├── Recovery\             # 系统恢复文件
-├── System Volume Information\ # 备份和恢复点信息（普通用户无法访问）
-├── Recycle Bin\          # 回收站，存放被删除但未永久清除的文件
-└── Temp\                 # 系统级临时文件（可与 `C:\Windows\Temp` 不同）
+C:\                                 # 系统盘（默认），存储 Windows 操作系统和应用程序
+├── Program Files\                  # 默认安装目录，存放 64 位应用程序（如 C:\Program Files\Google\Chrome）
+├── Program Files (x86)\            # 存放 32 位应用程序（仅在 64 位 Windows 上存在）
+├── Windows\                        # 操作系统核心目录，包含 Windows 组件、配置和驱动
+│   ├── System32\                   # 64 位系统核心文件，存储 DLL、EXE、驱动程序（如 cmd.exe, notepad.exe）
+│   ├── SysWOW64\                   # 32 位系统核心文件，仅在 64 位 Windows 上存在
+│   ├── WinSxS\                     # Windows 组件存储，管理不同版本的 DLL 以防止冲突
+│   ├── Temp\                       # 系统临时文件，程序运行时的缓存文件
+│   ├── Fonts\                      # 存放系统字体文件（如 Arial.ttf, SimSun.ttc）
+│   ├── Resources\                  # 主题文件、界面资源（如壁纸、音效）
+│   ├── Logs\                       # 系统日志文件
+│   ├── INF\                        # 驱动安装信息文件
+│   ├── Tasks\                      # 计划任务存储目录
+│   ├── SoftwareDistribution\       # Windows 更新文件缓存
+│   └── Web\                        # Edge 浏览器相关文件和壁纸存储
+├── Users\                          # 用户目录，存放用户的个人数据
+│   ├── Administrator\              # 管理员账户目录
+│   ├── Default\                    # 默认用户配置模板，新建用户时会复制该目录
+│   ├── Public\                     # 共享文件夹，所有用户可访问
+│   ├── [用户名]\                    # 个人用户目录
+│   │   ├── Desktop\                # 桌面文件
+│   │   ├── Documents\              # 文档目录
+│   │   ├── Downloads\              # 下载目录
+│   │   ├── Pictures\               # 图片目录
+│   │   ├── Videos\                 # 视频目录
+│   │   ├── Music\                  # 音乐目录
+│   │   ├── AppData\                # 应用程序数据（用户级）
+│   │   │   ├── Local\              # 本地应用数据（如缓存文件）
+│   │   │   ├── LocalLow\           # 低权限应用数据
+│   │   │   └── Roaming\            # 可同步的用户数据（网络账户时可同步）
+├── ProgramData\                    # 公共应用数据（类似 Linux 的 `/var` 目录）
+├── PerfLogs\                       # 性能日志文件
+├── Recovery\                       # 系统恢复文件
+├── System Volume Information\      # 备份和恢复点信息（普通用户无法访问）
+├── Recycle Bin\                    # 回收站，存放被删除但未永久清除的文件
+└── Temp\                           # 系统级临时文件（可与 `C:\Windows\Temp` 不同）
 ```
 
 ## 查看信息

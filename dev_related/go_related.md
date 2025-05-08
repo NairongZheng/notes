@@ -76,15 +76,24 @@ source ~/.bashrc
 
 远程vscode有效：
 
-```json
-// 路径：/home/damonzheng/.vscode-server/data/Machine/settings.json
-// 打开方式：左下角齿轮->settings->搜索 Go: Tools Env Vars
+```bash
+# 路径：/home/damonzheng/.vscode-server/data/Machine/settings.json
+# 打开方式：左下角齿轮->settings->搜索 Go: Tools Env Vars
 {
     "go.goroot": "/home/damonzheng/.gvm/gos/go1.22.1",
     "go.gopath": "/home/damonzheng/.gvm/pkgsets/go1.22.1/global",
     "go.toolsEnvVars": {
         "GOPROXY": "https://goproxy.cn,direct"
     }
+}
+```
+
+**vscode禁用go包跳转网页**
+
+```bash
+# Ctrl+, 打开vscode设置项，搜索gopls，添加以下项
+"gopls": {
+    "ui.navigation.importShortcut": "Definition"
 }
 ```
 
@@ -252,4 +261,34 @@ clean:
 make build   # 构建
 make run     # 运行
 make test    # 测试
+```
+
+**makefile部分解释**
+
+在makefile中，每个规则的基本格式是：
+
+```bash
+.PHONY: target
+target: dependencies
+	<shell 命令>
+	# @ <shell 命令>
+
+# 具体解释：
+# .PHONY: target
+    # .PHONY 是一个特殊的伪目标，它的作用是告诉 make，target 不是一个实际的文件，而是一个伪目标。
+    # make 默认会检查文件是否存在，如果目标是一个文件，且文件没有变化，make 会跳过这个目标。但通过 .PHONY 告诉 make，即使文件存在，依然执行目标规则。
+    # 所以，.PHONY: target 使得 make 每次运行时，都会执行 target 相关的命令，无论 target 是否存在。
+# target: dependencies
+    # target 是一个目标名，它可以是你希望 make 构建的任何东西。例如，build、clean、install 等等。
+    # dependencies 是 target 的依赖，它可以是一个或多个目标，表示 target 在执行前，必须先执行这些依赖。
+# <shell 命令>
+    # 这行命令是 make 在构建目标时执行的操作。命令通常是一个或多个 shell 命令。它们是执行具体工作的部分。
+    # 每行命令都必须以 TAB 键缩进（而不是空格），否则 make 会报错。
+# @
+    # 可选是否加@，如果加@就不会在命令行中显示'<shell 命令>'本身
+
+# 如：
+.PHONY: build
+build: clean
+	@ go build -o $(BIN_FILE) ./$(CMD_DIR)
 ```
