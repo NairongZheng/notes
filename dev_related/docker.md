@@ -4,6 +4,8 @@
 - [镜像相关命令](#镜像相关命令)
 - [volume相关](#volume相关)
 - [network相关](#network相关)
+- [其他](#其他)
+  - [端口转发](#端口转发)
 
 
 # 其他命令
@@ -127,7 +129,6 @@ docker commit -a "damonzheng" \
 | **便携性**       | 高，可在不同主机间迁移（配合 `volume inspect` + tar）        | 低，依赖宿主机目录结构             |
 | **典型用途**     | 数据持久化、数据库卷、配置存储                               | 本地开发时同步代码、调试数据       |
 
-
 # network相关
 
 1. **创建network**：`docker network create <network_name>`
@@ -146,3 +147,21 @@ docker commit -a "damonzheng" \
 4. 支持多网卡容器：一个容器可以连到多个 network，相当于多块网卡，复杂应用（如代理服务器）必备
 5. 跨主机扩展：使用 Swarm / Kubernetes，可以把 network 跨宿主机打通，做跨机集群
 6. 内建负载均衡：多个容器用同一个名字（服务名）注册时，docker network 会自动轮询负载均衡请求（bridge overlay支持）
+
+# 其他
+
+## 端口转发
+
+有时候忘记做端口映射，可以临时使用 `socat` 端口转发的方式：
+
+```bash
+# 基本语法：
+socat <source> <destination>
+    # <source>: 监听的源端口或文件、设备等。
+    # <destination>: 要转发到的目标端口或文件、设备等。
+
+# 将 <container_ip>:<container_port> 转发到宿主机的 <dev_port>
+socat TCP-LISTEN:<dev_port>,reuseaddr,fork TCP:<container_ip>:<container_port>
+# 监听宿主机的 60010 端口，并将请求转发到容器 172.17.0.2 的 3000 端口
+socat TCP-LISTEN:60010,reuseaddr,fork TCP:172.17.0.2:3000
+```

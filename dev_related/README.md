@@ -1,12 +1,10 @@
 # dev_related
-1. WSL
-2. op_and_cmd：一些操作与命令
-3. vim配置
-4. ssh
-5. gitbook_and_github
-6. git
-7. ansible_test
-8. docker
-9. python
-10. shell：shell脚本
-11. gpg：文件加解密
+
+1. op_and_cmd：一些操作与命令
+2. ssh
+3. git
+4. ansible_test
+5. docker
+6. python
+7.  shell：shell脚本
+8.  gpg：文件加解密

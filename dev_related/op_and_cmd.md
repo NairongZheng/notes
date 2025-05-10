@@ -69,11 +69,15 @@ apt install -y ssh                  # ssh
 apt install -y screen               # screen
 apt install -y htop                 # htop
 apt install -y lsof                 # lsof
+apt install -y tree                 # tree
+apt install -y cmake                # cmake
+apt install -y build-essential      # make、gcc/g++、其他编译器依赖
 apt install -y netcat               # netcat(nc)
 apt install -y telnet               # telnet
 apt install -y iputils-ping         # ping等工具
 apt install -y net-tools            # ifconfig、netstat等
 apt install -y iproute2             # 网络工具如ip（iproute2已取代了net-tools）
+apt install -y socat                # 端口转发（docker容器可以临时用用挺好用）
 apt install -y cloc                 # 统计代码量的工具
 ```
 
@@ -146,6 +150,7 @@ du -sh ./*
 ```bash
 tree
     # -L n：限制显示的目录层级为 n 级。例如：tree -L 2
+    # -I "<folder1>|<folder2>"：ignore 掉 folder1 跟 folder2
     # -d：只显示目录，不显示文件
     # -a：显示所有文件和目录，包括隐藏文件
     # -f：显示完整路径（从根目录开始的路径）。

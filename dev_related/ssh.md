@@ -66,6 +66,24 @@ Host <server_name>
 
 配置完之后就只要`ssh <server_name>`即可连上。
 
+**ssh连接github**
+
+用连接github举例：
+
+```bash
+# 1. 生成密钥对
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/key_for_github -C <"tag such as email">
+# 2. 将 ~/.ssh/key_for_github.pub 加到github的key中
+# 3. 配置 ssh config 文件，在其中添加以下内容
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/key_for_github
+  IdentitiesOnly yes
+# 4. 测试
+ssh -T git@github.com   # 显示 Hi NairongZheng! You've successfully authenticated, but GitHub does not provide shell access.
+```
+
 ## ssh config文件进阶使用
 
 **通配符匹配多个主机**
