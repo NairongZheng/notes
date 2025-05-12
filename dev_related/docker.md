@@ -61,25 +61,27 @@ sudo apt install -y nvidia-docker2
    2. `-q`：容器id：`docker ps -q`
    3. `-f`：过滤条件：`docker ps -f “name=<container_name>”`
    4. `-n`：最近创建的n个：`docker ps -n 3`
-3. **停止容器**：`docker stop [-f] [container_name|container_id]`
+3. **查看容器占用资源**：`docker stats [--no-stream] [container_name|container_id]`
+   1. `--no-stream`：一次性快照，不实时刷新
+4. **停止容器**：`docker stop [-f] [container_name|container_id]`
    1. `docker stop $(docker ps -q)`：停止所有容器
-4. **重启容器**：`docker restart <container_name>`
-5. **删除容器**：`docker rm [-f] [container_name|container_id]`
-6. **暂停容器**：`docker pause [container_name|container_id]`（短暂释放资源时使用）
-7. **取消暂停**：`docker unpause [container_name|container_id]`
-8. **查看正在运行的docker的日志（若有）**：`docker logs <container_name> --tail 10 -f`
+5. **重启容器**：`docker restart <container_name>`
+6. **删除容器**：`docker rm [-f] [container_name|container_id]`
+7. **暂停容器**：`docker pause [container_name|container_id]`（短暂释放资源时使用）
+8. **取消暂停**：`docker unpause [container_name|container_id]`
+9.  **查看正在运行的docker的日志（若有）**：`docker logs <container_name> --tail 10 -f`
    1. `--tail 10`：查看最后10行
    2. `-f`：实时刷新
-9. **进入容器**：
+10. **进入容器**：
    1. `docker attach <container_name>`
    2. `docker exec -it <container_name> bash`
    3. `attach`将连接到容器的主进程，可能会影响容器的运行（如使用 Ctrl+C 可能会停止容器）。
    4. `exec`启动一个新的进程，而不是连接到已有的主进程，不会影响容器的主进程，退出新进程不会停止容器。
    5. 也就是说，假如这个容器有启动命令，一直在前台运行某个服务，attach进去之后，其实没办法操作，只能Ctrl+C停止进程，而容器一般都使用-d -rm 之类的命令启动的，这么做就会使容器直接停止并删除。而使用exec进去之后是新开了一个进程，并不会影响主进程的运行，因此很适合进入有启动命令的容器查看相关信息。（总之推荐用exec！！！）
-10. **容器与宿主机文件传输**：
+11. **容器与宿主机文件传输**：
     1.  宿主机传输到容器：`docker cp <file_path> <container_id>:<container_file_path>`
     2.  容器传输到宿主机：`docker cp <container_id>:<container_file_path> <file_path>`
-11. **容器提交到镜像**：`docker commit <container_name> <newimage_name:tag>`，可以有以下参数：
+12. **容器提交到镜像**：`docker commit <container_name> <newimage_name:tag>`，可以有以下参数：
 ```bash
 docker commit -a "damonzheng" \
               -m "update base image with new configurations" \

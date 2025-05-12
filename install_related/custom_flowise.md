@@ -145,9 +145,84 @@ pnpm start
 # 安装依赖
 apt install -y xdg-utils
 # 启动
-pnpm dev
-# 即可边修改边实时更新
+pnpm dev [-- --host]
+# 不添加 -- --host 只能在localhost查看
+# 可边修改边实时更新，不过端口在8080，需要做容器端口映射或者做个端口转发，类似：
+# socat TCP-LISTEN:60010,reuseaddr,fork TCP:192.168.188.12:8080 &
 ```
 
 # Custom
 
+在`packages/components/nodes`中创建文件夹来添加类别，比如 `wa`
+
+然后再在其中添加需要实现的工具，比如：
+
+```bash
+# 文件夹结构
+wa
+├── DebugOutput
+│   ├── DebugOutput.ts
+│   └── debugoutput.svg
+└── HelloWorld
+    ├── HelloWorld.ts
+    └── helloworld.svg
+```
+
+```ts
+// HelloWorld.ts
+import { INode, INodeData, INodeParams } from '../../../src/Interface'
+
+class HelloWorldNode implements INode {
+    label: string
+    name: string
+    type: string
+    icon: string
+    category: string
+    description: string
+    inputs: INodeParams[]
+    version: number
+    baseClasses: string[]
+
+    constructor() {
+        this.label = 'Hello World'
+        this.name = 'helloWorld'
+        this.type = 'HelloWorld'
+        this.icon = 'function.svg'
+        this.category = 'wa'  // 这里定义在 UI 中的分类名
+        this.description = '输出 Hello World'
+        this.inputs = [
+            {
+                label: 'Name',
+                name: 'name',
+                type: 'string',
+                placeholder: '输入你的名字'
+            }
+        ]
+        this.version = 1.0
+        this.baseClasses = ['HelloWorldNode']
+    }
+
+    async run(nodeData: INodeData): Promise<string> {
+        const name = nodeData.inputs?.name as string;
+        return `Hello, ${name || 'World'}!`;
+    }
+}
+
+module.exports = { nodeClass: HelloWorldNode }
+```
+
+```bash
+# helloworld.svg
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="5" y="7" width="22" height="18" rx="2" stroke="black" stroke-width="2"/>
+<path d="M11 12L15 16L11 20" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17 20H21" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+```
+
+然后再重新编译运行即可
+
+```bash
+pnpm build
+pnpm start
+```

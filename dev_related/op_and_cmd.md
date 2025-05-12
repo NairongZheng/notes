@@ -298,13 +298,14 @@ netstat -tunlp
 
 ```bash
 # 查看端口监听状态
-lsof -i -P -n | grep LISTEN
+[sudo] lsof -i -P -n | grep LISTEN
+    # 不使用sudo则只能查看当前用户
     # -i：显示与网络相关的文件
     # -P：显示端口号而不是服务名（ssh就是22之类的）
     # -n：不解析主机名（localhost就显示127.0.0.1之类的）
 
 # 查看具体某端口状态
-lsof -i:<port>
+[sudo] lsof -i:<port>
 ```
 
 **其他**
