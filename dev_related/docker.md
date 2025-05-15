@@ -57,10 +57,11 @@ sudo apt install -y nvidia-docker2
 ```
 
 2. **查看容器**：`docker ps`
-   1. `-a`：所有容器：`docker ps -a`
-   2. `-q`：容器id：`docker ps -q`
-   3. `-f`：过滤条件：`docker ps -f “name=<container_name>”`
-   4. `-n`：最近创建的n个：`docker ps -n 3`
+   1. `-s`：查看容器占用磁盘：`docker ps -s`（其中size是本容器在它的镜像基础上写入了多少新内容，virtual是包括了基础镜像大小）
+   2. `-a`：查看所有容器：`docker ps -a`
+   3. `-q`：只显示容器id：`docker ps -q`
+   4. `-f`：过滤条件：`docker ps -f “name=<container_name>”`
+   5. `-n`：最近创建的n个：`docker ps -n 3`
 3. **查看容器占用资源**：`docker stats [--no-stream] [container_name|container_id]`
    1. `--no-stream`：一次性快照，不实时刷新
 4. **停止容器**：`docker stop [-f] [container_name|container_id]`

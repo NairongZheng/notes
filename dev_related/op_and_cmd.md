@@ -119,6 +119,27 @@ export PATH="<new_path>:$PATH"    # 推荐将自定义工具路径加到 PATH �
 # 7. 查看系统时间：date
 ```
 
+**查看进程信息**
+
+```bash
+ps -ef  # 用来看系统资源占用（CPU/MEM）
+ps aux  # 用来查找/过滤/分析进程关系（谁启动了谁）
+
+cat /proc/[PID]/cgroup  # 查看[PID]进程所属的 cgroup（控制组） 信息
+
+# 如果输出如下，说明该进程运行在容器中
+# 12:memory:/docker/6df812fd3dfe5c3b8cfa934c3d3f2c0c25a7c91ef59f6d5b2fffc3a75a18d48c
+# 11:cpu,cpuacct:/docker/6df812fd3dfe5c3b8cfa934c3d3f2c0c25a7c91ef59f6d5b2fffc3a75a18d48c
+# 10:cpuset:/docker/6df812fd3dfe5c3b8cfa934c3d3f2c0c25a7c91ef59f6d5b2fffc3a75a18d48c
+# ...
+
+# 如果如下，说明不是运行在容器中
+# 12:memory:/
+# 11:cpu,cpuacct:/
+# 10:cpuset:/
+# ...
+```
+
 **查看文件系统的磁盘空间使用情况 df (Disk Free)**
 
 ```bash
