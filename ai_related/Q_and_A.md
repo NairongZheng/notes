@@ -595,3 +595,65 @@ class TransformerEncoder(nn.Module):
 
 </details>
 
+
+<details>
+<summary>Seq2Seq模型的核心组件是什么？Encoder-Decoder结构如何解决长程依赖问题？输入序列过长，如何解决计算量问题？</summary>
+
+<br>
+
+**Seq2Seq 模型的核心组件**
+
+> Seq2Seq（Sequence-to-Sequence）是一类**将一个序列映射到另一个序列**的模型架构，广泛应用于：
+> 
+> - 机器翻译（如英文到法文）
+> - 文本摘要
+> - 问答系统
+> - 语音识别等
+> 
+> 核心组件：
+> 
+> 1. Encoder：负责接收输入序列，并将其编码为一个向量（或一组向量）表示输入的语义信息
+> 2. Decoder：接收 Encoder 的输出，并逐步生成目标序列（一个 token 一个 token 地预测）
+> 3. Attention（可选）：提高模型对长序列的处理能力，允许 Decoder 在每一步关注输入序列的不同部分
+
+**Encoder-Decoder 是如何解决长程依赖问题的？**
+
+> 最初的 Seq2Seq 模型（无 Attention）的问题：
+> 
+> - Encoder 把整个输入序列**压缩成一个固定大小的向量**（称为上下文向量 context），再传给 Decoder。
+> - 如果输入序列很长，固定向量无法承载全部信息 → **信息丢失，长程依赖难以建模**。
+> 
+> 引入 Attention 机制后的改进：
+> 
+> - Attention 机制让 Decoder 在生成每个词时动态地关注 Encoder 的输出中的不同位置。
+> - 不再依赖一个固定向量，而是每个时间步都能参考整个输入序列。
+> 
+> 现代 Transformer 架构下的 Seq2Seq：
+> 
+> - 完全抛弃 RNN，用**自注意力（Self-Attention）+ 多头注意力**实现 Encoder 和 Decoder。
+> - 每个位置可以直接访问序列中所有其他位置，**天然支持长程依赖**。
+>
+> **总结一句话**：Encoder-Decoder 架构通过引入 Attention 机制，让 Decoder 在生成序列时可以灵活关注输入序列的不同部分，从而有效解决长程依赖问题。
+
+**如果输入序列很长，注意力矩阵的计算量和显存占用会迅速膨胀，如何解决计算量问题？**
+
+> 注意力矩阵的维度是：`[batch_size,n_heads,seq_len,seq_len]`
+> 计算复杂度：$O(SeqLen^2)$
+> 
+> 解决方法（**减少计算量/减少精度两种方式**）：
+> 
+> 1. **稀疏注意力**：复杂度从 $O(n^2)$ 降低到 $O(n \cdot \sqrt{n})$ 或 $O(n \cdot \log n)$
+>    1. Longformer：局部窗口 + 全局 token 关注机制
+>    2. BigBird：局部 + 稀疏跳跃 + 全局 token，理论上具备 Transformer 表达能力
+>    3. Sparse Transformer：使用规则设计的稀疏注意力模式
+>    4. Reformer：使用 LSH（局部敏感哈希）减少注意力计算
+> 2. **线性注意力**：复杂度降为 $O(n)$，但可能会损失精度
+>    1. Performer：利用核函数重写注意力为线性形式
+>    2. Linformer：假设注意力矩阵是低秩的，对 K/V 做降维
+>    3. Linear Transformer：修改注意力定义为线性形式
+> 3. **分块输入（Chunking）或滑动窗口**：
+>    1. 把长序列拆成多个短块，分别计算注意力，再用跨块机制（如 sliding window）进行上下文传播。
+> 4. **使用低精度**：
+>    1. 虽然不减少计算复杂度，但可以降低显存占用，让长序列训练更现实。
+
+</details>
