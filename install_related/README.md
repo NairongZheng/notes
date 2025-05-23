@@ -5,3 +5,4 @@
 3. gitbook_and_github
 4. make_milvus：编译milvus
 5. custom_flowise：自定义flowise
+6. redis_usage：redis使用
