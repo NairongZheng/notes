@@ -1,3 +1,8 @@
+- [安装并配置redis](#安装并配置redis)
+- [设置需要tls认证的redis](#设置需要tls认证的redis)
+- [命令行使用redis](#命令行使用redis)
+- [python使用redis示例](#python使用redis示例)
+- [go使用redis示例](#go使用redis示例)
 
 
 ## 安装并配置redis
@@ -46,10 +51,13 @@ openssl req -new -key redis.key -out redis.csr -subj "/CN=redis-server"
 # 3. 用 CA 签发服务器证书
 openssl x509 -req -in redis.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out redis.crt -days 3650 -sha256
 
-# 最终你会有以下文件：
-    # ca.crt: 根证书（客户端需要）
-    # redis.crt: 服务器证书
-    # redis.key: 服务器私钥
+# 最终会有以下文件：
+    # ca.key: 根证书私钥，将用于签发服务器证书。
+    # ca.crt: 自签名的根证书（CA Certificate），公钥部分。（客户端需要，给客户端验证 Redis）
+    # ca.srl: 证书序列号（自动生成）
+    # redis.key: Redis服务端使用的私钥，用来参与 TLS 握手（仅 Redis 用）
+    # redis.csr: Redis 的“申请表”（请求用 CA 给它签名）
+    # redis.crt: Redis 服务器的最终证书（可公开）
 ```
 
 **配置 redis.conf**
@@ -101,6 +109,7 @@ redis-cli                       # 进入 Redis 命令行客户端。
 PING                            # 测试连接，返回 PONG 表示服务器在线。
 INFO                            # 查看 Redis 服务器的详细信息（版本、内存、连接数等）。
 CLIENT LIST                     # 查看当前所有客户端连接信息。
+TYPE <key>                      # 查看某个key的值是什么类型
 
 # 2. 键操作
 KEYS *                          # 查询所有 key（生产环境慎用，可能阻塞）。
@@ -237,3 +246,7 @@ if __name__ == "__main__":
     except CacheMiss:
         print("缓存过期后获取失败：CacheMiss")
 ```
+
+## go使用redis示例
+
+具体查看 [simple_go](https://github.com/NairongZheng/learning/tree/main/go_related/simple_go/test/redis_test.go)

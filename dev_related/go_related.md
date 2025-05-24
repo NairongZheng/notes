@@ -64,7 +64,7 @@ gvm use go1.22.1 --default
 
 **设置go模块下载代理**
 
-终端有效：
+linux终端永久有效：
 
 ```bash
 vim ~/.bashrc
@@ -72,6 +72,14 @@ vim ~/.bashrc
 export GOPROXY=https://goproxy.cn,direct
 # 激活设置
 source ~/.bashrc
+```
+
+windows终端临时有效：
+
+```bash
+set GOPROXY=https://goproxy.cn,direct
+# 验证设置
+go env GOPROXY
 ```
 
 远程vscode有效：
@@ -91,6 +99,16 @@ source ~/.bashrc
 **vscode禁用go包跳转网页**
 
 ```bash
+# Ctrl+, 打开vscode设置项，搜索gopls，添加以下项
+"gopls": {
+    "ui.navigation.importShortcut": "Definition"
+}
+```
+
+**vscode配置go高亮**
+
+```bash
+go install golang.org/x/tools/gopls@latest
 # Ctrl+, 打开vscode设置项，搜索gopls，添加以下项
 "gopls": {
     "ui.navigation.importShortcut": "Definition"
