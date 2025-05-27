@@ -181,22 +181,97 @@
 
 ## 子模块相关
 
-1. 添加子模块：`git submodule add <repository_url> [path]`，会自动创建`.gitmodules`文件并写入内容
-   1. `repository_url`：子模块的 Git 仓库地址。
-   2. `path`（可选）：子模块存放的目录，默认是和仓库同名的文件夹。
-2. 初始化并拉取子模块：
-   1. 初始化子模块（仅需运行一次）：`git submodule init`
-   2. 拉取子模块内容：`git submodule update`
-   3. 如果要递归更新所有子模块，使用：`git submodule update --init --recursive`
-3. 查看子模块状态：`git submodule status`
-4. 远端子模块更新到本地：
-   1. 方法一（推荐）：`git submodule update --remote`，会把**所有**子模块的`HEAD`更新到远程仓库的`origin/`里的默认分支
-   2. 方法二：手动进入子模块的目录更新，更新同步等都跟普通仓库一样即可。
-5. 删除子模块：
-   1. 取消子模块的关联：`git submodule deinit -f <path/to/submodule>`
-   2. 删除子模块的文件：`rm -rf <path/to/submodule>`
-   3. 从`Git`配置中移除子模块：`git rm -f <path/to/submodule>`，这会从主仓库的`Git`记录中删除子模块，`.gitmodules`中的内容也会相应删除，需要打开检查一下，还有的话可以手动删除。
-   4. 提交更改
+**添加子模块**
+
+```bash
+git submodule add <repository_url> [path]
+    # repository_url：子模块的 Git 仓库地址。
+    # path（可选）：子模块存放的目录，默认是和仓库同名的文件夹。
+```
+
+**初始化并拉取子模块**
+
+```bash
+# 1. 如果是第一次 clone 含有子模块的项目
+git clone --recurse-submodules <repo_url>
+# 2. 如果已经 clone 了项目，需要手动初始化和更新子模块
+git submodule init  # 初始化 .git/config 中的子模块配置（只需一次）
+git submodule update  # 检出父仓库记录的 commit（不会拉 remote 最新）
+# 3. 建议统一用以下命令来确保递归拉取所有子模块及其嵌套依赖
+git submodule update --init --recursive
+```
+
+**查看子模块状态**
+
+```bash
+git submodule status
+# 会列出每个子模块当前所指向的 commit。
+# 若子模块目录内容与父仓库记录不一致，会有 + 或 - 前缀，代表状态变动。
+```
+
+**提交并推送本地修改**
+
+```bash
+# step 1：到子模块文件夹修改并提交并推送
+# step 2：到父仓库修改并提交并推送
+# 若是多人协作开发应该先进行下面的《同步远端更新到本地》，再提交当前本地修改
+```
+
+**同步远端更新到本地**
+
+情景1：本地子模块没有修改：
+
+```bash
+# 本地子模块有改动的话千万别用这种，不然比较麻烦。
+# 1. fetch父仓库、merge父仓库
+# 2. 处理完冲突之后执行：
+git submodule update --init --recursive
+    # 子模块没有本地修改，所以直接恢复到父仓库记录的 commit 就行；
+    # 避免触发子模块合并逻辑，流程简单安全；
+    # 可防止“误拉子模块远程 HEAD”导致和父仓库记录不一致。
+```
+
+情景2：本地子模块有修改：
+
+```bash
+# 1. fetch&merge 父仓库并解决冲突（先别提交，因为子模块还没有跟远端merge）
+# 2. fetch 子模块（不会覆盖本地改动）
+git submodule foreach git fetch <origin>
+# 3. 进入有修改的子模块，手动 merge 并解决冲突
+cd <path/to/submodule>
+git merge <origin/main>
+git commit -m <"Resolve submodule conflict">
+git push
+# 4. 回到父仓库，更新子模块引用
+# 5. 推送所有更改（先子模块，再父仓库）
+cd <path/to/submodule>
+git push <origin> <main>
+cd <path/to/repositories>
+git push <origin> <your-branch>
+```
+
+情景3：管他三七二十一：
+
+```bash
+# 直接对父仓库跟所有子模块进行pull的merge
+git pull --recurse-submodules
+```
+
+**删除子模块**
+
+```bash
+# Step 1: 取消关联
+git submodule deinit -f <path/to/submodule>
+# Step 2: 从 Git 中移除并删除文件
+git rm -f <path/to/submodule>
+# Step 3: 删除残留文件夹（如果还在）
+rm -rf .git/modules/<path/to/submodule>
+rm -rf <path/to/submodule>
+# Step 4: 可选手动清理 .gitmodules 中的内容（若未自动移除）
+vim .gitmodules
+# Step 5: 提交更改
+git commit -m "Remove submodule <name>"
+```
 
 
 ## git lfs
