@@ -132,17 +132,17 @@ HDEL <key> <field>              # 删除哈希表 key 中的字段 field。
 HGETALL <key>                   # 获取哈希表 key 中所有字段和值。
 
 # 5. 列表（List）操作
-LPUSH key value                 # 从左边压入一个值到列表。
-RPUSH key value                 # 从右边压入一个值到列表。
-LPOP key                        # 从左边弹出一个值。
-RPOP key                        # 从右边弹出一个值。
-LRANGE key start stop           # 获取列表指定范围内的元素（start、stop 支持负数）。
+LPUSH <key <value>              # 从左边压入一个值到列表。
+RPUSH <key <value>              # 从右边压入一个值到列表。
+LPOP <key>                      # 从左边弹出一个值。
+RPOP <key>                      # 从右边弹出一个值。
+LRANGE <key> <start stop>       # 获取列表指定范围内的元素（start、stop 支持负数）。
 
 # 6. 集合（Set）操作
-SADD key member                 # 向集合添加一个成员。
-SREM key member                 # 从集合移除一个成员。
-SMEMBERS key                    # 获取集合所有成员。
-SISMEMBER key member            # 判断成员是否在集合中。
+SADD <key> <member>             # 向集合添加一个成员。
+SREM <key> <member>             # 从集合移除一个成员。
+SMEMBERS <key>                  # 获取集合所有成员。
+SISMEMBER <key> <member>        # 判断成员是否在集合中。
 
 # 7. 其他
 SELECT <db_num>                 # 选择数据库（默认 0-15 共16个）。
