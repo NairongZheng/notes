@@ -1,5 +1,6 @@
 - [安装](#安装)
 - [命令行使用postgre](#命令行使用postgre)
+- [常用sql语句](#常用sql语句)
 - [python使用postgre示例](#python使用postgre示例)
 - [使用 pgAdmin 可视化管理 PostgreSQL](#使用-pgadmin-可视化管理-postgresql)
 
@@ -65,7 +66,7 @@ GRANT SELECT ON TABLE users TO testuser;
 \d <tablename>                      # 查看表结构
 \q                                  # 退出
 
-# 更详细的查询就需要用spl语言了
+# 更详细的查询就需要用sql语言了
 
 # postgres=# \dt
 #          List of relations
@@ -125,6 +126,85 @@ host    all             all             ::1/128                 md5
 local   replication     all                                     peer
 host    replication     all             127.0.0.1/32            md5
 host    replication     all             ::1/128                 md5
+```
+
+
+## 常用sql语句
+
+**数据库操作**
+
+```sql
+-- 创建数据库
+CREATE DATABASE <database_name>;
+-- 删除数据库
+DROP DATABASE <database_name>;
+-- 切换数据库
+\c <database_name>         -- PostgreSQL 专用
+USE <database_name>;       -- MySQL 等数据库
+```
+
+**表操作**
+
+```sql
+-- 创建表
+CREATE TABLE <table_name> (
+    <column1> <data_type1>,
+    <column2> <data_type2>,
+    ...
+);
+-- 删除表
+DROP TABLE <table_name>;
+-- 修改表（添加列）
+ALTER TABLE <table_name> ADD COLUMN <column_name> <data_type>;
+-- 修改列名
+ALTER TABLE <table_name> RENAME COLUMN <old_name> TO <new_name>;
+-- 修改列类型
+ALTER TABLE <table_name> ALTER COLUMN <column_name> TYPE <new_type>;
+-- 删除列
+ALTER TABLE <table_name> DROP COLUMN <column_name>;
+-- 查看表结构
+\d <table_name>;           -- PostgreSQL
+DESCRIBE <table_name>;     -- MySQL
+```
+
+**数据操作（增删改查）**
+
+```sql
+-- 插入数据
+INSERT INTO <table_name> (<column1>, <column2>, ...)
+VALUES (<value1>, <value2>, ...);
+-- 查询数据
+SELECT <column1>, <column2>, ...
+FROM <table_name>
+WHERE <condition>
+ORDER BY <column> ASC|DESC
+LIMIT <n>;
+-- 更新数据
+UPDATE <table_name>
+SET <column1> = <value1>, <column2> = <value2>
+WHERE <condition>;
+-- 删除数据
+DELETE FROM <table_name>
+WHERE <condition>;
+```
+
+**条件与逻辑**
+
+```sql
+-- WHERE 条件
+SELECT * FROM <table_name> WHERE <column> = <value>;
+-- 多条件组合
+WHERE <col1> = <val1> AND <col2> > <val2>
+WHERE <col1> = <val1> OR <col2> IS NULL
+-- 模糊匹配
+WHERE <column> LIKE '%<substring>%'
+-- IN 范围匹配
+WHERE <column> IN (<value1>, <value2>, ...)
+-- BETWEEN 范围比较
+WHERE <column> BETWEEN <low> AND <high>
+-- NULL 检查
+WHERE <column> IS NULL
+WHERE <column> IS NOT NULL
 ```
 
 
