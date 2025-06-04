@@ -7,3 +7,4 @@
 5. custom_flowise：自定义flowise
 6. redis_usage：redis使用
 7. postgresql_usage：PostgreSQL使用
+8. tmux_usage：tmux使用
