@@ -1,4 +1,5 @@
 - [安装与配置](#安装与配置)
+- [一些命令](#一些命令)
 - [项目开发](#项目开发)
 
 
@@ -25,6 +26,7 @@ source ~/.gvm/scripts/gvm
 **gvm相关命令**
 
 ```bash
+# 可以加源来保证 gvm install 速度：export GVM_GO_GETTER="wget -O - https://mirrors.tuna.tsinghua.edu.cn/golang/go\$VERSION.src.tar.gz"
 gvm install                 # 列出所有可用go版本（包括旧版本）
 gvm list                    # 显示已安装的go版本
 gvm install go1.22.1        # 安装指定的go版本
@@ -35,6 +37,8 @@ gvm pkgset list             # 显示当前版本下的包集
 ```
 
 **手动安装go (1.22.1版本为例)**
+
+方法一（麻烦不推荐）：
 
 ```bash
 # 手动下载go
@@ -57,6 +61,20 @@ vim go1.22.1
 # 使配置生效
 source ~/.gvm/environments/go1.22.1
 # 设置该版本go为默认版本
+gvm use go1.22.1 --default
+```
+
+方法二（推荐）：
+
+```bash
+# 手动下载go
+cd /tmp
+wget https://golang.google.cn/dl/go1.22.1.linux-amd64.tar.gz
+mv go1.22.1.linux-amd64.tar.gz ~./gvm/gos/go1.22.1.linux-amd64.tar.gz
+# 手动下载了包之后 gvm install 就会优先识别这里的包
+gvm install go1.22.1
+# 有时候会编译失败，可以慢慢升级版本
+# 因为高版本的编译都是依赖低版本的，一下子装太高级的会编译不过
 gvm use go1.22.1 --default
 ```
 
@@ -87,6 +105,7 @@ go env GOPROXY
 ```bash
 # 路径：/home/damonzheng/.vscode-server/data/Machine/settings.json
 # 打开方式：左下角齿轮->settings->搜索 Go: Tools Env Vars
+# 不过尽量不要写死 goroot
 {
     "go.goroot": "/home/damonzheng/.gvm/gos/go1.22.1",
     "go.gopath": "/home/damonzheng/.gvm/pkgsets/go1.22.1/global",
@@ -114,6 +133,17 @@ go install golang.org/x/tools/gopls@latest
     "ui.navigation.importShortcut": "Definition"
 }
 ```
+
+# 一些命令
+
+**gvm相关命令**（上面有）
+
+**go相关命令**
+
+```bash
+# 查看go环境: go env
+```
+
 
 # 项目开发
 
