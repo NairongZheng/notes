@@ -386,6 +386,8 @@ less <filename>
 ```bash
 grep [OPTIONS] "<keyword>" <filename>
     # -v：反向匹配（排除指定内容）
+    # -m <n>：显示匹配的前n个
+    # -c：只显示匹配的个数，不显示内容
     # -i：忽略大小写查找
     # -n：显示行号
     # -r：递归查找某目录下的文件
