@@ -264,22 +264,6 @@ sha256sum <filename>    # sha256
 # 3. 解密文件：`gpg -d ${filename.gpg} > ${filename}`
 ```
 
-**查找文件**
-
-```bash
-find ${base_path} -name ${file_name} [options]
-    # -name：按文件名匹配查找
-    # -size：查找特定大小的文件。例如，-size +10M 查找大于 10MB 的文件，-size -10M 查找小于 10MB 的文件
-    # -iname：不区分大小写进行查找
-    # -type：按照文件类型查找。
-        # -type f：文件
-        # -type d：目录
-        # -type l：符号链接文件
-    # -perm：查找特定权限文件，如 -perm 755
-    # -user：查找指定用户文件
-    # -ls：列出详细信息
-```
-
 ## 网络端口操作
 
 **查看网络信息**
@@ -379,6 +363,22 @@ tail [-f] <filename> # 实时查看文件内容（适用于不断刷新的日志
 less <filename>
 ```
 
+**find查找文件**
+
+```bash
+find ${base_path} -name ${file_name} [options]
+    # -name：按文件名匹配查找
+    # -size：查找特定大小的文件。例如，-size +10M 查找大于 10MB 的文件，-size -10M 查找小于 10MB 的文件
+    # -iname：不区分大小写进行查找
+    # -type：按照文件类型查找。
+        # -type f：文件
+        # -type d：目录
+        # -type l：符号链接文件
+    # -perm：查找特定权限文件，如 -perm 755
+    # -user：查找指定用户文件
+    # -ls：列出详细信息
+```
+
 **grep查找文本行**
 
 （[正则表达式](./shell.md/#regexp)）
@@ -452,6 +452,9 @@ ps aux | grep <content> | awk '{print $2}' | xargs kill -9
     # grep <content>：获取包含<content>的进程
     # awk '{print $2}'：获取这些进程的pid
     # xargs kill -9：将这些进程的pid作为kill -9的参数
+# 删除带空格的文件名
+find ${base_path} -name "*.log" -print0 | xargs -0 rm -f
+    # -print0 和 -0 保证空格/特殊字符处理正确
 ```
 
 ## Linux用户和组管理
