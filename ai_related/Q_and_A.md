@@ -310,6 +310,7 @@
 > - $\theta$：一个参数，比如$W$
 > - $\eta$：学习率，控制每次更新的步长
 > - $\frac{\partial{L}}{\partial{\theta}}$：反向传播得到的梯度
+> - 梯度下降就是用梯度告诉我们“往哪走能让损失更小”，然后我们每次沿那个方向“走一小步”，直到找到最小值。
 
 **示例：数值举例**
 
@@ -353,6 +354,230 @@
 
 </details>
 
+<details>
+<summary>梯度下降与优化器</summary>
+
+<br>
+
+**基本梯度下降**
+
+> $$
+> \theta \leftarrow \theta - \eta \frac{\partial{L}}{\partial{\theta}}
+> $$
+> 
+> 其中：
+> - $\theta$：一个参数，比如$W$
+> - $\eta$：学习率，控制每次更新的步长
+> - $\frac{\partial{L}}{\partial{\theta}}$：反向传播得到的梯度
+> - 梯度下降就是用梯度告诉我们“往哪走能让损失更小”，然后我们每次沿那个方向“走一小步”，直到找到最小值。
+
+**Batch Gradient Descent（BGD 批量梯度下降）**
+
+> - 每轮迭代**用全部训练数据计算梯度**。
+> - 更新稳定，但每次计算开销大，不适合大数据集。
+> 
+> $$
+> \theta \leftarrow \theta - \eta · \frac{1}{N} \sum_{i=1}^N \nabla_\theta L(x_i,y_i) \\
+> \theta \leftarrow \theta - \eta · \frac{1}{N} \sum_{i=1}^N \frac{\partial L^{(i)}}{\partial \theta} \\
+> $$
+> 
+> 其中：
+> - $\eta$：学习率（learning rate）
+> - $N$：样本总数
+> - $L^{(i)}$：第$i$个样本的损失函数
+> 
+> 优点：更新方向精确、收敛平稳
+> 缺点：内存占用高，速度慢
+
+**Stochastic Gradient Descent（SGD）**
+
+> - 每次迭代只使用一个样本计算梯度
+> 
+> $$
+> \theta \leftarrow \theta - \eta · \nabla_\theta L(x_i,y_i) \\
+> \theta \leftarrow \theta - \eta · \frac{\partial L^{(i)}}{\partial \theta} \\
+> $$
+> 
+> 优点：迭代快，适合大数据、在线学习
+> 缺点：波动大、不稳定、可能收敛到局部最优
+
+**Mini-batch Gradient Descent（小批量梯度下降）**
+
+> - 每次迭代用一个小批量（如 32 或 64）样本：
+> 
+> $$
+> \theta \leftarrow \theta - \eta · \frac{1}{m} \sum_{i=1}^m \nabla_\theta L(x_i,y_i) \\
+> \theta \leftarrow \theta - \eta · \frac{1}{m} \sum_{i=1}^m \frac{\partial L^{(i)}}{\partial \theta} \\
+> $$
+> 
+> 优点：比 batch 快，且比 SGD 稳定，GPU 上更高效（张量并行）。现代神经网络中最常用的形式
+
+**为什么不直接用最基础的梯度下降？**
+> 
+> | 问题               | 原因                           |
+> | ------------------ | ------------------------------ |
+> | 震荡、收敛慢       | 学习率固定且对所有参数一样     |
+> | 陷入局部最优       | 梯度方向不够准确或变化太大     |
+> | 稀疏数据难以处理   | 学习率不能针对每个参数单独调整 |
+> | 学习率难以手动调好 | 手动调参难，收敛不稳定         |
+
+**Momentum（动量法）**
+
+> - 类似物理中“惯性”的概念。给参数一个速度变量v
+> - 先更新动量，再更新参数
+> 
+> $$
+> v_t=\gamma v_{t-1}+\eta · \nabla_\theta L(\theta) \\
+> \theta_t \leftarrow \theta_{t-1} - v_t
+> $$
+> 
+> - **让参数更新沿着长期一致的下降方向加速，避免被局部波动干扰**
+> - 在“平坦区”加快收敛，减少摆动，整体收敛更快更稳定
+
+**Adaptive Gradient Algorithm（AdaGrad 自适应梯度算法）**
+
+> **核心理念**：给每个参数一个自适应的学习率，让更新频繁的参数学习率变小，更新不频繁的参数保持较大学习率。
+> 
+> $$
+> G_{t,i}=G_{t-1,i}+(\nabla_{\theta_i} L(\theta))^2 \\
+> \theta_i \leftarrow \theta_i - \frac{\eta}{\sqrt{G_{t,i}}+\epsilon} · \nabla_{\theta_i} L(\theta)
+> $$
+> 
+> - 对于每个参数$\theta_i$，我们记录其历史所有梯度的平方和（只对该参数维度）。
+> - $G_{t,i}$是标量，表示$\theta_i$在迄今为止每一轮的梯度平方的累计值。
+> - 随着训练进行，$G_{t,i}$会越来越大（或保持不变）。
+> - 每个参数$\theta$拥有自己专属的学习率$\frac{\eta}{\sqrt{G_{t,i}}+\epsilon}$
+>   - 如果某个参数的梯度一直很大，$G_{t,i}$增长很快，则学习率下降得很快。
+>   - 如果某个参数的梯度一直很小，$G_{t,i}$增长缓慢，则学习率下降得慢。
+> 
+> **利用历史梯度自动调整每个参数的学习率**：
+> - 频繁更新的参数 -> 学习率自动变小（趋于稳定）
+> - 更新较少的参数 -> 学习率保持较大（继续探索）
+> 
+> 优点：对稀疏特征（如 NLP）特别有效
+> 缺点：$G_{t,i}$是累计和，训练时间长后会很大，导致学习率不断变小，甚至趋近于 0；
+
+**RMSProp（Root Mean Square Propagation）**
+
+> 改进点：不要累加所有历史梯度平方，而是使用指数衰减平均（EMA）来控制“历史的记忆长度”。
+> 
+> - 改进 AdaGrad 的“过早衰减”问题
+> - 使用指数衰减平均
+> 
+> $$
+> E[g^2]_t=\gamma E[g^2]_{t-1}+(1-\gamma) · (\nabla_\theta L)^2 \\
+> \theta_i \leftarrow \theta_i - \frac{\eta}{\sqrt{E[g^2]_t}+\epsilon} · \nabla_{\theta} L
+> $$
+> 
+> 其中：
+> - $\gamma$：衰减率（典型值：0.9）
+> - 当前梯度平方被加入历史梯度平方的加权平均中，权重递减
+> 
+> 梯度变化剧烈 -> $E[g^2]_t$大 -> 更新幅度减小（更稳定）
+> 梯度变化平缓 -> $E[g^2]_t$小 -> 更新幅度保留（更敏感）
+
+**Adam（Adaptive Moment Estimation）**
+
+> 当前最常用优化器！结合了 Momentum + RMSProp 的优点：
+> - Momentum（动量法）：缓解震荡、加速收敛；
+> - RMSProp：自适应地缩放每个参数的学习率。
+> 
+> Adam 为每个参数维护两个 一阶矩（平均梯度） 和 二阶矩（平均平方梯度） 的估计：
+> - 一阶矩估计：动量思想（梯度的滑动平均）
+> - 二阶矩估计：RMSProp 思想（梯度平方的滑动平均）
+> - 然后通过这些估计动态调整学习率。
+> 
+> $$
+> 初始化：m_0=0,v_0=0,t=0 \\
+> 更新一阶矩估计（类似动量）：m_t=\beta_1 · m_{t-1}+(1-\beta_1) · g_t \\
+> 更新二阶矩估计（类似RMSProp）：v_t=\beta_2 · v_{t-1}+(1-\beta_2) · g_t^2 \\
+> 计算偏差修正项：\hat{m_t}=\frac{m_t}{1-\beta_1^t},\hat{v_t}=\frac{v_t}{1-\beta_2^t} \\
+> 更新参数：\theta_t \leftarrow \theta_{t-1} - \eta · \frac{\hat{m_t}}{\sqrt{\hat{v_t}}+\epsilon}
+> $$
+
+</details>
+
+
+<details>
+<summary>正则化</summary>
+
+<br>
+
+**正则化简介**
+
+> 在深度学习中，正则化（Regularization） 是防止模型过拟合的重要方法。其**核心思想**是：
+> 
+> > 在优化原始损失的同时，限制模型复杂度，使其具有更好的泛化能力。
+> 
+> 没有正则化时，梯度更新是：
+> 
+> $$
+> \theta \leftarrow \theta - \eta · \frac{\partial L_0}{\partial \theta}
+> $$
+
+**L1正则化**
+
+> 原理：在损失函数中加入所有参数的绝对值之和：
+> 
+> $$
+> L=L_0+\lambda \sum_i|w_i|
+> $$
+> 
+> 特点：
+> - 会使部分权重变为 0，具有特征选择能力；
+> - 可以产生稀疏模型；
+> - 适用于高维数据（特征维度远大于样本数）；
+> - 梯度不连续，在 0 点有“尖角”。
+> 
+> 此时梯度更新变成了：
+> 
+> $$
+> \theta \leftarrow \theta - \eta (\frac{\partial L_0}{\partial \theta}+\lambda · sign(\theta))
+> $$
+
+**L2正则化**
+
+> 原理：在损失函数中加入所有参数的平方和：
+> 
+> $$
+> L=L_0+\lambda \sum_i w_i^2
+> $$
+> 
+> 特点：
+> - 会让参数变小，但不为零；
+> - 对权重惩罚更平滑，收敛稳定；
+> - 适合大多数深度学习场景；
+> - 常用于与 SGD 搭配。
+> 
+> 此时梯度更新变成了：
+> 
+> $$
+> \theta \leftarrow \theta - \eta (\frac{\partial L_0}{\partial \theta}+\lambda · 2\theta)
+> $$
+> 
+> 这就相当于：
+> - 除了“让损失更小”的方向，还加了一个“**让参数变小**”的力，小的参数通常表示“更简单的模型”，而简单的模型更不容易过拟合，泛化能力更强。
+> - 所以正则化会在训练过程中持续影响参数的大小。
+
+**λ（正则化强度）怎么选？**
+
+> - $\lambda$越大，正则化越强，模型越简单，可能欠拟合；
+> - $\lambda$越小，正则化越弱，模型越复杂，可能过拟合；
+> - 通常通过交叉验证（Cross Validation）来调节$\lambda$；
+> - 在深度学习中，也可以通过学习率调度器或 weight decay 来间接调控。
+
+**Dropout 正则化（非参数化）**
+
+> Dropout 是一种随机性的正则化方法：
+> - 在训练时随机将神经元“丢弃”；
+> - 相当于对不同子网络进行集成学习；
+> - 流行于深度神经网络，尤其是卷积网络和全连接层；
+> - 不需要修改损失函数，仅改变前向传播/反向传播过程。
+> 
+> Dropout 能有效减少 co-adaptation（协同适应：神经网络中多个神经元彼此过度依赖），提升泛化性能。
+
+
+</details>
 
 ## 大模型相关
 
