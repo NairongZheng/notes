@@ -8,3 +8,4 @@
 6. redis_usage：redis使用
 7. postgresql_usage：PostgreSQL使用
 8. tmux_usage：tmux使用
+9. llama_factory：llama_factory的使用
