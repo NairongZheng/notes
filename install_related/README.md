@@ -6,6 +6,7 @@
 4. make_milvus：编译milvus
 5. custom_flowise：自定义flowise
 6. redis_usage：redis使用
-7. postgresql_usage：PostgreSQL使用
-8. tmux_usage：tmux使用
-9. llama_factory：llama_factory的使用
+7. mysql_usage：mysql使用
+8. postgresql_usage：PostgreSQL使用
+9. tmux_usage：tmux使用
+10. llama_factory：llama_factory的使用

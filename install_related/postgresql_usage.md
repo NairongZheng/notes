@@ -211,7 +211,7 @@ WHERE <column> IS NOT NULL
 ## python使用postgre示例
 
 ```python
-# 前提是在postgre中创建了testdb数据库跟testuser用户，并且在其中建立了user表格
+# 前提是在postgre中创建了testdb数据库跟testuser用户，并且在其中建立了users表格
 # 并且授权testdb给testuser，并且给了SELECT权限
 
 import psycopg2
