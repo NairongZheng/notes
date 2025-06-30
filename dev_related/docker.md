@@ -1,4 +1,5 @@
 
+- [安装docker](#安装docker)
 - [其他命令](#其他命令)
 - [容器相关命令](#容器相关命令)
 - [镜像相关命令](#镜像相关命令)
@@ -7,6 +8,29 @@
 - [其他](#其他)
   - [端口转发](#端口转发)
 
+# 安装docker
+
+```bash
+# 安装依赖
+apt update
+apt install -y apt-transport-https ca-certificates curl software-properties-common
+# 添加官方密钥
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+# 添加docker仓库
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+# 再次更新apt软件包索引
+apt update
+# 安装 Docker Engine
+apt install -y docker-ce docker-ce-cli containerd.io
+# 验证docker是否安装成功
+docker version
+
+# 安装docker compose（若需要）
+mkdir -p ~/.docker/cli-plugins/
+curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+chmod +x ~/.docker/cli-plugins/docker-compose
+docker compose version
+```
 
 # 其他命令
 1. 启动docker服务：`systemctl start docker`（老版用`service docker start`）
@@ -136,7 +160,7 @@ docker commit -a "damonzheng" \
 
 1. **创建network**：`docker network create <network_name>`
 2. **查看所有network**：`docker network ls`
-3. **查看network详细信息**：`docker network inspect <network_name>`
+3. **查看network详细信息**：`docker network inspect <network_name>`（加上` | grep Name`可以查看当前网络有哪些容器）
 4. **将容器连接到network**：`docker network connect <network_name> <container_name_or_id>`
 5. **将容器从指定network断开**：`docker network disconnect <network_name> <container_name_or_id>`
 6. **删除network**：`docker network rm <network_name>`
