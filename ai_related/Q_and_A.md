@@ -586,6 +586,31 @@
 [RLHF](./RLHF.md)
 
 
+<!-- <details> -->
+<summary>DPO (Direct Preference Optimization, 直接偏好优化)</summary>
+
+<br>
+
+**背景回顾**
+
+> 传统 RLHF 三步骤：
+> - SFT（Supervised Fine-Tuning）：用高质量数据监督微调基础模型。
+> - RM（Reward Model）训练：基于人类选择 A 优于 B 的对比数据训练奖励模型。
+> - PPO 强化学习：用奖励模型优化语言模型，强化“人类喜欢的输出”。
+> 
+> 存在问题：
+> - RM + PPO 很复杂，训练难调
+> - PPO 不稳定，样本效率低
+> - 架构复杂，训练耗时
+
+**DPO 思想核心与原理**
+
+核心思想：绕过奖励模型，直接优化原模型使其符合人类偏好
+
+
+</details>
+
+
 <details>
 <summary>大模型幻觉</summary>
 
@@ -1215,7 +1240,7 @@ class TransformerEncoder(nn.Module):
 
 
 <details>
-<summary>PPO</summary>
+<summary>PPO (Proximal Policy Optimization, 近端策略优化)</summary>
 
 <br>
 

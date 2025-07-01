@@ -86,6 +86,7 @@ sudo apt install -y nvidia-docker2
    3. `-q`：只显示容器id：`docker ps -q`
    4. `-f`：过滤条件：`docker ps -f “name=<container_name>”`
    5. `-n`：最近创建的n个：`docker ps -n 3`
+   6. `--format "{{.字段名}}"`：格式化显示，如`docker ps --format "{{.ID}},{{.Image}},{{.Names}}"`
 3. **查看容器占用资源**：`docker stats [--no-stream] [container_name|container_id]`
    1. `--no-stream`：一次性快照，不实时刷新
 4. **停止容器**：`docker stop [-f] [container_name|container_id]`

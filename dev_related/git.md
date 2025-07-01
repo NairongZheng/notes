@@ -313,15 +313,24 @@ git lfs ls-files
 
 ## 其他操作
 
+**回退**
+
 1. 放弃本地未提交的修改：
-   1. 撤销**所有**未提交的更改：`git checkout -- .`
-   2. 放弃**所有**已`git add`但未`commit`的修改：`git reset --hard`
-   3. 放弃某个文件的修改：`git checkout -- <filename>`
+   1. 撤销**工作区**更改：`git checkout -- .`
+   2. 撤销**工作区和暂存区**更改：`git reset --hard`
+   3. 撤销某个文件的修改：`git checkout -- <filename>`
+   4. 撤销**未追踪文件**：`git clean -fd`（不可恢复！可以先用`git chean -nd`查看有哪些会被删除）
 2. 放弃`Git Merge`：
    1. 中止正在进行的合并：`git merge --abort`
    2. 如果`--abort`无效：`git reset --hard HEAD`
    3. 回退到`merge`之前的提交：`git reset --hard <之前的 commit ID>`
 
+| 用法                        | 用途                                      | 是否保留代码改动 |
+| --------------------------- | ----------------------------------------- | ---------------- |
+| `git reset`                 | 取消 commit 或 add，但保留工作区修改      | ✅ 是             |
+| `git reset --soft`          | 仅移动 HEAD，保留暂存区和工作区（最安全） | ✅ 是             |
+| `git reset --mixed`（默认） | 移动 HEAD + 清除暂存区，但保留工作区      | ✅ 是             |
+| `git reset --hard`          | 完全回退 HEAD + 暂存区 + 工作区（危险）   | ❌ 否             |
 
 # rebase和merge应用示例
 
