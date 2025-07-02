@@ -586,7 +586,7 @@
 [RLHF](./RLHF.md)
 
 
-<!-- <details> -->
+<details>
 <summary>DPO (Direct Preference Optimization, 直接偏好优化)</summary>
 
 <br>
@@ -603,10 +603,99 @@
 > - PPO 不稳定，样本效率低
 > - 架构复杂，训练耗时
 
-**DPO 思想核心与原理**
+**DPO 的工作流程**
 
-核心思想：绕过奖励模型，直接优化原模型使其符合人类偏好
+> **核心思想**：绕过奖励模型，直接优化原模型使其符合人类偏好
+> 
+> 它是RLHF的一种替代方案，但不需要强化学习，不用什么奖励模型，**只用监督学习方式**就能搞定。
+> 
+> **第一步：准备数据（成对偏好数据）**
+> 
+> - Prompt: “介绍一下猫和狗的区别。”
+> - 回答 A（chosen）：猫和狗都是常见的宠物，猫通常独立，狗更黏人。
+> - 回答 B（rejected）：狗是动物，猫不是狗。
+> - 很明显，人更喜欢回答 A
+> 
+> 那么就记录一个三元组：`[prompt, chosen_response=A, rejected_response=B]`
+> 
+> **第二步：准备两个模型**
+> 
+> - 当前模型 $\pi$（要训练的模型）
+> - 参考模型 $\pi_{ref}$（固定的，不训练，用来当参照物）
+> 
+> **第三步：给两个回答打分（模型算概率）**
+> 
+> 得到了 4 个数字：
+> 
+> ```bash
+> log π(chosen | prompt)
+> log π(rejected | prompt)
+> log π_ref(chosen | prompt)
+> log π_ref(rejected | prompt)
+> ```
+> 
+> **第四步：计算“谁更好”的损失函数**
+> 
+> $$
+> L=-\log \sigma (\beta · [\log \pi (y^+) - \log \pi (y^-) - (\log \pi_{ref} (y^+) - \log \pi_{ref} (y^-))])
+> $$
 
+**DPO 损失函数详解**
+
+> **第一步：比较两个答案的概率差**
+> 
+> 用 log-prob（对数概率）来表示模型对两个回答的倾向：
+> 
+> $$
+> \Delta_{\pi}=\log \pi (y^+) - \log \pi (y^-)
+> $$
+> 
+> 如果这个值越大，说明模型越偏向好回答。
+> 
+> **第二步：减去参考模型的偏好差**
+> 
+> 如果我们有一个参考模型（比如 SFT 模型 $\pi_{ref}$），我们可以只优化“比参考模型更好的那部分”：
+> 
+> $$
+> \Delta_{diff}=\Delta_{\pi} - \Delta_{\pi_{ref}}
+> $$
+> 
+> **第三步：放进 sigmoid + log 中变成分类损失**
+> 
+> $$
+> L=-\log \sigma (\beta · (\Delta_{\pi} - \Delta_{\pi_{ref}}))
+> $$
+> 
+> 其中：
+> - $\sigma(z) = \frac{1}{1 + e^{-z}}$是 sigmoid 函数；
+> - $\beta$ 是一个温度参数，控制 sharpness（一般取 1.0）。
+> 
+> 所以最后就是：
+> 
+> $$
+> L=-\log \sigma (\beta · [\log \pi (y^+) - \log \pi (y^-) - (\log \pi_{ref} (y^+) - \log \pi_{ref} (y^-))])
+> $$
+> 
+> 也可以用softmax的形式表示：
+> 
+> $$
+> L=-\log (\frac{e^{\beta (\log \pi (y^+) - \log \pi_{ref} (y^+))}}{e^{\beta (\log \pi (y^+) - \log \pi_{ref} (y^+))} + e^{\beta (\log \pi (y^-) - \log \pi_{ref} (y^-))}})
+> $$
+
+**DPO 相对于 RLHF 的优点总结**
+
+> 1. 无需奖励模型（Reward Model）
+>    1. RLHF：需要先训练一个奖励模型（Reward Model, RM）来估计人类偏好，然后再通过 PPO 等算法微调策略模型。
+>    2. DPO：直接使用人类偏好数据进行优化，不需要显式训练奖励模型，省去一个步骤，减少误差传播。
+> 2. 更稳定、更简单的训练过程
+>    1. RLHF（如 PPO）：是基于强化学习的复杂优化过程，需要价值函数估计、advantage 计算、clip 等技巧，训练过程不稳定，调参困难。
+>    2. DPO：是一个纯监督学习形式（logistic loss），没有 RL 的不稳定性，更容易训练和复现。
+> 3. 无策略偏移（Policy Misalignment）问题
+>    1. PPO 优化的是 reward，而不是人类真实偏好，有可能导致策略漂移。
+>    2. DPO 明确建模偏好概率分布，优化的目标是让模型产生更偏好的人类答案，目标更贴近实际偏好数据。
+> 4. 更强的可解释性
+>    1. DPO 的 loss 是一个有明确意义的对数偏好概率（log-sigmoid），结果更易解释；
+>    2. RLHF 的 reward 是间接学习到的，缺乏可解释性。
 
 </details>
 
