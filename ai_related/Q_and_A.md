@@ -1210,7 +1210,7 @@ class TransformerEncoder(nn.Module):
 
 ## 强化学习相关
 
-强化学习相关的也可以去看看[白话强化学习笔记](./白话强化学习笔记.md)或者[slaythespire_AI](../other/slaythespire_AI.md)
+强化学习相关的也可以去看看[强化学习](./强化学习.md)、[白话强化学习笔记](./白话强化学习笔记.md)或者[slaythespire_AI](../other/slaythespire_AI.md)
 
 <details>
 <summary>强化学习的两种优化方法</summary>

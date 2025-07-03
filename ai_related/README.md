@@ -2,11 +2,12 @@
 1. Q_and_A
 2. 大模型微调
 3. RLHF：Reinforcement Learning with Human Feedback，人类反馈强化学习
-4. 目标检测——RCNN与YOLO系列
-5. 目标检测——R2CNN与SCRDet
-6. ViT
-7. transformer
-8. swin_transformer
-9. 机器学习
-10. 机器学习2
-11. 白话强化学习笔记
+4. 强化学习
+5. 目标检测——RCNN与YOLO系列
+6. 目标检测——R2CNN与SCRDet
+7. ViT
+8. transformer
+9. swin_transformer
+10. 机器学习
+11. 机器学习2
+12. 白话强化学习笔记
