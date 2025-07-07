@@ -44,18 +44,18 @@
 ## slay the spire
 ### 玩法简介
 <div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
-    <img src="../images/202241203/20241206_slaythespire_3.png" alt="Image 1" style="width: 80%; height: auto;">
+    <img src="../../images/202241203/20241206_slaythespire_3.png" alt="Image 1" style="width: 80%; height: auto;">
 </div>
 <br>
 <br>
 <div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
-    <img src="../images/202241203/20241206_slaythespire_4.png" alt="Image 1" style="width: 80%; height: auto;">
+    <img src="../../images/202241203/20241206_slaythespire_4.png" alt="Image 1" style="width: 80%; height: auto;">
 </div>
 <br>
 <br>
 <div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
-    <img src="../images/202241203/20241206_slaythespire_1.png" alt="Image 1" style="width: 30%; height: auto;">
-    <img src="../images/202241203/20241206_slaythespire_2.png" alt="Image 2" style="width: 40%; height: auto;">
+    <img src="../../images/202241203/20241206_slaythespire_1.png" alt="Image 1" style="width: 30%; height: auto;">
+    <img src="../../images/202241203/20241206_slaythespire_2.png" alt="Image 2" style="width: 40%; height: auto;">
 </div>
 <br>
 <br>
@@ -63,8 +63,8 @@
 ### 简单分析
 **一、卡组设计**[^2][^3]
 <div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
-    <img src="../images/202241203/20241206_slaythespire_6.png" alt="Image 1" style="width: 60%; height: auto;">
-    <img src="../images/202241203/20241206_slaythespire_5.png" alt="Image 2" style="width: 25%; height: auto;">
+    <img src="../../images/202241203/20241206_slaythespire_6.png" alt="Image 1" style="width: 60%; height: auto;">
+    <img src="../../images/202241203/20241206_slaythespire_5.png" alt="Image 2" style="width: 25%; height: auto;">
 </div>
 <br>
 
@@ -81,7 +81,7 @@
    3. 增加触发条件，提高资源价值。<span style="color: #BACEDA;">如交锋资源价值为0费打14，甚至高于了1费的标准值。但其的触发条件“手中每张都是攻击牌时才可打出”，使玩家若想打出这种手牌，需要进行一定的布局。</span>
 
 <div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
-    <img src="../images/202241203/20241210_slaythespire_9.png" alt="Image 1" style="width: 80%; height: auto;">
+    <img src="../../images/202241203/20241210_slaythespire_9.png" alt="Image 1" style="width: 80%; height: auto;">
 </div>
 
 <br>
@@ -92,18 +92,18 @@
    3. 放大卡牌的正面效果：<span style="color: #BACEDA;">如重刃的正面增益“受到力量的加成*3”, 使得其可以与任何提供力量的卡牌形成协同效应，从而放大正面增益，使卡牌强度超出标准值。</span>
 
 <div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
-    <img src="../images/202241203/20241206_slaythespire_7.png" alt="Image 1" style="width: 80%; height: auto;">
+    <img src="../../images/202241203/20241206_slaythespire_7.png" alt="Image 1" style="width: 80%; height: auto;">
 </div>
 <br>
 <div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
-    <img src="../images/202241203/20241210_slaythespire_10.png" alt="Image 1" style="width: 80%; height: auto;">
+    <img src="../../images/202241203/20241210_slaythespire_10.png" alt="Image 1" style="width: 80%; height: auto;">
 </div>
 <br>
 这样的设计大大增加了牌组构筑的灵活度，同样也降低了游戏的运气成分，让玩家几乎不可能凑不出协同效应，区别只在于强度。
 
 **二、地图、房间、路线设计**
 <div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
-    <img src="../images/202241203/20241206_slaythespire_8.png" alt="Image 1" style="width: 80%; height: auto;">
+    <img src="../../images/202241203/20241206_slaythespire_8.png" alt="Image 1" style="width: 80%; height: auto;">
 </div>
 
 1. 房间类型、房间数量、路线设计、随机性与均衡性
@@ -118,7 +118,7 @@
 
 ## 骰子浪游者
 <div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
-    <img src="../images/202241203/20241206_骰子浪游者_1.png" alt="Image 1" style="width: 80%; height: auto;">
+    <img src="../../images/202241203/20241206_骰子浪游者_1.png" alt="Image 1" style="width: 80%; height: auto;">
 </div>
 
 
@@ -136,8 +136,8 @@
 
 
 <div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
-    <img src="../images/202241203/20241203_Dots_and_Boxes_1.png" alt="Image 1" style="width: 22%; height: auto;">
-    <img src="../images/202241203/20241203_Dots_and_Boxes_2.png" alt="Image 2" style="width: 22%; height: auto;">
+    <img src="../../images/202241203/20241203_Dots_and_Boxes_1.png" alt="Image 1" style="width: 22%; height: auto;">
+    <img src="../../images/202241203/20241203_Dots_and_Boxes_2.png" alt="Image 2" style="width: 22%; height: auto;">
 </div>
 
 评价函数设计难点：
@@ -147,18 +147,18 @@
 
 结果一：
 <div style="display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;">
-    <img src="../images/202241203/20241203_Dots_and_Boxes_2.png" alt="Image 2" style="width: 22%; height: auto;">
-    <img src="../images/202241203/20241203_Dots_and_Boxes_3.png" alt="Image 3" style="width: 22%; height: auto;">
-    <img src="../images/202241203/20241203_Dots_and_Boxes_4.png" alt="Image 4" style="width: 22%; height: auto;">
+    <img src="../../images/202241203/20241203_Dots_and_Boxes_2.png" alt="Image 2" style="width: 22%; height: auto;">
+    <img src="../../images/202241203/20241203_Dots_and_Boxes_3.png" alt="Image 3" style="width: 22%; height: auto;">
+    <img src="../../images/202241203/20241203_Dots_and_Boxes_4.png" alt="Image 4" style="width: 22%; height: auto;">
 </div>
 
 
 结果二：
 <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-    <img src="../images/202241203/20241203_Dots_and_Boxes_2.png" alt="Image 2" style="width: 22%; height: auto;">
-    <img src="../images/202241203/20241203_Dots_and_Boxes_5.png" alt="Image 5" style="width: 22%; height: auto;">
-    <img src="../images/202241203/20241203_Dots_and_Boxes_6.png" alt="Image 6" style="width: 22%; height: auto;">
-    <img src="../images/202241203/20241203_Dots_and_Boxes_7.png" alt="Image 7" style="width: 22%; height: auto;">
+    <img src="../../images/202241203/20241203_Dots_and_Boxes_2.png" alt="Image 2" style="width: 22%; height: auto;">
+    <img src="../../images/202241203/20241203_Dots_and_Boxes_5.png" alt="Image 5" style="width: 22%; height: auto;">
+    <img src="../../images/202241203/20241203_Dots_and_Boxes_6.png" alt="Image 6" style="width: 22%; height: auto;">
+    <img src="../../images/202241203/20241203_Dots_and_Boxes_7.png" alt="Image 7" style="width: 22%; height: auto;">
 </div>
 
 ## AlphaGo与AlphaZero

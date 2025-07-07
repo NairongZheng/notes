@@ -581,9 +581,9 @@
 
 ## 大模型相关
 
-[大模型微调](./大模型微调.md)
+[大模型微调](./LLM/大模型微调.md)
 
-[RLHF](./RLHF.md)
+[RLHF](./RL/RLHF.md)
 
 
 <details>
@@ -1075,7 +1075,7 @@ class TransformerEncoder(nn.Module):
 
 <br>
 
-在[大模型微调](./大模型微调.md)里面有详细介绍。
+在[大模型微调](./LLM/大模型微调.md)里面有详细介绍。
 
 </details>
 
@@ -1210,7 +1210,7 @@ class TransformerEncoder(nn.Module):
 
 ## 强化学习相关
 
-强化学习相关的也可以去看看[强化学习](./强化学习.md)、[白话强化学习笔记](./白话强化学习笔记.md)或者[slaythespire_AI](../other/slaythespire_AI.md)
+强化学习相关的也可以去看看[强化学习](./RL/强化学习.md)、[白话强化学习笔记](./RL/白话强化学习笔记.md)或者[slaythespire_AI](./RL/slaythespire_AI.md)
 
 <details>
 <summary>强化学习的两种优化方法</summary>
