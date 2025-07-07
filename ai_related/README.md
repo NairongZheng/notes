@@ -7,6 +7,7 @@
    4. slaythespire_AI
 3. LLM：大模型相关
    1. 大模型微调
+   2. Attention：LLM的注意力机制，包括MHA、MQA、GQA、MLA
 4. ML：机器学习
    1. 机器学习
    2. 机器学习2
