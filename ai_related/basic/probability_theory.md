@@ -250,5 +250,26 @@ $$
 p(\theta)=\prod\limits_i Laplace(\theta_i|0,b) \propto\exp(-\frac{1}{b}\sum\limits_i |\theta_i|)
 $$
 
+概率理解：
+- L1 正则化表示你相信大部分参数应该为 0，只有少数是非零的。
+- 拉普拉斯分布的尖峰和重尾特性会导致稀疏解（有些参数被压到严格为 0）。
+- 更强烈地推动“简洁模型”，有助于特征选择。
 
 **L2正则化**
+
+L2 正则项是参数的平方和：
+
+$$
+\lambda\sum\limits_i \theta_i^2
+$$
+
+等价于对参数$\theta$引入一个零均值的高斯先验：
+
+$$
+p(\theta)=\prod\limits_i \mathcal{N}(\theta_i|0,\sigma^2) \propto\exp(-\frac{1}{\sigma^2}\sum\limits_i \theta_i^2)
+$$
+
+概率理解：
+- L2 正则化表示你相信参数应该服从正态分布，集中在 0 附近但允许较大值的出现。
+- 惩罚大参数，但不会使参数严格为 0。
+- 平滑、小幅惩罚，鼓励整体较小但非稀疏的参数。
