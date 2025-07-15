@@ -1,5 +1,6 @@
 - [regexp](#regexp)
 - [cURL](#curl)
+- [wscat](#wscat)
 
 
 # regexp
@@ -119,4 +120,69 @@ curl -s -o img.png https://httpbin.org/image/png
 curl -X POST https://httpbin.org/post \
      -H "Content-Type: application/json" \
      -d '{"username":"admin","password":"1234"}'
+```
+
+# wscat
+
+**安装**
+
+```bash
+# 确保你已安装 Node.js（包含 npm）
+node -v
+npm -v
+# 安装wscat（若无）
+npm install -g wscat
+wscat -V
+```
+
+**基本用法：连接 WebSocket 服务器**
+
+```bash
+# 连接到 WebSocket 服务器
+wscat -c ws://echo.websocket.org
+```
+
+**-c 指定连接地址**
+
+```bash
+# -c（--connect）：指定要连接的 WebSocket 地址
+wscat -c ws://localhost:8080
+```
+
+**-H 设置自定义请求头**
+
+```bash
+# -H：设置自定义请求头（可多次使用）
+wscat -c ws://localhost:8080 -H "Authorization: Bearer <token>"
+```
+
+**-p 指定子协议**
+
+```bash
+# -p：指定 WebSocket 子协议
+wscat -c ws://localhost:8080 -p "chat"
+```
+
+**-o 以只读模式连接**
+
+```bash
+# -o：只读模式，只接收消息不发送
+wscat -c ws://localhost:8080 -o
+```
+
+**-n 禁用颜色输出**
+
+```bash
+# -n：禁用彩色输出
+wscat -c ws://localhost:8080 -n
+```
+
+**发送消息**
+
+连接后，直接输入内容并回车即可发送消息到服务器。
+
+**组合使用**
+
+```bash
+wscat -c ws://localhost:8080 -H "Authorization: Bearer <token>" -p "chat"
 ```

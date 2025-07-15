@@ -701,6 +701,82 @@
 </details>
 
 
+<details>
+<summary>TRPO (Trust Region Policy Optimization, 信赖域策略优化)</summary>
+<br>
+
+**背景：为什么要 TRPO？**
+
+> 在传统的策略梯度方法（如 REINFORCE、Vanilla Policy Gradient）中，策略更新步长过大时，容易导致策略发生剧烈变化，训练过程不稳定，甚至性能退化。
+>
+> - 问题1：策略更新“跳太远”
+>   - 策略是概率分布，参数稍微变化就可能导致行为完全不同。
+>   - 大步长更新可能让策略“崩掉”。
+> - 问题2：目标函数无约束
+>   - 传统方法直接最大化期望回报，没有限制策略变化幅度。
+> - 问题3：训练不稳定
+>   - 策略更新过大，导致采样分布和目标分布差异过大，梯度估计不准确，训练容易发散。
+
+**TRPO 的核心思想**
+
+> TRPO 的核心思想：每次更新策略时，限制新旧策略之间的“距离”不超过一个信赖域（trust region），保证策略变化平稳，训练更稳定。
+>
+> - 用 KL 散度（Kullback-Leibler Divergence）度量新旧策略的差异。
+> - 通过约束 KL 散度，确保每次策略更新不会“跳太远”。
+> - 本质上是“在保证安全的范围内，尽可能提升策略性能”。
+
+**TRPO 的算法流程**
+
+> 1. 采样：用当前策略$\pi_{old}$与环境交互，收集一批轨迹（state, action, reward）。
+> 2. 估计优势函数：用 GAE（Generalized Advantage Estimation）等方法估算每个动作的优势$A_t$。
+> 3. 构建目标函数：最大化新旧策略概率比加权的优势期望。
+> 4. 信赖域约束：约束新旧策略的平均 KL 散度不超过$\delta$（如 0.01）。
+> 5. 求解优化问题：用二阶优化（如共轭梯度法）近似求解带约束的最大化问题，得到新的策略参数。
+> 6. 更新策略：用新参数替换旧策略，进入下一轮。
+
+**TRPO 的目标函数**
+
+> TRPO 的优化目标是：
+>
+> $$
+> \max_{\theta} \ \mathbb{E}{s,a \sim \pi{\text{old}}} \left[ \frac{\pi_{\theta}(a|s)}{\pi_{\text{old}}(a|s)} A^{\pi_{\text{old}}}(s,a) \right]
+> $$
+>
+> 同时约束新旧策略的平均 KL 散度不超过阈值$\delta$：
+>
+> $$
+> \text{subject to} \ \mathbb{E}{s \sim \pi{\text{old}}} \left[ D_{KL}(\pi_{\text{old}}(\cdot|s) \| \pi_{\theta}(\cdot|s)) \right] \leq \delta
+> $$
+>
+> - 其中 $A^{\pi_{\text{old}}}(s,a)$ 是优势函数。
+> - $D_{KL}$ 是 KL 散度，衡量新旧策略的“距离”。
+> - δ 是一个超参数，控制每次更新的最大幅度。
+
+**TRPO 的优缺点总结**
+
+> | 优点 | 说明 |
+> |------------------------------|--------------------------------------------------------------|
+> | 更新稳定 | 通过 KL 散度约束，防止策略剧烈变化，训练过程更平滑 |
+> | 理论收敛性好 | 有严格的理论保证，更新不会导致性能下降 |
+> | 支持大步长 | 可以安全地使用较大的步长，提升优化效率 |
+> | 适合高维、复杂策略 | 在大规模神经网络策略中表现良好 |
+>
+> | 缺点 | 说明 |
+> |------------------------------|--------------------------------------------------------------|
+> | 实现复杂，计算量大 | 需要二阶优化（如共轭梯度法、Hessian 向量积），实现较复杂 |
+> | 计算资源消耗高 | 每次更新涉及大量矩阵运算，训练速度慢于 PPO |
+> | 不易扩展到大规模分布式场景 | 二阶优化和全局 KL 约束难以高效并行化 |
+> | 实践中常被 PPO 替代 | PPO 用剪切近似代替 KL 约束，效果相近但实现更简单，效率更高 |
+
+**TRPO 与 PPO 的对比**
+
+> - TRPO：严格的 KL 散度约束，二阶优化，理论保证强，计算复杂。
+> - PPO：PPO中的 KL 散度只是加在损失函数后的类似于“正则项”的操作，并不是严格约束，而是“软KL惩罚”！
+
+其中KL散度相关的部分可以查看[概率论部分](./basic/probability_theory.md#kl散度kullback-leibler-divergence)
+
+</details>
+
 
 <details>
 
@@ -1338,6 +1414,126 @@ class TransformerEncoder(nn.Module):
 >    1. 把长序列拆成多个短块，分别计算注意力，再用跨块机制（如 sliding window）进行上下文传播。
 > 4. **使用低精度**：
 >    1. 虽然不减少计算复杂度，但可以降低显存占用，让长序列训练更现实。
+
+</details>
+
+
+<details>
+<summary>MoE（专家混合模型，Mixture of Experts）</summary>
+
+**基本原理与优势**
+
+> MoE（专家混合模型，Mixture of Experts）是一种深度学习模型结构，旨在通过引入多个“专家”子网络和一个“门控”机制，实现模型参数的高效利用和推理加速。MoE在大规模模型（如NLP中的大语言模型）中尤为流行，因为它能在不显著增加推理成本的情况下提升模型容量。
+> 
+> **基本原理**
+> 
+> - **专家（Experts）**：每个专家通常是一个独立的神经网络（如MLP），专注于处理输入空间的某一部分。
+> - **门控网络（Gate）**：门控网络根据输入内容，动态选择最合适的一个或几个专家进行激活和计算，**其余专家不参与本次前向传播**。
+> - **稀疏激活**：每次只激活少量专家（如Top-1或Top-2），大大减少了实际计算量。
+> 
+> **主要优势**
+> 
+> 1. **参数高效扩展**：可以在不增加推理计算量的前提下，极大地增加模型参数量（如Switch Transformer、GLaM等）。
+> 2. **推理加速**：由于每次只激活部分专家，推理速度远快于同等参数量的全连接大模型。
+> 3. **模型多样性**：不同专家可以学习输入空间的不同特征，提高模型泛化能力。
+> 
+> **典型结构**
+> 
+> 以Transformer中的MoE层为例，通常在Feed Forward部分插入MoE结构：
+> 
+> 1. 输入经过门控网络，计算每个专家的权重（通常用softmax）。
+> 2. 选择Top-k个专家（如Top-1或Top-2），只将输入分配给这几个专家。
+> 3. 专家输出加权求和，作为MoE层的输出。
+
+
+**MoE常见问题及解决方案**
+
+> **1. 专家负载不均衡（Load Imbalance）**
+> 
+> **问题描述**：门控网络可能会偏向某些专家，导致部分专家过载，部分专家几乎不被激活，影响训练效率和模型效果。
+> 
+> **解决方法**：
+> - **负载均衡损失（Load Balancing Loss）**：在总损失中加入负载均衡项，鼓励门控网络均匀分配输入到各个专家。
+> - **噪声门控（Noisy Gating）**：在门控分数中加入噪声，增加探索性，防止陷入局部最优。
+> - **专家容量限制（Capacity Constraint）**：限制每个专家每次最多接收多少输入，超出部分丢弃或分配到其他专家。
+> 
+> **2. 通信和并行效率问题**
+> 
+> **问题描述**：大规模MoE模型通常需要跨多卡/多机分布式训练，专家之间的数据交换和同步会带来通信瓶颈。
+> 
+> **解决方法**：
+> - **专家并行（Expert Parallelism）**：将不同专家分布到不同设备上，利用分布式框架（如DeepSpeed、FairScale）优化通信。
+> - **局部专家分组（Local Expert Grouping）**：将专家分组，每组只在本地设备内通信，减少全局通信量。
+> - **稀疏调度优化**：只传递被激活的专家数据，减少无用通信。
+> 
+> **3. 门控网络训练不稳定**
+> 
+> **问题描述**：门控网络如果训练不充分，可能导致专家选择不合理，影响模型性能。
+> 
+> **解决方法**：
+> - **门控网络预热（Warm-up）**：训练初期对门控网络参数进行预热，或采用更平滑的激活策略。
+> - **正则化**：对门控输出加正则项，防止过度偏向某些专家。
+> - **温度调整（Temperature Scaling）**：调整softmax温度，控制门控分布的平滑度。
+> 
+> **4. 专家漂移（Expert Drift）**
+> 
+> **问题描述**：部分专家长期不被激活，导致参数更新缓慢甚至“死亡”。
+> 
+> **解决方法**：
+> - **周期性重置专家**：定期重置长期未被激活的专家参数。
+> - **专家激活监控**：监控每个专家的激活频率，动态调整门控策略。
+
+**代码实现**
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class Expert(nn.Module):
+    def __init__(self, d_model, d_ff):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(d_model, d_ff),
+            nn.ReLU(),
+            nn.Linear(d_ff, d_model)
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+class Top1Gate(nn.Module):
+    def __init__(self, d_model, num_experts):
+        super().__init__()
+        self.gate = nn.Linear(d_model, num_experts)
+
+    def forward(self, x):
+        # x: [batch, d_model]
+        logits = self.gate(x)  # [batch, num_experts]
+        gate_scores = F.softmax(logits, dim=-1)
+        top1_idx = torch.argmax(gate_scores, dim=-1)  # [batch]
+        one_hot = F.one_hot(top1_idx, num_classes=gate_scores.size(-1)).float()
+        mask = one_hot  # [batch, num_experts]
+        return mask, gate_scores
+
+class MoE(nn.Module):
+    def __init__(self, d_model, d_ff, num_experts):
+        super().__init__()
+        self.experts = nn.ModuleList([Expert(d_model, d_ff) for _ in range(num_experts)])
+        self.gate = Top1Gate(d_model, num_experts)
+
+    def forward(self, x):
+        # x: [batch, d_model]
+        mask, gate_scores = self.gate(x)  # mask: [batch, num_experts]
+
+        expert_outputs = torch.stack([expert(x) for expert in self.experts], dim=1)  # [batch, num_experts, d_model]
+
+        # 只取 top1 的输出（可以修改成 top-k）
+        mask = mask.unsqueeze(-1)  # [batch, num_experts, 1]
+        out = torch.sum(mask * expert_outputs, dim=1)  # [batch, d_model]
+
+        return out
+```
 
 </details>
 
