@@ -1239,6 +1239,49 @@ class TransformerEncoder(nn.Module):
 
 </details>
 
+<details>
+<summary>transformer在softmax中为什么要除以根号d_k</summary>
+
+<br>
+
+**注意力回顾**
+
+> 在Transformer的自注意力（Self-Attention）机制中，计算注意力分数时有如下公式：
+> 
+> $$
+> \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+> $$
+> 
+> 其中，$Q$（Query）、$K$（Key）、$V$（Value）是通过输入和参数矩阵线性变换得到的，$d_k$是Key向量的维度。
+
+**如果不除，会发生什么？**
+
+> 设 $Q$ 和 $K$ 是随机初始化的，元素是独立的零均值高斯变量，维度为 $d_k$，则它们的点积 $Q \cdot K$ 的期望和方差如下：
+> 期望：$E[Q \cdot K] = 0$
+> 方差：$\text{Var}[Q \cdot K] = d_k$
+> 也就是说：维度越高，点积值就越大（方差正比于 $d_k$）。
+> 结果是：
+> - 点积过大 -> softmax 输出变成 one-hot
+> - 梯度传播变得不稳定（几乎只对一个位置有梯度）
+> - 模型训练困难，学习缓慢甚至不收敛
+
+**为什么除以 $\sqrt{d_k}$ 有用？**
+
+> 这是为了把 $Q \cdot K^T$ 的值“标准化”到一个比较稳定的范围。
+> 如果点积期望方差为 $d_k$，那么除以 $\sqrt{d_k}$ 后：
+> - 方差变成 $\text{Var}[Q \cdot K] / d_k = 1$（随机变量 $X$ 除以常数 $c$，其 方差变化为：$\text{Var}(X / c) = \text{Var}(X) / c^2$）
+> - 保证 softmax 输入值的尺度稳定在一个合理区间（比如 -4 到 +4）
+> - softmax 输出更平滑，不至于极端化，利于训练
+
+**举个极端例子（数值说明）**
+
+> 假设没有除以 $\sqrt{d_k}$，某一对 $QK$ 点积值为 50，而其他值为 1：
+> - $softmax([50, 1, 1, 1]) ≈ [~1, 0, 0, 0]$ -> 几乎 one-hot
+> - 梯度集中在一个位置，模型变得不稳定
+> 
+> 而如果我们除以 $\sqrt{d_k}$（比如 $\sqrt{64} = 8$），点积值变成 6.25，softmax 输出就会更加平滑。
+
+</details>
 
 <details>
 <summary>RAG（检索增强生成，Retrieval-Augmented Generation）技术</summary>
