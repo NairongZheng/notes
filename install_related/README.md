@@ -12,3 +12,4 @@
 10. postgresql_usage：PostgreSQL使用
 11. tmux_usage：tmux使用
 12. llama_factory：llama_factory的使用
+13. es_usage：elastic search的使用
