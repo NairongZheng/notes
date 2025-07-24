@@ -10,6 +10,7 @@
   - [文档操作相关](#文档操作相关)
   - [索引级别相关操作](#索引级别相关操作)
   - [总结](#总结)
+- [一键脚本部署](#一键脚本部署)
 
 
 ## 基本概念快速理解
@@ -151,10 +152,14 @@ Go to http://0.0.0.0:5601/?code=511503 to get started.
 docker exec -it es01 /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
 ```
 
-将生成的令牌复制到网页中，然后点击确定，进入初始化，初始化完成之后会让输入：
+将生成的令牌复制到网页中，然后点击确定。
+
+之后可能会有一个验证码认证，到终端复制粘贴过来。一定要用复制粘贴的方式，直接输入的话会卡。
+
+通过验证之后会初始化，初始化完成后让输入：
 
 ```bash
-# Username: Kibana
+# Username: elastic
 # Password: 就是运行 Elasticsearch 容器时生成的那个密码，在这里就是 rOvmWsl0=5FqMXiV01G4
 ```
 
@@ -458,6 +463,8 @@ curl --cacert http_ca.crt -u elastic:$ELASTIC_PASSWORD \
 
 ### kibana使用
 
+[参考链接](https://www.cnblogs.com/chenqionghe/p/12503181.html)，这个链接有一些超链接都可以看看
+
 **kibana的命令行**
 
 在web的 `management - Dev Tools`中可以打开web命令行直接操作，具体使用略。
@@ -560,3 +567,50 @@ curl -X GET "https://localhost:9200/test_database/_search" -H 'Content-Type: app
 | 分析 | `_analyze`         | 验证分词器效果           |
 | 映射 | `_mapping`         | 定义或查看字段结构       |
 | 设置 | `_settings`        | 调整 analyzer、shards 等 |
+
+
+## 一键脚本部署
+
+（随便记的）
+
+```bash
+echo "[1/9] 设置 vm.max_map_count..."
+# 自动写入配置并生效（如已存在则不重复写入）
+grep -q '^vm.max_map_count=262144' /etc/sysctl.conf || echo 'vm.max_map_count=262144' | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+
+echo "[2/9] 拉取 ElasticSearch 与 Kibana 镜像..."
+docker pull docker.elastic.co/elasticsearch/elasticsearch:9.0.3
+# docker pull docker.elastic.co/kibana/kibana:9.0.3
+
+echo "[3/9] 创建数据目录并设置权限..."
+sudo mkdir -p /data1/damonzheng/elasticsearch_docker_single/data
+sudo chown -R 1000:1000 /data1/damonzheng/elasticsearch_docker_single
+sudo chown -R 1000:1000 /data1/damonzheng/elasticsearch_docker_single/data
+
+echo "[4/9] 启动 ElasticSearch 容器..."
+# docker run -d --name es01 --net host -p 9200:9200 -m 8GB docker.elastic.co/elasticsearch/elasticsearch:9.0.3
+docker run -d --name es01 --net host -p 9200:9200 -m 8GB \
+  -v /data1/damonzheng/elasticsearch_docker_single/data:/usr/share/elasticsearch/data \
+  docker.elastic.co/elasticsearch/elasticsearch:9.0.3
+echo "ElasticSearch 容器已启动 (es01)，端口: 9200"
+
+echo "[5/9] 安装 IK 分词插件..."
+docker exec es01 bin/elasticsearch-plugin install --batch https://get.infini.cloud/elasticsearch/analysis-ik/9.0.3
+echo "IK 分词插件安装完成。"
+
+echo "[6/9] 重启 ElasticSearch 容器使插件生效..."
+docker restart es01
+echo "ElasticSearch 容器已重启。"
+
+echo "[7/9] 启动 Kibana 容器..."
+docker run -d --name kib01 --net host -p 5601:5601 docker.elastic.co/kibana/kibana:9.0.3
+echo "Kibana 容器已启动 (kib01)，端口: 5601"
+
+echo "[8/9] 检查 ElasticSearch 状态..."
+docker ps -a | grep es01
+
+echo "[9/9] 部署完成！"
+echo "访问 ElasticSearch: http://localhost:9200"
+echo "访问 Kibana: http://localhost:5601"
+```

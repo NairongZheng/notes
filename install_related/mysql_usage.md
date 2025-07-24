@@ -3,6 +3,9 @@
 - [命令行使用mysql](#命令行使用mysql)
 - [常用sql语句](#常用sql语句)
 - [python使用mysql](#python使用mysql)
+- [mysql数据备份与恢复](#mysql数据备份与恢复)
+  - [备份](#备份)
+  - [恢复](#恢复)
 
 
 ## 安装
@@ -100,4 +103,35 @@ for row in rows:
 
 cur.close()
 conn.close()
+```
+
+## mysql数据备份与恢复
+
+### 备份
+
+**备份所有数据库**
+
+```bash
+mysqldump -u ${user_name} -p --all-databases > mysql_all_backup.sql
+```
+
+**备份一个数据库**
+
+```bash
+mysqldump -u ${user_name} -p ${your_database} > mysql_backup_database_name.sql
+```
+
+**只备份某张表**
+
+```bash
+mysqldump -u ${user_name} -p ${your_database} ${your_table} > mysql_backup_databese_table_name.sql
+```
+
+### 恢复
+
+**将某张备份表格导入某数据库**
+
+```bash
+# 默认是直接覆盖替换
+mysql -u ${user_name} -p ${your_database} < ${backup_sql_path.sql}
 ```

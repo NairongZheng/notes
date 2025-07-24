@@ -3,6 +3,8 @@
 - [命令行使用redis](#命令行使用redis)
 - [python使用redis示例](#python使用redis示例)
 - [go使用redis示例](#go使用redis示例)
+- [redis可视化](#redis可视化)
+- [redis数据备份](#redis数据备份)
 
 
 ## 安装并配置redis
@@ -99,6 +101,9 @@ redis-cli --tls --cert /root/redis-tls/redis.crt --key /root/redis-tls/redis.key
 # 127.0.0.1:6379> auth damonzheng
 # OK
 # 127.0.0.1:6379>
+
+# 有时候一个服务器上会有多个redis服务，运行在不同的端口，就需要指定端口进行连接
+redis-cli -p <port>
 ```
 
 **常用命令**
@@ -113,6 +118,8 @@ TYPE <key>                      # 查看某个key的值是什么类型
 
 # 2. 键操作
 KEYS *                          # 查询所有 key（生产环境慎用，可能阻塞）。
+keys user:*                     # 查找以 user: 开头的 key
+scan 0 match user:* count 10    # 从游标 0 开始扫描，匹配的 key 规则，一次返回最多 10 条记录
 EXISTS <key>                    # 判断 key 是否存在，存在返回 1，不存在返回 0。
 DEL <key>                       # 删除指定 key。
 EXPIRE <key> seconds            # 设置 key 的过期时间（秒）。
@@ -250,3 +257,29 @@ if __name__ == "__main__":
 ## go使用redis示例
 
 具体查看 [simple_go](https://github.com/NairongZheng/learning/tree/main/go_related/simple_go/test/redis_test.go)
+
+## redis可视化
+
+```bash
+# 使用官方推荐的 RedisInsight: https://redis.com/redis-enterprise/redis-insight/
+# 要确保网络是通的，不然读不到
+docker run -d --name redisinsight -p 5540:5540 redislabs/redisinsight:latest
+# 然后访问 http://localhost:5540
+```
+
+![redis连接](../images/2025/20250724_redis连接.png)
+
+
+## redis数据备份
+
+**快速手动备份：复制 dump.rdb**
+
+```bash
+# 确定 RDB 文件路径
+redis-cli -p <redis_port> -a <password> CONFIG GET dir
+# 上面的命令会有redis数据存放的路径，输出示例
+# 1) "dir"
+# 2) "/var/lib/redis"
+# 可以通过ls查看详情，然后再备份
+cp /var/lib/redis/dump.rdb /path/to/backup/dump_$(date +%F).rdb
+```
