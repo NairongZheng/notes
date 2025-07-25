@@ -6,6 +6,7 @@
 - [mysql数据备份与恢复](#mysql数据备份与恢复)
   - [备份](#备份)
   - [恢复](#恢复)
+- [mysql可视化](#mysql可视化)
 
 
 ## 安装
@@ -134,4 +135,15 @@ mysqldump -u ${user_name} -p ${your_database} ${your_table} > mysql_backup_datab
 ```bash
 # 默认是直接覆盖替换
 mysql -u ${user_name} -p ${your_database} < ${backup_sql_path.sql}
+```
+
+## mysql可视化
+
+```bash
+# 因为我的mysql运行在linux本机，裸机运行，而不是运行在另一个docker，所以需要填写-e PMA_HOST
+# 在linux使用 ip addr show docker0，显示的内容如: 192.168.188.1/24
+# 其中的 192.168.188.1 就是这里要填的ip
+# 裸机的mysql默认在3306端口
+docker run --rm --name myadmin -d -e PMA_HOST=<docker_ip> -e PMA_PORT=3306 -p 8282:80 phpmyadmin
+# 运行成功后，就可以在 localhost:8282 查看到页面（需要输入mysql的用户名跟密码）
 ```
