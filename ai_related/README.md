@@ -1,5 +1,5 @@
 # ai_related
-1. Q_and_A
+1. Q_and_A：问题答案的形式
 2. basic：一些基础知识
    1. probability_theory：概率论知识
 3. RL：强化学习相关
@@ -18,4 +18,4 @@
    2. 目标检测——R2CNN与SCRDet
 7. ViT
 8. transformer
-9.  swin_transformer
+9. swin_transformer
