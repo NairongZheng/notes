@@ -15,7 +15,7 @@ Swin Transformer ( Swin TRM ) 做到了两点：
 - ViT 是把 9 个 patch 一起输进去（一个 patch 当作一个 token），这样做的不就是整张图片的注意力嘛，但是图片太大，显然不可能一起输进去。
 - Swin 是把一个个 patch 单独处理（每个 patch 里面的每个像素当作 token，当然每个像素指的不是一个值，而是$[1, \  clannels]$）再输进去，这不就是 patch 内部的注意力嘛，把 9 个 patch 当作一个 batch，如果图片很多张的话，就可以把几张图片当成一个大 batch。
 
-<img src="../images/20211128/20211128_ViT与Swin输入对比.jpg" style="zoom:50%;" />
+<img src="../../images/20211128/20211128_ViT与Swin输入对比.jpg" style="zoom:50%;" />
 
 
 
@@ -32,7 +32,7 @@ Swin Transformer ( Swin TRM ) 做到了两点：
 ## 2. Swin TRM
 ### 2.1. Swin TRM 整体架构
 整体的结构如下图所示：
-<img src="../images/20211128/20211128_SwinTRM网络结构.jpg" style="zoom: 80%;" />
+<img src="../../images/20211128/20211128_SwinTRM网络结构.jpg" style="zoom: 80%;" />
 假设输入图像是 $224 \times 224 \times 3$，那么图中每个部分的输入输出为：
 
 1. $224 \times 224 \times 3$ 到 $(224\ /\ 4 ) \times (224\ /\ 4 ) \times (4 \times4\times3)$
@@ -40,9 +40,9 @@ Swin Transformer ( Swin TRM ) 做到了两点：
 3. $(224\ /\ 4 ) \times (224\ /\ 4 ) \times 96$ 到 $(224\ /\ 4 ) \times (224\ /\ 4 ) \times 96$ （第三个这边下面有一个 $\times2$，说明是经过两个 block，就是上图右边的那两个 block，那两个其实是不一样的，是两个 Encoder。我们说过，TRM 的 Encoder 是不会改变形状的，所以经过这个之后形状是没有改变的。）
 4. $(224\ /\ 4 ) \times (224\ /\ 4 ) \times 96$ 到 $(224\ /\ 8 ) \times (224\ /\ 8 ) \times (96\times2=128)$ （其实这边在下采样的时候是变成了 4，然后 4 再映射到 2 ，所以后面是 $96\times2=128$）
 
-<img src="../images/20211128/20211128_SwinTRM网络结构2.jpg" style="zoom:67%;" />
+<img src="../../images/20211128/20211128_SwinTRM网络结构2.jpg" style="zoom:67%;" />
 代码实现的时候，其实是下面这个图这么组装的：
-<img src="../images/20211128/20211128_SwinTRM网络结构_代码实现.jpg" style="zoom: 80%;" />
+<img src="../../images/20211128/20211128_SwinTRM网络结构_代码实现.jpg" style="zoom: 80%;" />
 
 ### 2.2. 输入数据处理（框1）
 <font color='red'>假设图像是 (224, 224, 3)，patch size 是 4，映射的维度是 96。</font>那么第一个框框的操作就是（解决数据输入的问题）：
@@ -75,7 +75,7 @@ SoftMax 里面的这个东西的本质是计算每个字符对每个字符的相
 
 
 
-<img src="../images/20211128/20211128_SwinTRM_位置编码1.jpg" style="zoom:50%;" />
+<img src="../../images/20211128/20211128_SwinTRM_位置编码1.jpg" style="zoom:50%;" />
 
 
 
@@ -83,7 +83,7 @@ SoftMax 里面的这个东西的本质是计算每个字符对每个字符的相
 
 
 
-<img src="../images/20211128/20211128_SwinTRM_位置编码2.jpg" style="zoom:67%;" />
+<img src="../../images/20211128/20211128_SwinTRM_位置编码2.jpg" style="zoom:67%;" />
 
 
 
@@ -99,13 +99,13 @@ $$
 
 （多头的话就是 $4\times4\times heads$）
 
-<img src="../images/20211128/20211128_SwinTRM_位置编码3.jpg" style="zoom:67%;" />
+<img src="../../images/20211128/20211128_SwinTRM_位置编码3.jpg" style="zoom:67%;" />
 
 **现在的问题就是怎么把上面的 4 个相对位置信息融入到这个 Attention 矩阵中！**
 
 我们把第一行看作是以1为原点，以此类推，不就可以把相对位置矩阵融入进去了吗？如下图：
 
-<img src="../images/20211128/20211128_SwinTRM_位置编码4.jpg" style="zoom: 50%;" />
+<img src="../../images/20211128/20211128_SwinTRM_位置编码4.jpg" style="zoom: 50%;" />
 
 梳理一下：
 
@@ -120,7 +120,7 @@ $$
 
 当然，上面这个只是举例，实际上，Swin TRM 的操作是下面这个图：
 
-<img src="../images/20211128/20211128_SwinTRM_位置编码5.jpg" style="zoom:67%;" />
+<img src="../../images/20211128/20211128_SwinTRM_位置编码5.jpg" style="zoom:67%;" />
 
 其实是一样的，只不过他用的是两个值，稍微复杂了一点而已。
 那他用这两个值怎么取索引？很简单的思路就是把这两个值加起来当作索引矩阵再去取值的。（例如上面第一行就会变成 (0, 1, 1, 2)）
@@ -139,7 +139,7 @@ $$
 
 下面的流程就很容易懂了：
 
-<img src="../images/20211128/20211128_SwinTRM_位置编码6.jpg" style="zoom: 50%;" />
+<img src="../../images/20211128/20211128_SwinTRM_位置编码6.jpg" style="zoom: 50%;" />
 
 
 
@@ -165,8 +165,8 @@ $$
 
 
 <center class="half">
-    <img src="../images/20211128/20211128_Swin_移动窗口3.jpg" style="zoom: 50%;" />
-    <img src="../images/20211128/20211128_Swin_移动窗口2.jpg" style="zoom:50%;" />
+    <img src="../../images/20211128/20211128_Swin_移动窗口3.jpg" style="zoom: 50%;" />
+    <img src="../../images/20211128/20211128_Swin_移动窗口2.jpg" style="zoom:50%;" />
 </center>
 
 ​    
@@ -181,7 +181,7 @@ $$
 
 那么要怎么办呢？下面画出示意图并解释。
 
-<img src="../images/20211128/20211128_Swin_移动窗口.jpg" style="zoom:67%;" />
+<img src="../../images/20211128/20211128_Swin_移动窗口.jpg" style="zoom:67%;" />
 
 
 
@@ -191,7 +191,7 @@ $$
 
 
 
-<img src="../images/20211128/20211128_Swin_移动窗口4.jpg" style="zoom: 67%;" />
+<img src="../../images/20211128/20211128_Swin_移动窗口4.jpg" style="zoom: 67%;" />
 
 
 
@@ -199,7 +199,7 @@ $$
 
 
 
-<img src="../images/20211128/20211128_Swin_移动窗口5.jpg" style="zoom:50%;" />
+<img src="../../images/20211128/20211128_Swin_移动窗口5.jpg" style="zoom:50%;" />
 
 
 
