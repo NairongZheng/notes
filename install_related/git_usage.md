@@ -293,7 +293,9 @@ git-log
 
 ### 4.1. 在dev上rebase到main
 
-在dev上rebase到main：`git rebase main`
+先将main分支最新修改进行拉取（多人开发的话，每次都要拉一下保持最新）：`git fetch origin main`
+
+在dev上rebase到main：`git rebase origin/main`
 
 需要解决冲突，解决完后：`git add .` && `git rebase --continue`
 
