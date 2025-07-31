@@ -79,6 +79,20 @@ apt install -y net-tools            # ifconfig、netstat等
 apt install -y iproute2             # 网络工具如ip（iproute2已取代了net-tools）
 apt install -y socat                # 端口转发（docker容器可以临时用用挺好用）
 apt install -y cloc                 # 统计代码量的工具
+
+
+# 安装nvm (Node Version Manager)
+git clone https://github.com/nvm-sh/nvm.git ~/.nvm
+echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.bashrc
+echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bashrc
+source ~/.bashrc
+# 安装nodejs
+nvm install 18.18.2
+nvm use 18.18.2
+nvm alias default 18.18.2
+    # nvm list: 查看nvm
+    # node -v: 查看nodejs版本
+    # npm -v: 查看npm版本
 ```
 
 **配置**

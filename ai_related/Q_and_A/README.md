@@ -52,6 +52,7 @@
 10. 模型在训练和推理时的显存占用如何估算？
 11. Seq2Seq模型的核心组件是什么？Encoder-Decoder结构如何解决长程依赖问题？输入序列过长，如何解决计算量问题？
 12. MoE（专家混合模型，Mixture of Experts）
+13. KV Cache
 ```
 
 ## RAG相关
@@ -68,6 +69,7 @@
 [Agent相关](./agent_related.md)，包含以下几个问题：
 
 ```bash
-1. Agent中的tool use
+1. Agent关键技术与流程
+2. Agent中的tool use
 2. Agent/LLM 输出质量评估方法
 ```
