@@ -147,3 +147,5 @@ mysql -u ${user_name} -p ${your_database} < ${backup_sql_path.sql}
 docker run --rm --name myadmin -d -e PMA_HOST=<docker_ip> -e PMA_PORT=3306 -p 8282:80 phpmyadmin
 # 运行成功后，就可以在 localhost:8282 查看到页面（需要输入mysql的用户名跟密码）
 ```
+
+![mysql可视化](../images/2025/20250808_mysql可视化.png)

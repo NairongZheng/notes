@@ -251,6 +251,19 @@ docker run -p 5050:80 \
 # 然后访问 http://localhost:5050，输入邮箱跟密码即可登录
 ```
 
+如果是apt启动的postgresql应该可以直接显示。（忘记了）
+
+如果是容器启动的postgresql， 登录之后需要配置访问的postgresql的ip跟port以及用户名与密码。
+
+假设postgresql容器的端口设置是这样的：`0.0.0.0:4432->5432/tcp`
+
+- 同一个network，直接输入容器名跟port(5432)就行
+- postgresql那个容器的ip(用`docker inspect`查看)跟端口(5432)
+- 用本机的ip跟端口（应该也可以，忘记了，可以试试）
+
+![](../images/2025/20250808_postgresql可视化连接.jpg)
+
+
 **连接 PostgreSQL 数据库**
 
 1. 左侧点击 `Add New Server`
