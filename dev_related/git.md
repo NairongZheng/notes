@@ -12,26 +12,63 @@
 
 ## 配置相关
 
-1. git log显示格式：在`~/.bashrc`中配置`git-log`：`alias git-log='git log --pretty=oneline --all --graph --abbrev-commit'`
-   1. `-all`：显示所有分支
-   2. `-pretty=oneline`：将提交信息显示为一行
-   3. `-abbrev-commit`：是的输出的commit更简短
-   4. `-graph`：以图的形式显示
-2. 配置：
-   1. [忽略文件权限导致的diff](https://www.jianshu.com/p/3b8ba804c47b)：`git config [--global || --local] core.filemode false`
-   2. [处理系统换行导致的diff](#换行符说明与配置)
-3. 查看配置：
-   1. 查看当前仓库配置：`git config --local --list`
-   2. 查看全局配置：`git config --global --list`
-   3. 查看某个特定配置：`git config [--global || --local] <setting name such as core.fileMode>`
-   4. 查看所有配置（包括系统级、全局级和本地仓库级）：`git config --list --show-origin`
-      1. 这个命令会列出 所有级别的 Git 配置，并显示它们存储在哪个配置文件中。
-      2. 本地配置（仓库级）：存储在仓库中的 `.git/config` 文件中，优先级最高，会覆盖其他级别的设置。
-      3. 全局配置（用户级）：存储在用户主目录下的 `.gitconfig` 文件中，优先级低于本地配置，但高于系统配置。
-      4. 系统配置：存储在系统级别的配置文件中（例如 `/etc/gitconfig`），优先级最低。
-4. 删除配置：
-   1. 删除某个配置项（单个最先匹配）：`git config --local --unset <配置项>`
-   2. 删除某个配置项（所有）：`git config --local --unset-all <配置项>`
+**git log设置**
+
+```shell
+# vim ~/.bashrc，添加：
+alias git-log='git log --pretty=oneline --all --graph --abbrev-commit
+    # -all：显示所有分支
+    # -pretty=oneline：将提交信息显示为一行
+    # -abbrev-commit：是的输出的commit更简短
+    # -graph：以图的形式显示
+```
+
+**文件权限与系统换行**
+
+
+[忽略文件权限导致的diff](https://www.jianshu.com/p/3b8ba804c47b)：`git config [--global || --local] core.filemode false`
+
+处理系统换行导致的diff：具体查看下一节[换行符说明与配置](#换行符说明与配置)
+
+**配置查看与删除**
+
+```shell
+# 查看当前仓库配置
+git config --local --list
+# 查看全局配置
+git config --global --list
+# 查看某个特定配置
+git config [--global || --local] <setting name such as core.fileMode>
+# 查看所有配置（包括系统级、全局级和本地仓库级）
+git config --list --show-origin
+    # 这个命令会列出 所有级别的 Git 配置，并显示它们存储在哪个配置文件中。
+    # 本地配置（仓库级）：存储在仓库中的 `.git/config` 文件中，优先级最高，会覆盖其他级别的设置。
+    # 全局配置（用户级）：存储在用户主目录下的 `.gitconfig` 文件中，优先级低于本地配置，但高于系统配置。
+    # 系统配置：存储在系统级别的配置文件中（例如 `/etc/gitconfig`），优先级最低。
+
+# 删除某个配置项（单个最先匹配）
+git config --local --unset <配置项>
+# 删除某个配置项（所有）
+git config --local --unset-all <配置项>
+```
+
+**配置免密登陆**
+
+方法一：使用ssh的方式，可以参考[ssh的配置](./ssh.md)
+
+方法二：使用token的方式：
+
+```shell
+# 都是在第一次使用的时候输入即可，后面就不用了
+# token需要在对应网站的个人设置里面去获取，都是一次显示的，需要的话自己保存
+
+# 用明文的方式存在 ~/.git-credentials （Windows、macOS、Linux通用）
+git config --global credential.helper store
+
+# 不用明文的话（使用明文存储就可以啦）
+git config --global credential.helper osxkeychain    # macOS
+git config --global credential.helper manager        # Windows
+```
 
 
 ### 换行符说明与配置

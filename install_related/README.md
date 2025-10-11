@@ -13,3 +13,4 @@
 11. tmux_usage：tmux使用
 12. llama_factory：llama_factory的使用
 13. es_usage：elastic search的使用
+14. uv_usage：uv环境的使用

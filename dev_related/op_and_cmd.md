@@ -95,6 +95,54 @@ nvm alias default 18.18.2
     # npm -v: 查看npm版本
 ```
 
+**没有root权限安装包**
+
+1. 安装cloc
+
+```shell
+# 确认系统有 perl
+perl --version
+
+# 如果有 perl，就用 cpanm 安装
+cpan App::clocpm
+```
+
+2. 安装tree（直接下载编译好的，缺点是没办法更新，但是也无所谓
+
+```shell
+mkdir -p ~/.local/bin
+wget https://mirrors.edge.kernel.org/ubuntu/pool/universe/t/tree/tree_2.0.2-1_amd64.deb
+dpkg-deb -x tree_2.0.2-1_amd64.deb tmp
+mv tmp/usr/bin/tree ~/.local/bin/
+export PATH=$HOME/.local/bin:$PATH    # 可以直接加到～/.zshrc
+tree --version
+```
+
+3. 安装rsync（能安装成功，但是在使用的时候会报错，还不知道怎么解决。。。）
+
+```shell
+# 下载包
+cd ~/tmp
+wget -O rsync-3.3.0.tar.gz https://sourceforge.net/projects/immortalwrt/files/sources/rsync-3.3.0.tar.gz/download
+tar -xzf rsync-3.3.0.tar.gz
+cd rsync-3.3.0
+
+# 配置安装路径，禁用不必要依赖（因为没有且懒得一个个装，哈哈哈）
+./configure --prefix=$HOME/.local \
+            --disable-openssl \
+            --disable-xxhash \
+            --disable-zstd \
+            --disable-lz4
+
+# 编译并安装
+make
+make install
+
+# 添加环境变量
+export PATH=$HOME/.local/bin:$PATH    # 可以直接添加到~/.zshrc
+rsync --version
+```
+
 **配置**
 
 `~/.bashrc`部分配置：
