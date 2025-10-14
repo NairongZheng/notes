@@ -1,6 +1,8 @@
 - [CMD](#cmd)
 - [linux](#linux)
 - [windows的mobaXterm](#windows的mobaxterm)
+- [vim使用](#vim使用)
+  - [vimdiff](#vimdiff)
 
 # CMD
 
@@ -240,4 +242,28 @@ def PythonSysPath( **kwargs ):
    1. 安装nodejs：`curl -sL install-node.now.sh/lts | bash`
    2. 安装yarn：`curl --compressed -o- -L https://yarnpkg.com/install.sh | bash`
    3. 安装另一个插件管理器：`curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim`（不要改，就这样）
-   4. 
+
+
+# vim使用
+
+## vimdiff
+
+vimdiff的一些设置：
+
+```shell
+# 命令行模式下
+
+## 有时候没配置的话高亮太难看，可以改主题
+:colorscheme desert
+:colorscheme evening
+:colorscheme elflord
+:colorscheme industry
+
+## 相同内容折叠与否（需要两边都设置一下）
+:set nofoldenable   # 相同内容不折叠
+:set foldenable     # 相同内容折叠
+
+## 是否换行显示
+:set wrap           # 换行显示
+:set nowrap         # 关闭换行显示
+```

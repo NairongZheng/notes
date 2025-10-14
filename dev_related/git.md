@@ -343,3 +343,14 @@ git lfs ls-files
 **merge和rebase**
 
 查看[git_usage](../install_related/git_usage.md)
+
+**git diff**
+
+| 命令                           | 对比范围          | 用途                                         |
+| ------------------------------ | ----------------- | -------------------------------------------- |
+| `git diff`                     | 工作区 ↔ 暂存区   | 查看还没 git add 的改动                      |
+| `git diff --cached`            | 暂存区 ↔ 最新提交 | 查看准备提交的内容                           |
+| `git diff HEAD`                | 工作区 ↔ 最新提交 | 查看当前所有未提交的改动（含未 add）         |
+| `git diff <commit1> <commit2>` | 两个提交之间      | 对比任意两次提交                             |
+| `git diff <branch1> <branch2>` | 两个分支之间      | 比较两个分支的差异                           |
+| `git diff --stat`              | 显示变更统计      | 显示修改文件数量、增删行数（不显示具体代码） |
