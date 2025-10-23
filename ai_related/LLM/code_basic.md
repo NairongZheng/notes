@@ -2,6 +2,7 @@
 - [some\_pkg](#some_pkg)
   - [AutoTokenizer](#autotokenizer)
   - [AutoConfig \& AutoConfig](#autoconfig--autoconfig)
+  - [AzureOpenAI](#azureopenai)
 
 
 # basic
@@ -242,3 +243,7 @@ a n
 ## AutoConfig & AutoConfig
 
 [示例脚本](./code/demo_AutoConfig_and_AutoConfig.py)
+
+## AzureOpenAI
+
+AzureOpenAI及一些llm的api调用，[示例脚本](./code/llm_api.py)
