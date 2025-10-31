@@ -2,6 +2,9 @@
 
 1. Q_and_A：问题答案的形式
 2. network_related：网络相关
+   1. transformer
+   2. swin_transformer
+   3. ViT
 3. basic：一些基础知识
    1. probability_theory：概率论知识
 4. RL：强化学习相关
@@ -20,6 +23,4 @@
 7. CV：计算机视觉
    1. 目标检测——RCNN与YOLO系列
    2. 目标检测——R2CNN与SCRDet
-8. ViT
-9.  transformer
-10. swin_transformer
+8. distributed_train：分布式训练的一些概念

@@ -173,7 +173,10 @@ export PATH="<new_path>:$PATH"    # 推荐将自定义工具路径加到 PATH �
 
 ```bash
 # 1. 查看linux版本等信息：cat /etc/os-release
-# 2. 查看当前使用的shell：echo $SHELL 或者 echo $0
+# 2. 查看当前使用的shell
+    # echo $SHELL：系统中该账户默认登陆的shell
+    # echo $0：当前正在执行的shell或者脚本
+    # 有可能是在zsh中运行bash，那么 $SHELL=zsh, $0=bash
 # 3. 查看当前shell的PID：echo $$
 # 4. 查看内存：free -h
 # 5. 查看系统系统区域设置（语言、字符编码、日期格式等）：locale
@@ -421,8 +424,10 @@ head [-n] <filename>
 # tail：查看文件后n行
 tail [-n] <filename>
 tail [-f] <filename> # 实时查看文件内容（适用于不断刷新的日志文件）
+
 # less：分页查看文件，空格可以翻页（非常非常好用）
-less <filename>
+less [-N] <filename>
+    # -N：带行号
 ```
 
 **find查找文件**

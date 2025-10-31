@@ -93,6 +93,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 ```shell
 brew install wget        # wget
 brew install tmux        # tmux
+brew install bash        # bash # 自带的/bin/bash版本低，可以使用这个命令安装新的bash，然后在～/.zshrc里面添加 export PATH="/opt/homebrew/bin:$PATH" 来使用新安装的bash
 ```
 
 ## Miniconda
@@ -108,6 +109,9 @@ bash Miniconda3-py312_24.9.2-0-MacOSX-arm64.sh -b -p $HOME/miniconda3
 # 有时候不需要添加，直接source即可
 echo 'export PATH="$HOME/miniconda3/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
+
+# conda可以添加envs的路径来使用别的环境
+conda config --add envs_dirs ${path/to/conda/envs}
 ```
 
 ## iterm2
