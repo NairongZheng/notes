@@ -14,6 +14,8 @@
    4. slaythespire_AI
 5. LLM：大模型相关
    1. code：llm生成的一些示例代码
+      1. llm_api：调用llm的不同方式
+      2. chat_template_hf：[hugging face的chat_template示例](https://hugging-face.cn/docs/transformers/chat_templating_writing)（采用jinja2）
    2. 大模型微调
    3. Attention：LLM的注意力机制，包括MHA、MQA、GQA、MLA
    4. code_basic：一些代码相关的介绍
