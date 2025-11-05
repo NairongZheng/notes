@@ -8,6 +8,7 @@
   - [Miniconda](#miniconda)
   - [iterm2](#iterm2)
     - [tmux](#tmux-1)
+  - [docker](#docker)
 - [Other](#other)
   - [Vscode/cursor](#vscodecursor)
     - [cursor的一些设置](#cursor的一些设置)
@@ -165,6 +166,15 @@ set -g xterm-keys on
 
 # 保留会话，关闭时不会销毁
 set -g destroy-unattached off
+```
+
+## docker
+
+```shell
+# 安装
+brew install --cask docker # --cask: 用于安装带有图形界面的桌面应用程序。macos需要使用这个来启动docker的守护进程
+# 启动
+open /Applications/Docker.app # 或者在电脑双击打开也行
 ```
 
 # Other

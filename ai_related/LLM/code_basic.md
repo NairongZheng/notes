@@ -1,4 +1,5 @@
 - [basic](#basic)
+- [部署llm](#部署llm)
 - [请求llm](#请求llm)
   - [OpenAI \& AzureOpenAI](#openai--azureopenai)
     - [推理字段介绍](#推理字段介绍)
@@ -238,6 +239,13 @@ a n
 分词器会根据这些规则逐步合并。
 
 </details>
+
+# 部署llm
+
+可以用lightllm或者vllm部署。
+
+1. vllm：[官方文档](https://docs.vllm.ai/)，[一些参数说明](https://docs.vllm.ai/en/latest/configuration/engine_args.html)
+2. lightllm：[官方文档](https://docs.litellm.ai/docs)，[一些参数说明](https://docs.litellm.ai/docs/proxy/cli)
 
 # 请求llm
 
