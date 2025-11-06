@@ -247,6 +247,42 @@ a n
 1. vllm：[官方文档](https://docs.vllm.ai/)，[一些参数说明](https://docs.vllm.ai/en/latest/configuration/engine_args.html)
 2. lightllm：[官方文档](https://docs.litellm.ai/docs)，[一些参数说明](https://docs.litellm.ai/docs/proxy/cli)
 
+```shell
+# vllm serve 启动之后有类似的log
+(APIServer pid=1209) INFO 11-05 23:12:32 [api_server-py: 1865] Starting VLLM API server 0 on http://0.0.0.0:8090
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher•py:29] Available routes are:
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /openapi.json, Methods: GET, HEAD
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /docs, Methods: GET, HEAD
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /docs/oauth2-redirect, Methods: GET, HEAD
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /redoc, Methods: GET, HEAD
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /health, Methods: GET
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /load, Methods: GET
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /ping, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /ping, Methods: GET
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /tokenize, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /detokenize, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /vl/models, Methods: GET
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /version, Methods: GET
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /vl/responses, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /vl/responses/{response_id}, Methods: GET
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /vl/responses/{response_id}/cancel, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /v1/chat/completions, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher.py: 37] Route: /v1/completions, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /vl/embeddings, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /pooling, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /classify, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /score, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /vl/score, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /vl/audio/transcriptions, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /vl/audio/translations, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /rerank, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /v1/rerank, Methods: POST
+(APIServer pid=1209) INFO 11-05 23:12:32 [launcher-py: 37] Route: /v2/rerank, Methods: POST
+
+# 收到请求之后会有类似的log
+(APIServer pid=1221) INFO 11-06 19:52:50 [loggers.py:123] Engine 000: Avg prompt throughput: 21331.0 tokens/s, Avg generation throughput: 1221.1 tokens/s, Running: 97 reqs, Waiting: 0 reqs, GPU KV cache usage: 19.0%, Prefix cache hit rate: 88.4%
+```
+
 # 请求llm
 
 [参考脚本](./code/llm_api.py)

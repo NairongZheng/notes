@@ -1,12 +1,15 @@
-- [基本用法](#基本用法)
-- [基本命令](#基本命令)
-- [基本快捷键](#基本快捷键)
+- [tmux](#tmux)
+  - [基本用法](#基本用法)
+  - [基本命令](#基本命令)
+  - [基本快捷键](#基本快捷键)
+- [screen](#screen)
 
+
+# tmux
 
 [参考链接](https://www.ruanyifeng.com/blog/2019/10/tmux.html)
 
-
-# 基本用法
+## 基本用法
 
 **安装**
 
@@ -48,7 +51,7 @@ set -g status-right "Time: %H:%M:%S | Date: %Y-%m-%d"
 ```
 
 
-# 基本命令
+## 基本命令
 
 ```bash
 # ======= 会话管理命令 ======= #
@@ -71,7 +74,7 @@ set -g status-right "Time: %H:%M:%S | Date: %Y-%m-%d"
 ```
 
 
-# 基本快捷键
+## 基本快捷键
 
 ```bash
 # ======= 会话管理快捷键 ======= #
@@ -96,3 +99,26 @@ set -g status-right "Time: %H:%M:%S | Date: %Y-%m-%d"
 # 显示窗格编号: Ctrl+b & q
 ```
 
+# screen
+
+1. 创建screen：`screen -S <screen_name>`
+2. 退出screen：`Ctrl+a+d`
+3. 查看screen：`screen -ls`
+4. 查看是否在screen中：`echo $STY`，非空则表示在screen中
+5. 进入已有screen：`screen -r <screen_name>`
+6. 断开并保留screen：`screen -d <screen_name>`，若要强制进入别人正在查看的screen可以先用这个命令断开
+7. 删除screen：`kill -9 <screen_pid>` && `screen -wipe`
+8. 关闭所有会话：`screen -X quit`
+9. 配置`~/.screenrc`（screen屏闪、鼠标滚轮、语言支持等）：
+
+```bash
+# 在~/.screenrc中添加以下内容，然后关闭所有会话再重启
+# 避免闪屏
+vbell off
+defscrollback 10000
+# 启用鼠标支持
+termcapinfo xterm* ti@:te@
+mousetrack on
+# 设置编码为UTF-8
+defutf8 on
+```

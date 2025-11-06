@@ -2,6 +2,7 @@
 - [regexp](#regexp)
 - [cURL](#curl)
 - [wscat](#wscat)
+- [nc (netcat)](#nc-netcat)
 
 # 基础shell语法
 
@@ -326,4 +327,108 @@ wscat -c ws://localhost:8080 -n
 
 ```bash
 wscat -c ws://localhost:8080 -H "Authorization: Bearer <token>" -p "chat"
+```
+
+
+# nc (netcat)
+
+**常用参数**
+
+| 参数 | 说明                             |
+| ---- | -------------------------------- |
+| `-l` | 启动监听（Listen mode）          |
+| `-p` | 指定本地端口号                   |
+| `-v` | 显示详细信息（verbose）          |
+| `-n` | 不进行 DNS 解析（加快速度）      |
+| `-z` | 只扫描端口，不发送数据           |
+| `-u` | 使用 UDP（默认 TCP）             |
+| `-w` | 设置超时秒数                     |
+| `-k` | 保持监听，多次接收连接（若支持） |
+
+**端口扫描（快速探测某台主机哪些端口开放）**
+
+```shell
+# 1. 简单测试
+nc -zv ${ip} ${port}
+nc -zv localhost 1-1024 # 探测本机 1-1024 端口（localhost一般会扫描ipv4跟ipv6两种，所以会有两条log）
+
+# 2. 更细粒度脚本（显示开放端口）
+for p in {1..1024}; do
+  nc -z -w 1 localhost $p 2>/dev/null && echo "open $p"
+done
+```
+
+**简单通信 / 聊天（两个终端互相发消息）**
+
+```shell
+# 服务端
+nc -lk ${listen_port}
+# 客户端
+nc ${server_ip} ${port}
+
+# 然后就可以互相发送消息
+```
+
+**模拟http交互**
+
+模拟与curl的交互
+
+```shell
+# 服务端
+nc -lk ${listen_port}
+# 客户端
+curl http://${server_ip}:${port}
+
+# 然后服务端会有类似以下的log：
+    # GET / HTTP/1.1
+    # Host: localhost:60012
+    # User-Agent: curl/8.7.1
+    # Accept: */*
+# 可以在服务端模拟返回：
+    # HTTP/1.1 200 OK
+    # Content-Type: text/plain
+    # Content-Length: 13
+
+    # Hello, world!
+# 客户端就可以收到返回
+# 当然，你还可以测试json之类的返回格式
+```
+
+http当服务端，nc当客户端
+
+```shell
+# 服务端
+python -m http.server ${port}
+# 客户端
+nc ${server_ip} ${port}
+
+# 然后客户端用一下信息模拟请求（要有空行，也就是多按个回车即可）：
+    # GET / HTTP/1.1
+    # Host: localhost:8000
+    # Connection: close
+    # 
+# 就会收到类似以下的log：
+    # HTTP/1.0 200 OK
+    # Server: SimpleHTTP/0.6 Python/3.12.11
+    # Date: Thu, 06 Nov 2025 04:58:16 GMT
+    # Content-type: text/html; charset=utf-8
+    # Content-Length: 308
+
+    # <!DOCTYPE HTML>
+    # <html lang="en">
+    # <head>
+    # <meta charset="utf-8">
+    # <title>Directory listing for /</title>
+    # </head>
+    # <body>
+    # <h1>Directory listing for /</h1>
+    # <hr>
+    # <ul>
+    # <li><a href="test.json">test.json</a></li>
+    # <li><a href="test.py">test.py</a></li>
+    # <li><a href="test.sh">test.sh</a></li>
+    # </ul>
+    # <hr>
+    # </body>
+    # </html>
 ```

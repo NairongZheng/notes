@@ -1,6 +1,7 @@
 - [General](#general)
 - [Windows](#windows)
   - [MobaXterm](#mobaxterm)
+    - [使用本机的conda](#使用本机的conda)
     - [tmux](#tmux)
 - [Mac](#mac)
   - [设置](#设置)
@@ -29,6 +30,19 @@
 3. notepad++：[https://notepad-plus-plus.org/downloads/](https://notepad-plus-plus.org/downloads/)
 
 ## MobaXterm
+
+### 使用本机的conda
+
+[mobaXterm使用本机conda](https://www.cnblogs.com/AnonymousDestroyer/p/17258702.html)：在`~/.bashrc`中添加以下代码：
+
+```bash
+export PATH=/drives/d/app/anaconda/install/Scripts:$PATH
+export PYTHONIOENCODING=utf-8
+if [[ "${OSTYPE}" == 'cygwin' ]]; then
+    set -o igncr
+    export SHELLOPTS
+fi
+```
 
 ### tmux
 

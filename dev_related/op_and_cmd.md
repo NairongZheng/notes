@@ -4,20 +4,18 @@
   - [查看信息](#查看信息)
   - [文件操作](#文件操作)
   - [网络端口操作](#网络端口操作)
-  - [screen操作](#screen操作)
-  - [其他操作](#其他操作)
   - [文本处理命令](#文本处理命令)
   - [Linux用户和组管理](#linux用户和组管理)
     - [用户管理](#用户管理)
     - [组管理](#组管理)
     - [权限管理](#权限管理)
+  - [其他操作或问题](#其他操作或问题)
 - [windows操作相关](#windows操作相关)
   - [windows目录结构](#windows目录结构)
   - [查看信息](#查看信息-1)
   - [网络端口操作](#网络端口操作-1)
-  - [其他操作](#其他操作-1)
+  - [其他操作](#其他操作)
 - [环境相关](#环境相关)
-- [问题](#问题)
 
 
 # linux操作相关
@@ -386,33 +384,6 @@ iptables -L             # 查看防火墙规则
 telnet <ip> <port>      # 测试能否连上某<ip:port>
 ```
 
-## screen操作
-1. 创建screen：`screen -S <screen_name>`
-2. 退出screen：`Ctrl+a+d`
-3. 查看screen：`screen -ls`
-4. 查看是否在screen中：`echo $STY`，非空则表示在screen中
-5. 进入已有screen：`screen -r <screen_name>`
-6. 断开并保留screen：`screen -d <screen_name>`，若要强制进入别人正在查看的screen可以先用这个命令断开
-7. 删除screen：`kill -9 <screen_pid>` && `screen -wipe`
-8. 关闭所有会话：`screen -X quit`
-9. 配置`~/.screenrc`（screen屏闪、鼠标滚轮、语言支持等）：
-
-```bash
-# 在~/.screenrc中添加以下内容，然后关闭所有会话再重启
-# 避免闪屏
-vbell off
-defscrollback 10000
-# 启用鼠标支持
-termcapinfo xterm* ti@:te@
-mousetrack on
-# 设置编码为UTF-8
-defutf8 on
-```
-
-## 其他操作
-
-1. [重定向输出到黑洞](https://blog.csdn.net/longgeaisisi/article/details/90519690)：`/dev/null 2>&1`
-
 ## 文本处理命令
 
 **查看文件内容**
@@ -694,6 +665,12 @@ sudo chown [-R] :<new_group> <file_or_dir>
 sudo chown [-R] <new_owner>:<new_group> <file_or_dir>
 ```
 
+## 其他操作或问题
+
+1. [重定向输出到黑洞](https://blog.csdn.net/longgeaisisi/article/details/90519690)：`> /dev/null 2>&1`
+2. [linux中按上下左右键为什么变成\^\[\[A\^\[\[B\^\[\[C\^\[\[D](https://www.zhihu.com/question/31429658)：输入`reset`解决
+
+
 # windows操作相关
 
 ## windows目录结构
@@ -753,17 +730,3 @@ C:\                                 # 系统盘（默认），存储 Windows 操
 
 1. [python项目自动生成环境配置文件requirements.txt](https://blog.csdn.net/pearl8899/article/details/113877334)：`pipreqs .`
 2. 导出conda环境配置：`conda env export > environment.yml`
-3. [mobaXterm使用本地conda](https://www.cnblogs.com/AnonymousDestroyer/p/17258702.html)：在`~/.bashrc`中添加以下代码：
-
-```bash
-export PATH=/drives/d/app/anaconda/install/Scripts:$PATH
-export PYTHONIOENCODING=utf-8
-if [[ "${OSTYPE}" == 'cygwin' ]]; then
-    set -o igncr
-    export SHELLOPTS
-fi
-```
-
-# 问题
-
-1. [linux中按上下左右键为什么变成\^\[\[A\^\[\[B\^\[\[C\^\[\[D](https://www.zhihu.com/question/31429658)：输入`bash`解决
