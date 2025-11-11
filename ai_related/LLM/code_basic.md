@@ -2,12 +2,12 @@
 - [部署llm](#部署llm)
 - [请求llm](#请求llm)
   - [OpenAI \& AzureOpenAI](#openai--azureopenai)
+    - [请求与返回](#请求与返回)
     - [推理字段介绍](#推理字段介绍)
   - [直接采用post请求](#直接采用post请求)
 - [some\_pkg](#some_pkg)
   - [AutoTokenizer](#autotokenizer)
   - [AutoConfig \& AutoConfig](#autoconfig--autoconfig)
-  - [AzureOpenAI](#azureopenai)
 
 
 # basic
@@ -392,7 +392,7 @@ a n
 > # output
 > # 不同框架不完全一致，例如lightllm：
 > {
->   "generated_text": "XXXXXX"    # 需要自己解析
+>   "generated_text": ["XXXXXX"]    # 需要自己解析
 > }
 > ```
 > 
@@ -433,6 +433,26 @@ a n
 | Base URL                      | 默认 https://api.openai.com/v1 | 必须设置为 Azure endpoint                   |
 | 是否支持自定义网络 / 安全策略 | ❌                              | ✅ 支持企业 VNet、Private Link、合规性控制   |
 | 兼容性                        | 用于所有 OpenAI 兼容服务       | 专用于 Azure 环境                           |
+
+### 请求与返回
+
+```python
+# 其实只有 client 创建方式不一样而已
+# 注意请求中的 extra_body 里面的各个字段实际上是解开传进去的，而不是直接传 "extra_body" 这个字段
+# 模型的返回，两个包都会包装好再返回，跟 requests 方式返回的 dict 有区别，但本质上一样的
+
+# OpenAI client:
+client = OpenAI(base_url="", api_key="")
+# OpenAI 的请求:
+response = client.chat.completions.create(model="", messages=[], tools=[], extra_body={})
+# OpenAI 的返回: response.choices[0].message, response 里有多个字段，都可以看看
+
+# AzureOpenAI client:
+client = AzureOpenAI(azure_endpoint="", api_key="", api_version="")
+# AzureOpenAI 的请求:
+response = client.chat.completions.create(model="", messages=[], tools=[], extra_body={})
+# AzureOpenAI 的返回: response.choices[0].message, response 里有多个字段，都可以看看
+```
 
 ### 推理字段介绍
 
@@ -491,7 +511,13 @@ a n
 其实就是不使用openai的sdk，直接采用requests.post的方式来调用。看[请求llm](#请求llm)最开头的介绍和脚本就懂了。
 
 ```python
+# 请求: 正常情况下用这种方式都可以
 response = requests.post(url, headers=headers, data=json.dumps(data))
+# 不过有些部署方式有规定 data 的形式，比如 lightllm 部署的 /generate 接口就要求: data = {"inputs": "", "parameters": {}}
+
+# 返回:
+    # 1. 一般的 /v1/chat/completions 接口返回: model_response = response.json(), 主要 content 字段: model_response["choices"][0]["message"]["content"]
+    # 2. lightllm 的 /generate 接口返回: model_response = response['generated_text'][0]
 ```
 
 # some_pkg
@@ -503,7 +529,3 @@ response = requests.post(url, headers=headers, data=json.dumps(data))
 ## AutoConfig & AutoConfig
 
 [示例脚本](./code/demo_AutoConfig_and_AutoConfig.py)
-
-## AzureOpenAI
-
-AzureOpenAI及一些llm的api调用，[示例脚本](./code/llm_api.py)

@@ -47,18 +47,19 @@ def _get_reasoning_content_from_dict(message: dict):
     return None
 
 
-def test_openai(url, api_key, model_name, messages, tools):
+def test_openai(base_url, api_key, model, messages, tools):
     """
     用OpenAI的api调用，直接调用v1接口
-    url如: https://api.siliconflow.cn/v1, 当然也可以用openai的
+    base_url如: https://api.siliconflow.cn/v1, 当然也可以用openai的
+    他会自动往 base_url 的 /chat/completions 路由接口发送请求
     """
     client = OpenAI(
-        base_url=url,
+        base_url=base_url,
         api_key=api_key,
     )
     # 有些模型是不支持某些参数的，可能会报错的
     response = client.chat.completions.create(
-        model=model_name,
+        model=model,
         messages=messages,
         tools=tools,
         tool_choice="auto",
@@ -89,7 +90,7 @@ def test_openai(url, api_key, model_name, messages, tools):
         print(f"Tool arguments: {tool_args}")
 
 
-def test_azure_openai(url, api_key, model_name, messages, tools):
+def test_azure_openai(azure_endpoint, api_key, model, messages, tools):
     """
     用AzureOpenAI的api调用
     url: 如 https://{xxxxxx}.openai.azure.com, 这是azure上自己定义的endpoint
@@ -98,12 +99,12 @@ def test_azure_openai(url, api_key, model_name, messages, tools):
     推理也是类似，这边不知道一些部署模型的参数，就不试了
     """
     client = AzureOpenAI(
-        azure_endpoint=url,
+        azure_endpoint=azure_endpoint,
         api_key=api_key,
         api_version="2025-01-01-preview",
     )
     response = client.chat.completions.create(
-        model=model_name,
+        model=model,
         messages=messages,
         tools=tools,
         tool_choice="auto",
