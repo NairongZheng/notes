@@ -389,8 +389,6 @@ telnet <ip> <port>      # 测试能否连上某<ip:port>
 **查看文件内容**
 
 ```bash
-# cat：显示文件内容，-n带行号
-cat [-n] <filename>
 # head：查看文件前n行（默认前10行）
 head [-n] <filename>
 # tail：查看文件后n行
@@ -400,6 +398,23 @@ tail [-f] <filename> # 实时查看文件内容（适用于不断刷新的日志
 # less：分页查看文件，空格可以翻页（非常非常好用）
 less [-N] <filename>
     # -N：带行号
+```
+
+**cat命令**
+
+```shell
+# 1. 显示文件内容，-n带行号
+cat [-n] <filename>
+# 2. 创建/写入文件（ctrl+d 完成写入）
+cat [> || >>] <filename>    # > 覆盖写入; >> 追加写入
+
+# 3. 使用 Here Document（多行一次性写入）
+# <<EOF 表示输入直到标识符 EOF 为止。变量默认会被解析，可用 <<'EOF' 或者用双引号 "${para}" 禁止变量解析。
+cat [> || >>] file.txt <<EOF
+Line 1
+Line 2
+Line 3
+EOF
 ```
 
 **find查找文件**
@@ -433,6 +448,17 @@ grep [OPTIONS] "<keyword>" <filename>
     # -l：只显示匹配的文件名，不显示内容
     # 还可以匹配正则表达式 ``
     # -E：支持高阶正则表达式
+```
+
+**diff查看文件修改**
+
+```bash
+diff [options] ${floder1} ${folder2}
+    # -r：递归比较目录
+    # -q：只显示文件是否不同，不显示内容
+    # -N：如果文件只在其中一个目录存在，也显示为差异（默认会跳过）
+    # -w：忽略所有空格差异
+    # -B：忽略空白行的差异
 ```
 
 **sed文本流编辑**
@@ -494,17 +520,6 @@ ps aux | grep <content> | awk '{print $2}' | xargs kill -9
 # 删除带空格的文件名
 find ${base_path} -name "*.log" -print0 | xargs -0 rm -f
     # -print0 和 -0 保证空格/特殊字符处理正确
-```
-
-**diff查看文件修改**
-
-```bash
-diff [options] ${floder1} ${folder2}
-    # -r：递归比较目录
-    # -q：只显示文件是否不同，不显示内容
-    # -N：如果文件只在其中一个目录存在，也显示为差异（默认会跳过）
-    # -w：忽略所有空格差异
-    # -B：忽略空白行的差异
 ```
 
 ## Linux用户和组管理
