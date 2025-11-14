@@ -12,11 +12,13 @@
 
 # basic
 
+下面用[Qwen/Qwen3-14B](https://huggingface.co/Qwen/Qwen3-14B/tree/main)举例
+
 ```shell
 .
 ├── config.json                        # 模型结构配置文件，定义模型的结构参数，比如隐藏层维度、层数、注意力头数、RoPE 范围、词表大小等。
 ├── generation_config.json             # 文本生成参数默认值。定义推理时的默认参数：如 max_new_tokens、temperature、top_p、do_sample 等。被 model.generate() 调用时使用。
-├── chat_template.jinja                # message组织的模板，hugging face会通过这个模板将message组织成文本传给llm。
+├── chat_template.jinja                # message组织的模板，hugging face会通过这个模板将message组织成文本传给llm。（Qwen3-14B直接放在tokenizer_config中）
 ├── merges.txt                         # BPE 合并规则。定义哪些字符对可以合并成新 token，例如 “th” + “e” → “the”。BPE 分词器必须配合 vocab.json 使用。
 ├── model-00001-of-00008.safetensors   # 模型权重文件（分片）
 ├── model-00002-of-00008.safetensors
@@ -27,7 +29,7 @@
 ├── model-00007-of-00008.safetensors
 ├── model-00008-of-00008.safetensors
 ├── model.safetensors.index.json       # 指明每个权重张量在哪个分片文件里。例如 "model.layers.0.self_attn.q_proj.weight" 在第 2 个 safetensor 文件。模型加载时用它拼接参数。
-├── tokenizer_config.json              # 分词器的配置文件。定义分词器类名、特殊 token（BOS、EOS、PAD、UNK）等元信息。
+├── tokenizer_config.json              # 分词器的配置文件。定义分词器类名、特殊 token（BOS、EOS、PAD、UNK）等元信息。(一些模型也会把chat template放在这里)
 ├── tokenizer.json                     # 分词器完整定义（Hugging Face 格式）。包含分词算法、词表、merge 规则等，是最主要的 tokenizer 文件。
 └── vocab.json                         # 词表文件（BPE 或 SentencePiece）。旧版兼容文件，部分 tokenizer 会用它和 merges.txt 一起加载。
 ```
@@ -51,24 +53,25 @@
 ```shell
 {
   "architectures": ["QwenForCausalLM"],
-  "model_type": "qwen",
+  "model_type": "qwen3",
   "hidden_size": 5120,
-  "intermediate_size": 13824,
+  "intermediate_size": 17408,
   "num_attention_heads": 40,
   "num_hidden_layers": 40,
   "vocab_size": 151936,
-  "max_position_embeddings": 32768,
-  "rms_norm_eps": 1e-5,
-  "rope_scaling": {"type": "linear", "factor": 2.0},
+  "max_position_embeddings": 40960,
+  "rms_norm_eps": 1e-6,
+  "rope_scaling": null,
   "use_cache": true,
-  "torch_dtype": "bfloat16"
+  "torch_dtype": "bfloat16",
+  ...
 }
 ```
 
 | 字段                    | 含义                                                                    |
 | ----------------------- | ----------------------------------------------------------------------- |
 | architectures           | 模型对应的类名（Transformers 自动加载时使用）。例如 "QwenForCausalLM"。 |
-| model_type              | 模型家族类型（如 "qwen", "llama", "gpt2"），决定加载逻辑。              |
+| model_type              | 模型家族类型（如 "qwen3", "llama", "gpt2"），决定加载逻辑。             |
 | hidden_size             | 每层 Transformer 的隐藏维度。                                           |
 | intermediate_size       | FFN 层（前馈层）的中间维度。                                            |
 | num_attention_heads     | 注意力头数量。                                                          |
@@ -90,12 +93,22 @@
 ```shell
 {
   "metadata": {
-    "total_size": 31987654321
+    "total_size": 29536614400
   },
   "weight_map": {
+    "lm_head.weight": "model-00008-of-00008.safetensors",
     "model.embed_tokens.weight": "model-00001-of-00008.safetensors",
+    "model.layers.0.input_layernorm.weight": "model-00001-of-00008.safetensors",
+    "model.layers.0.mlp.down_proj.weight": "model-00001-of-00008.safetensors",
+    "model.layers.0.mlp.gate_proj.weight": "model-00001-of-00008.safetensors",
+    "model.layers.0.mlp.up_proj.weight": "model-00001-of-00008.safetensors",
+    "model.layers.0.post_attention_layernorm.weight": "model-00001-of-00008.safetensors",
+    "model.layers.0.self_attn.k_norm.weight": "model-00001-of-00008.safetensors",
+    "model.layers.0.self_attn.k_proj.weight": "model-00001-of-00008.safetensors",
+    "model.layers.0.self_attn.o_proj.weight": "model-00001-of-00008.safetensors",
+    "model.layers.0.self_attn.q_norm.weight": "model-00001-of-00008.safetensors",
     "model.layers.0.self_attn.q_proj.weight": "model-00001-of-00008.safetensors",
-    "model.layers.0.self_attn.k_proj.weight": "model-00002-of-00008.safetensors",
+    "model.layers.0.self_attn.v_proj.weight": "model-00001-of-00008.safetensors",
     ...
   }
 }
@@ -116,25 +129,35 @@
 
 ```shell
 {
-  "max_new_tokens": 512,
-  "temperature": 0.8,
-  "top_p": 0.9,
-  "do_sample": true,
-  "repetition_penalty": 1.05,
-  "bos_token_id": 1,
-  "eos_token_id": 2,
-  "pad_token_id": 0
+    "transformers_version": "4.51.0",
+    "bos_token_id": 151643,
+    "do_sample": true,
+    "eos_token_id": [
+        151645,
+        151643
+    ],
+    "pad_token_id": 151643,
+    "repetition_penalty": 1.05,
+    "temperature": 0.6,
+    "top_k": 20,
+    "top_p": 0.95,
+    "max_length": 1024,
+    "max_new_tokens": 512,
 }
 ```
 
-| 字段                                       | 含义                        |
-| ------------------------------------------ | --------------------------- |
-| max_new_tokens                             | 最大生成 token 数。         |
-| temperature                                | 采样温度，控制生成多样性。  |
-| top_p                                      | nucleus sampling 截断阈值。 |
-| do_sample                                  | 是否启用采样模式。          |
-| repetition_penalty                         | 重复惩罚因子。              |
-| bos_token_id / eos_token_id / pad_token_id | 特殊 token 的 ID。          |
+| 字段               | 含义                                                                                                                                                                                                     |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| bos_token_id       | Beginning Of Sentence Token，句子起始 token ID（模型输入的开头符号）。<br> Qwen3 使用自己的特殊 token：151643 → "<\|endoftext\|>"（为什么不是151644 "<\|im_start\|>"）                                   |
+| do_sample          | 是否启用采样模式。<br> 1. true → 使用 temperature / top-p 随机采样） <br> 2. false → 使用 greedy decoding（贪心，确定性）                                                                                |
+| eos_token_id       | End Of Sentence Tokens（结束标记），Qwen3 设置了 多个结束符，包括：<br> 1. 151645 →  "<\|im_end\|>" <br> 2. 151643 →  "<\|endoftext\|>"（与 bos_token_id 同 ID 在 Qwen3 是合理的，因为会复用同类 token） |
+| pad_token_id       | 处理 batch 时用于填充的 token ID。                                                                                                                                                                       |
+| repetition_penalty | 重复惩罚因子。用于减少模型重复生成内容的概率。值越大，惩罚越强。<br> 1. 1.0 → 不惩罚 <br> 2. 1.05 → 轻微惩罚（Qwen3 默认值）<br> 3. 1.2 → 文本质量会下降（太严格会变怪）                                 |
+| temperature        | 采样温度，控制生成多样性。<br> 1. 低温（0～0.7）：更稳、更像“确定回答” <br> 2. 高温（0.8～1.5）：更创造性、更多样                                                                                        |
+| top_k              | 只从最高概率的 k 个 token 中采样（通常为0，表示不启用） <br> 1. 较低（如 20）：更稳定、更收敛 <br> 2. 较高（如 50+）：更发散                                                                             |
+| top_p              | 核采样（nucleus sampling）。在概率累积达到 0.95 的 token 子集中采样。<br> 1. 低值（0.7） → 模型更确定 <br> 2. 高值（0.95~1.0） → 更多样化                                                                |
+| max_new_tokens     | 限制最大生成 token 数。（优先级比max_length高，有时候混用会代表max_length）                                                                                                                              |
+| max_length         | 限制输入+输出总长度（不推荐单独使用）                                                                                                                                                                    |
 
 </details>
 
@@ -146,31 +169,67 @@
 
 ```shell
 {
-  "model": {
-    "type": "BPE",
-    "vocab": {"the": 0, "a": 1, "an": 2, ...},
-    "merges": ["t h", "th e", ...]
-  },
-  "added_tokens": [
-    {"id": 0, "content": "<pad>", "special": true},
-    {"id": 1, "content": "<bos>", "special": true},
-    {"id": 2, "content": "<eos>", "special": true}
-  ],
-  "normalizer": {"type": "Sequence", "normalizers": [{"type": "NFKC"}]},
-  "pre_tokenizer": {"type": "ByteLevel"},
-  "post_processor": {"type": "ByteLevel"}
+    "version": "1.0",
+    "trunction": null,
+    "padding": null,
+    "added_tokens": [
+        {"id": 151643, "content": "<endoftext>", "special": true},
+        {"id": 151655, "content": "<im_start>", "special": true},
+        {"id": 151645, "content": "<im_end>", "special": true},
+        ...
+    ],
+    "normalizer": {"type": "NFC"},
+    "pre_tokenizer": {
+        "type": "Sequence",
+        "pretokenizers": [
+            {
+                "type": "Split",
+                "pattern": {"Regex": ""},
+                "behavior": "Isolated",
+                "invert": false
+            },
+            {
+                ...
+            }
+        ],
+    },
+    "post_processor": {
+        "type": "ByteLevel",
+        "add_prefix_space": false,
+        "trim_offsets": false,
+        "use_regex": false
+    },
+    "decoder": {
+        "type": "ByteLevel",
+        "add_prefix_space": false,
+        "trim_offsets": false,
+        "use_regex": false
+    },
+    "model": {
+        "type": "BPE",
+        "dropout": null,
+        "vocab": {"the": 0, "a": 1, "an": 2, ...},
+        "merges": ["t h", "th e", ...]
+    }
 }
 ```
+分词器层面 未启用任何截断规则。
 
-| 字段           | 含义                                         |
-| -------------- | -------------------------------------------- |
-| model.type     | 分词算法类型（BPE、Unigram、WordPiece 等）。 |
-| vocab          | token → id 的映射表。                        |
-| merges         | 字符组合规则（仅 BPE 模型有）。              |
-| added_tokens   | 特殊 token 定义。                            |
-| normalizer     | 文本归一化规则（如小写、NFKC 形式）。        |
-| pre_tokenizer  | 切分前的预处理方式。                         |
-| post_processor | 添加特殊符号的逻辑。                         |
+模型的最大长度截断由 generate() / model.config 控制，而不是 tokenizer 控制。
+| 字段           | 含义                                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------- |
+| trunction      | null 表示分词器层面 未启用任何截断规则。模型的最大长度截断由模型控制而不是 tokenizer 控制。 |
+| padding        | null 表示分词器不自动填充                                                                   |
+| added_tokens   | 这里列出 不属于 BPE 词表、但需要特殊处理的 token。                                          |
+| normalizer     | 文本归一化规则。保证不同输入的 Unicode 变体映射到相同 token                                 |
+| pre_tokenizer  | pre-tokenizer 决定了如何把原始文本切分成“初步 token”再喂给 BPE 模型。                       |
+| post_processor | 后处理步骤，在 BPE 分词完成后执行。保证解码时：还原原始空格，还原原始字节序列               |
+| decoder        | 用于“解码”token → 文本。                                                                    |
+| model          | 这是核心，BPE模型本体。                                                                     |
+| model.type     | 分词算法类型（BPE、Unigram、WordPiece 等）。                                                |
+| model.vocab    | token → id 的映射表。                                                                       |
+| model.merges   | 表示要合并哪些字符对：先把文本按字节切成 token，再根据 merges 规则合并为更大的语言单元      |
+
 
 </details>
 
@@ -182,25 +241,53 @@
 
 ```shell
 {
-  "tokenizer_class": "QwenTokenizer",
-  "do_lower_case": false,
-  "model_max_length": 32768,
-  "padding_side": "right",
-  "truncation_side": "right",
-  "special_tokens_map_file": null,
-  "bos_token": "<bos>",
-  "eos_token": "<eos>",
-  "pad_token": "<pad>"
+    "add_bos_token": false,
+    "add_prefix_space": false,
+    "added_tokens_decoder": {
+        "151643": {...},
+        "151644": {...},
+        ...
+    },
+    "additional_special_tokens": [
+        "<|im_start|>",
+        "<|im_end|>",
+        "<|object_ref_start|>",
+        "<|object_ref_end|>",
+        "<|box_start|>",
+        "<|box_end|>",
+        "<|quad_start|>",
+        "<|quad_end|>",
+        "<|vision_start|>",
+        "<|vision_end|>",
+        "<|vision_pad|>",
+        "<|image_pad|>",
+        "<|video_pad|>"
+    ],
+    "bos_token": null,
+    "chat_template": "...",
+    "clean_up_tokenization_spaces": false,
+    "eos_token": "<|im_end|>",
+    "errors": "replace",
+    "model_max_length": 131072,
+    "pad_token": "<|endoftext|>",
+    "split_special_tokens": false,
+    "tokenizer_class": "Qwen2Tokenizer",
+    "unk_token": null
 }
 ```
 
-| 字段                              | 含义               |
-| --------------------------------- | ------------------ |
-| tokenizer_class                   | 对应的分词器类。   |
-| model_max_length                  | 最大可编码长度。   |
-| do_lower_case                     | 是否将输入转小写。 |
-| padding_side                      | pad 填充方向。     |
-| bos_token / eos_token / pad_token | 特殊 token 定义。  |
+| 字段                         | 含义                                                                                                                                                                          |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| add_bos_token                | 是否自动在 序列开头加入 BOS                                                                                                                                                   |
+| add_prefix_space             | 是否在文本开头自动添加一个空格                                                                                                                                                |
+| added_tokens_decoder         | HuggingFace 将 tokenizer.json 中的 "added_tokens" 反向映射到一个 dict <br> decoder 需要知道 ID → token 的映射 <br> 包含特殊符号如 "<\|im_start\|>"、视觉 token 等             |
+| additional_special_tokens    | 列出了所有额外添加的特殊 token（不属于 BPE vocabulary）                                                                                                                       |
+| chat_template                | 将对话结构转换为模型 input 格式，`tokenizer.apply_chat_template()` 时使用                                                                                                     |
+| clean_up_tokenization_spaces | 是否在 decode 时清理多余空格                                                                                                                                                  |
+| eos_token                    | 模型遇到该 token 将停止生成。                                                                                                                                                 |
+| errors                       | 这是 Python 的字符串错误处理策略：tokenizer 在 decode 时遇到非法字节 → 替换为 "�"                                                                                             |
+| model_max_length             | 模型能够处理的最大上下文长度（token 数）。用于 tokenizer 层面做截断检查，这是硬上限，即你不能给模型输入长度超过这个数，否则会报错。（注意与max_length跟max_new_tokens的区别） |
+| split_special_tokens         | 是否允许对特殊 token 进行拆分，必须为 false，否则 "<\|im_end\|>" 会被拆坏成 "<" "\|" "im_end" ...                                                                             |
 
 </details>
 

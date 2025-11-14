@@ -18,7 +18,6 @@
       2. chat_template_hf：[hugging face的chat_template示例](https://hugging-face.cn/docs/transformers/chat_templating_writing)（采用jinja2）
    2. 大模型微调
    3. Attention：LLM的注意力机制，包括MHA、MQA、GQA、MLA
-   4. code_basic：一些代码相关的介绍
 6. ML：机器学习
    1. 机器学习
    2. 机器学习2

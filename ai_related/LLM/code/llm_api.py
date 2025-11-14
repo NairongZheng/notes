@@ -201,7 +201,7 @@ def get_chat_template(messages, tools=None, enable_reasoning=False, add_generati
       工具定义（tool schema）
       reasoning（<think></think> 块）
     """
-    # 随便写的，大概这个意思吧
+    # 随便写的，大概这个意思吧（或者去看chat_template_qwen.jinja2）
     chat_template = """
     {%- if tools %}
         {{- '<|im_start|>system\n' }}
