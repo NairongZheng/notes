@@ -18,9 +18,14 @@ api：
 
 ```python
 import json
+import time
 import requests
-from huggingface_hub import HfApi
+from datasets import load_dataset
+from huggingface_hub import HfApi, snapshot_download
+from huggingface_hub.utils import HfHubHTTPError, RepositoryNotFoundError
+
 hf_api = HfApi()
+HF_TOKEN = "hf_xxx"
 
 
 def search_models(query: str, limit: int = 2):
@@ -111,13 +116,41 @@ def get_dataset_more_info(dataset_id: str):
     return request_dataset_schema_info, request_dataset_splits_info, request_dataset_parquet_info, request_dataset_content_info
 
 
+def download_hf_repo(repo_id: str, repo_type: str, local_dir: str = "./download"):
+    """下载huggingface仓库"""
+    if not repo_id:
+        return "repo_id is required"
+    max_retries = 3
+    delay = 1
+    res_str = ""
+    for attempt in range(max_retries):
+        try:
+            res_str = snapshot_download(
+                repo_id=repo_id,
+                repo_type=repo_type,
+                local_dir=local_dir,
+                token=HF_TOKEN
+            )
+            break
+        except HfHubHTTPError as e:
+            if e.response.status_code in [401, 403]:
+                res_str = "HfHubHTTPError"
+        except Exception as e:
+            res_str = "error"
+        time.sleep(delay)
+        delay = min(delay * 2, 60)
+    return res_str
+
+
 def main():
     request_models_list, huggingface_hub_models_list = search_models("gpt")
     request_datasets_list, huggingface_hub_datasets_list = search_datasets("jdaddyalbs/playwright-mcp-toolcalling")
     request_model_info, huggingface_hub_model_info = get_model_info(huggingface_hub_models_list[0].id)
     request_dataset_info, huggingface_hub_dataset_info = get_dataset_info(huggingface_hub_datasets_list[0].id)
     dataset_more_info = get_dataset_more_info(huggingface_hub_datasets_list[0].id)
-    pass
+    
+    # 下载 hf 仓库
+    download_res = download_hf_repo("inclusionAI/ASearcher-train-data", "dataset", "/tmp/ASearcher-train-data")
 
 
 if __name__ == "__main__":

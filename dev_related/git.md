@@ -7,6 +7,10 @@
   - [子模块相关](#子模块相关)
   - [git lfs](#git-lfs)
   - [其他操作](#其他操作)
+    - [回退](#回退)
+    - [merge和rebase](#merge和rebase)
+    - [clone部分仓库](#clone部分仓库)
+    - [git-filter-repo重写git历史](#git-filter-repo重写git历史)
 
 # git命令
 
@@ -320,7 +324,7 @@ git lfs ls-files
 
 ## 其他操作
 
-**回退**
+### 回退
 
 1. 放弃本地未提交的修改：
    1. 撤销**工作区**更改：`git checkout -- .`
@@ -340,7 +344,7 @@ git lfs ls-files
 | `git reset --hard`          | 完全回退 HEAD + 暂存区 + 工作区（危险）   | ❌ 否             |
 
 
-**merge和rebase**
+### merge和rebase
 
 查看[git_usage](../install_related/git_usage.md)
 
@@ -354,3 +358,42 @@ git lfs ls-files
 | `git diff <commit1> <commit2>` | 两个提交之间      | 对比任意两次提交                             |
 | `git diff <branch1> <branch2>` | 两个分支之间      | 比较两个分支的差异                           |
 | `git diff --stat`              | 显示变更统计      | 显示修改文件数量、增删行数（不显示具体代码） |
+
+### clone部分仓库
+
+有时候仓库太大，只想要其中的某个文件夹或者某个文件，可以参考下面的做法：
+
+```shell
+git clone --filter=blob:none --sparse <repo_rul>
+cd <repo_name>
+git sparse-checkout init [--cone || --no-cone]
+git sparse-checkout set <folder_or_filepath> # 文件用 --no-cone, 文件夹用 --cone
+```
+
+当然如果只要看文件而不需要提交记录等，直接用 `curl` 或者 `wget` 是最简单的。比如：
+
+```shell
+# 具体的 url 可以查看该文件在 github 页面右上角的 "Raw" 按钮
+curl -O https://raw.githubusercontent.com/...
+```
+
+### git-filter-repo重写git历史
+
+！！！危险操作！！！
+
+下面用删除某文件举例说明 git-filter-repo 的大概使用方法
+
+假设我们需要删除一些文件及它们的记录，那么就需要对整个仓库的提交进行更改。可以参考（注意：commit id 都会变！）：
+
+```shell
+# 安装
+pip install git-filter-repo
+# 删除某文件
+git filter-repo --path <relative_path1> --path <relative_path2> --invert-paths
+    # --invert-paths：删除这些文件（从所有历史中彻底移除）
+# 有时候需要多 check 两遍是否真的删除了，然后重新 add remote，再 push
+
+# 由于 hash 都变了，所以别人同步的时候需要重新覆盖本地
+git fetch origin
+git reset --hard origin/main
+```

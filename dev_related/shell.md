@@ -235,6 +235,13 @@ curl -o image.png https://httpbin.org/image/png
 curl -O https://httpbin.org/image/png
 ```
 
+**--create-dirs**
+
+```shell
+# --create-dirs：与 -o 配和使用，自动创建多层文件（不能跟 -O 一起使用）
+curl --create-dirs -o <path/to/save/file> <file_url>
+```
+
 **-u 使用用户名和密码**
 
 ```bash
