@@ -6,7 +6,8 @@
   - [标签相关](#标签相关)
   - [子模块相关](#子模块相关)
   - [git lfs](#git-lfs)
-  - [其他操作](#其他操作)
+  - [其他](#其他)
+    - [commit规范](#commit规范)
     - [回退](#回退)
     - [merge和rebase](#merge和rebase)
     - [clone部分仓库](#clone部分仓库)
@@ -125,70 +126,159 @@ git config --global credential.helper manager        # Windows
 
 ## 仓库相关
 
-1. 初始化仓库：`git init --initial-branch=<init_branch_name>`（默认是`master`，现多用`main`）
-2. 新建关联远端仓库：`git remote add <another_remote_name> <another_remote_url>`（一般默认都叫`origin`）
-3. 查看远端仓库：`git remote -v`
-4. 重命名仓库：`git remote rename <old_remote_name> <new_remote_name>`（一般默认都叫`origin`）
-5. 重新设置远端关联：`git remote set-url <remote_name> <new_url>`
-6. 删除远端仓库关联：`git remote remove <remote_name>`
-7. 查看本地仓库所有记录：`git reflog`（记录了本地仓库中 HEAD 和分支的移动记录，包括提交、合并、分支创建和删除等操作）
-8. 克隆仓库：`git clone [-b branch_name] <remote_url> <file_name>`
+**本地仓库**
+
+```shell
+# 初始化仓库。默认是`master`，现多用`main`
+git init --initial-branch=<init_branch_name>
+# 克隆仓库
+git clone [-b branch_name] <remote_url> <file_name>
+# 查看本地仓库所有记录
+git reflog  # 记录了本地仓库中 HEAD 和分支的移动记录，包括提交、合并、分支创建和删除等操作
+```
+
+**远端仓库**
+
+```shell
+# 新建关联远端仓库。一般默认都叫`origin`
+git remote add <another_remote_name> <another_remote_url>
+# 重命名远端关联仓库。一般默认都叫`origin`
+git remote rename <old_remote_name> <new_remote_name>
+# 查看远端仓库
+git remote -v
+# 重新设置远端关联
+git remote set-url <remote_name> <new_url>
+# 删除远端仓库关联
+git remote remove <remote_name>
+```
 
 ## 分支相关
 
-1. 查看分支：
-   1. 查看所有分支：`git branch -a`
-   2. 查看远端所有分支：`git branch -r`
-   3. 查看本地分支与远端分支的追踪关系：`git branch -vv`（只能追踪一个，所以如果有多个远端仓库关联，也只显示一个）
-2. 设置本地分支与远端分支关联追踪：`git branch --set-upstream-to=<remote_name>/<remote_branch_name> <local_branch_name>`
-3. 推送分支：
-   1. 推送分支到指定远端仓库：`git push <remote_name> <local_branch_name>`
-   2. 推送分支到所有远端仓库：`git push --all`（好像不好使？）
-4. 重命名分支：
-   1. 重命名本地分支：`git branch -m <old_branch_name> <new_branch_name>`
-   2. 重命名远端分支：先删除远端分支，重命名本地分支，再推送本地分支
-5. 删除分支：
-   1. 删除本地分支：`git branch -d <branch_name>`
-   2. 删除远端分支：`git push <remote_name> --delete <branch_name>`
-6. 检出/切换分支：
-   1. 检出到现有分支：`git checkout <branch_name>`
-   2. 检出新的分支：`git checkout -b <new_branch_name> <base_branch_or_tag_version>`
-7. 获取分支：
-   1. 拉取远端分支：`git pull <remote_name> <remote-branch-name>:<local-branch-name>`
-   2. 更新追踪的远端分支信息：`git fetch <remote_name> <remote_branch_name>`
-   3. 更新所有远端仓库的所有分支信息：`git fetch --all`
-8. 合并分支：
-   1. `git merge [--no-commit] <branch_name>`
-   2. 这里merge的时候，需要选择好分支，使用前面配置的`git-log`是一目了然的。是合并更新下来的`origin/branch_name`（远端的）还是`branch_name`（本地的），如果多人开发的话，大概率远端跟本地是不同步的，且很有可能是有冲突的。具体怎么做还是看开发需求。
-   3. 详细流程可以查看[这里](#rebase和merge应用示例)
-9. 恢复删除的分支：
-   1. 用`git reflog`查找要恢复的分支的hash
-   2. 然后`git checkout -b <branch-name> <reflog-hash>`
-10. 回退：
-    1. 回退并保留更改：`git reset <hash>`
-    2. 回退并清空暂存区和工作区：`git reset --hard <hash>`
+**查看分支与分支关联**
 
+```shell
+# 查看所有分支
+git branch -a
+# 查看远端所有分支
+git branch -r
+# 查看本地分支与远端分支的追踪关系（只能追踪一个，所以如果有多个远端仓库关联，也只显示一个）
+git branch -vv
+# 设置本地分支与远端分支关联追踪
+git branch --set-upstream-to=<remote_name>/<remote_branch_name> <local_branch_name>
+```
+
+**获取分支**
+
+```shell
+# 拉取远端分支（会自动进行merge，建议先fetch）
+git pull <remote_name> <remote-branch-name>:<local-branch-name>
+# 更新追踪的远端分支信息
+git fetch <remote_name> <remote_branch_name>
+# 更新所有远端仓库的所有分支信息，并清理不再存在的分支
+git fetch --all -p
+```
+
+**推送分支**
+
+```shell
+# 推送分支到指定远端仓库
+git push <remote_name> <local_branch_name>
+# 推送分支到所有远端仓库（好像不好使？）
+git push --all
+```
+
+**删除分支**
+
+```shell
+# 删除本地分支
+git branch -d <branch_name>
+# 删除远端分支
+git push <remote_name> --delete <branch_name>
+```
+
+**重命名分支**
+
+```shell
+# 重命名本地分支
+git branch -m <old_branch_name> <new_branch_name>
+# 重命名远端分支：先删除远端分支，重命名本地分支，再推送本地分支
+```
+
+**检出/切换分支**
+
+```shell
+# 检出到现有分支
+git checkout <branch_name>
+# 检出新的分支
+git checkout -b <new_branch_name> <base_branch_or_tag_version>
+```
+
+**合并分支**
+
+详细流程可以查看[rebase和merge应用示例](#rebase和merge应用示例)
+
+```shell
+git merge [--no-commit] <branch_name>
+# 这里merge的时候，需要选择好分支，使用前面配置的`git-log`是一目了然的。
+# 是合并更新下来的`origin/branch_name`（远端的）还是`branch_name`（本地的）。
+# 如果多人开发的话，大概率远端跟本地是不同步的，且很有可能是有冲突的。具体怎么做还是看开发需求。
+```
+
+**恢复删除的分支**
+
+```shell
+# 查找要恢复的分支
+git reflog
+# 恢复分支
+git checkout -b <branch-name> <reflog-hash>
+```
 
 ## 标签相关
 
-1. 创建附注标签：
-   1. 从HEAD：`git tag -a <tag_version> -m <"message">`
-   2. 从某个特定commit：`git tag -a <tag_version> <commit_id> -m <"message">`
-2. 查看标签：
-   1. 查看所有标签：`git tag`
-   2. 查看标签信息：`git show <tag_version>`
-3. 推送标签：
-   1. 推送单个标签：`git push <remote_name> <tag_version>`
-   2. 推送所有标签：`git push <remote_name> --tags`
-4. 获取标签：
-   1. 更新远端标签到本地：`git fetch --tags`
-5. 删除标签：
-   1. 删除本地标签：`git tag -d <tag_version>`
-   2. 删除远程标签：`git push <remote_name> --delete <tag_version>`
-6. 检出标签：
-   1. Git 标签不是分支，无法直接切换到标签进行开发，而是进入“分离 HEAD”状态：`git checkout <tag_version>`
-   2. 基于某个标签创建新分支：`git checkout -b <new_branch_name> <tag_version>`
+**创建附注标签**
 
+```shell
+# 从HEAD
+git tag -a <tag_version> -m <"message">
+# 从某个特定commit
+git tag -a <tag_version> <commit_id> -m <"message">
+```
+
+**查看标签**
+
+```shell
+# 查看所有标签
+git tag
+# 查看标签信息
+git show <tag_version>
+```
+
+**推送标签**
+
+```shell
+# 推送单个标签
+git push <remote_name> <tag_version>
+# 推送所有标签
+git push <remote_name> --tags
+```
+
+**删除标签**
+
+```shell
+# 删除本地标签
+git tag -d <tag_version>
+# 删除远程标签（跟删除远端分支的命令一样，如果重名只会删除tag而不会删除分支，除非显式指定）
+git push <remote_name> --delete <tag_version>
+```
+
+**检出标签**
+
+```shell
+# Git 标签不是分支，无法直接切换到标签进行开发，而是进入“分离 HEAD”状态
+git checkout <tag_version>
+# 基于某个标签创建新分支
+git checkout -b <new_branch_name> <tag_version>
+```
 
 ## 子模块相关
 
@@ -322,7 +412,53 @@ git lfs ls-files
 ```
 
 
-## 其他操作
+## 其他
+
+### commit规范
+
+一般标准的 commit 信息分为三个部分：
+
+```shell
+<type>(<scope>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+```
+
+1. type：类型。标识本次提交的类别。常用类型在下面列出来。
+2. scope：范围（可选）。说明本次 commit 影响的模块或范围，如果没有特定的模块，可以省略。
+3. subject：简短描述。尽量简短，不超过 50 个字符。
+4. body：详细描述（可选）。分点说明修改的细节、逻辑或副作用。
+5. footer：脚注（可选）。用于关联 issue 或标记 BREAKING CHANGE。
+
+示例：
+
+```shell
+feat(cart): 支持购物车批量删除
+
+1. 用户可以一次性删除多个购物车商品
+2. 同时修复了删除后数量显示错误的问题
+
+Closes #234
+```
+
+**type类型**
+
+| 类型     | 说明                                                   |
+| -------- | ------------------------------------------------------ |
+| feat     | 新功能（feature）                                      |
+| fix      | 修复 bug                                               |
+| docs     | 文档更新                                               |
+| style    | 代码格式（空格、分号、缩进等，不影响功能）             |
+| refactor | 重构（既不是新增功能，也不是修复 bug）                 |
+| perf     | 性能优化                                               |
+| test     | 测试相关                                               |
+| build    | 构建系统或依赖更新                                     |
+| ci       | 持续集成相关                                           |
+| chore    | 杂务（不影响源代码的修改，例如修改配置文件、工具脚本） |
+| revert   | 回滚某次提交                                           |
+
 
 ### 回退
 

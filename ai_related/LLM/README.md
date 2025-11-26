@@ -5,6 +5,7 @@
     - [请求与返回](#请求与返回)
     - [推理字段介绍](#推理字段介绍)
   - [直接采用post请求](#直接采用post请求)
+- [查看 tensorboaed](#查看-tensorboaed)
 - [some\_pkg](#some_pkg)
   - [AutoTokenizer](#autotokenizer)
   - [AutoConfig \& AutoConfig](#autoconfig--autoconfig)
@@ -213,22 +214,20 @@
     }
 }
 ```
-分词器层面 未启用任何截断规则。
 
-模型的最大长度截断由 generate() / model.config 控制，而不是 tokenizer 控制。
-| 字段           | 含义                                                                                        |
-| -------------- | ------------------------------------------------------------------------------------------- |
-| trunction      | null 表示分词器层面 未启用任何截断规则。模型的最大长度截断由模型控制而不是 tokenizer 控制。 |
-| padding        | null 表示分词器不自动填充                                                                   |
-| added_tokens   | 这里列出 不属于 BPE 词表、但需要特殊处理的 token。                                          |
-| normalizer     | 文本归一化规则。保证不同输入的 Unicode 变体映射到相同 token                                 |
-| pre_tokenizer  | pre-tokenizer 决定了如何把原始文本切分成“初步 token”再喂给 BPE 模型。                       |
-| post_processor | 后处理步骤，在 BPE 分词完成后执行。保证解码时：还原原始空格，还原原始字节序列               |
-| decoder        | 用于“解码”token → 文本。                                                                    |
-| model          | 这是核心，BPE模型本体。                                                                     |
-| model.type     | 分词算法类型（BPE、Unigram、WordPiece 等）。                                                |
-| model.vocab    | token → id 的映射表。                                                                       |
-| model.merges   | 表示要合并哪些字符对：先把文本按字节切成 token，再根据 merges 规则合并为更大的语言单元      |
+| 字段           | 含义                                                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| trunction      | null 表示分词器层面 未启用任何截断规则。模型的最大长度截断由模型控制（generate() / model.config）而不是 tokenizer 控制。 |
+| padding        | null 表示分词器不自动填充                                                                                                |
+| added_tokens   | 这里列出 不属于 BPE 词表、但需要特殊处理的 token。                                                                       |
+| normalizer     | 文本归一化规则。保证不同输入的 Unicode 变体映射到相同 token                                                              |
+| pre_tokenizer  | pre-tokenizer 决定了如何把原始文本切分成“初步 token”再喂给 BPE 模型。                                                    |
+| post_processor | 后处理步骤，在 BPE 分词完成后执行。保证解码时：还原原始空格，还原原始字节序列                                            |
+| decoder        | 用于“解码”token → 文本。                                                                                                 |
+| model          | 这是核心，BPE模型本体。                                                                                                  |
+| model.type     | 分词算法类型（BPE、Unigram、WordPiece 等）。                                                                             |
+| model.vocab    | token → id 的映射表。                                                                                                    |
+| model.merges   | 表示要合并哪些字符对：先把文本按字节切成 token，再根据 merges 规则合并为更大的语言单元                                   |
 
 
 </details>
@@ -605,6 +604,12 @@ response = requests.post(url, headers=headers, data=json.dumps(data))
 # 返回:
     # 1. 一般的 /v1/chat/completions 接口返回: model_response = response.json(), 主要 content 字段: model_response["choices"][0]["message"]["content"]
     # 2. lightllm 的 /generate 接口返回: model_response = response['generated_text'][0]
+```
+
+# 查看 tensorboaed
+
+```shell
+tensorboard --logdir <tensorboard_dir> --port <port>
 ```
 
 # some_pkg
