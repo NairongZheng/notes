@@ -1,4 +1,6 @@
 - [basic](#basic)
+  - [模型文件介绍](#模型文件介绍)
+  - [一些参数介绍](#一些参数介绍)
 - [部署llm](#部署llm)
 - [请求llm](#请求llm)
   - [OpenAI \& AzureOpenAI](#openai--azureopenai)
@@ -12,6 +14,8 @@
 
 
 # basic
+
+## 模型文件介绍
 
 下面用[Qwen/Qwen3-14B](https://huggingface.co/Qwen/Qwen3-14B/tree/main)举例
 
@@ -325,6 +329,33 @@ a n
 分词器会根据这些规则逐步合并。
 
 </details>
+
+## 一些参数介绍
+
+这边会介绍一些训练中可能会出现的参数
+
+**seq_len**
+
+> （序列长度 / context length）
+> 单条训练样本的最大 token 长度，即模型可以看到的**上下文窗口大小**。
+> - 决定 Transformer 的注意力矩阵大小：`seq_len × seq_len`
+> - 决定 GPU 显存消耗（注意力成本 ~ `O(seq_len²)`）
+> - 决定模型的上下文能力（长上下文任务必然要更大的 seq_len）
+> 
+> 常见用法：
+> 
+> ```shell
+> seq_len=4096   # 训练 4K 上下文
+> ```
+> 
+> - seq_len 越大，显存开销越高。
+> - 推理时也受限于此值，但训练时可以采用 RoPE scaling、YaRN、NTK scaling 允许推理更长上下文。
+
+**dp_size、tp_size、pp_size**
+
+满足：$\text{总GPU数}=\text{dp\_size}\times\text{tp\_size}\times\text{pp\_size}$
+
+> 具体查看 [model_train](./model_train.md) 中的相关介绍。
 
 # 部署llm
 

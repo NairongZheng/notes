@@ -270,6 +270,17 @@ SUM:                           317           9081           9830         440516
 
 ## 文件操作
 
+**软链接**
+
+```shell
+ln -s [options] <目标文件/目录> <链接名>
+# ln -snv /path/to/target ./target
+# 在当前文件夹创建一个名为 target 的软链接指向 /path/to/target
+    # -s: 创建符号链接（软链接），默认不加 -s 创建硬链接
+    # -n: 不跟随原来的软链接，把软链接本身当作普通文件来覆盖（加就完了）
+    # -v: 显示详细信息，告诉你链接创建成功
+```
+
 **文件解压**
 
 ```bash
@@ -320,7 +331,7 @@ sha256sum <filename>    # sha256
 
 **文件加密**
 
-具体查看[gpg文件加密](./gpg.md)
+具体查看[gpg文件加密](../install_related/gpg.md)
 
 ```bash
 # 1. 安装gpg：`sudo apt install gnupg`
@@ -398,6 +409,7 @@ tail [-f] <filename> # 实时查看文件内容（适用于不断刷新的日志
 # less：分页查看文件，空格可以翻页（非常非常好用）
 less [-N] <filename>
     # -N：带行号
+    # 进去之后，`G` 跳到文件结尾，`g` 跳到文件开头
 ```
 
 **cat命令**

@@ -10,7 +10,7 @@
 
 
 # 安装uv
-curl -LsSf https://astral.sh/uv/install.sh | s
+curl -LsSf https://astral.sh/uv/install.sh | sh
 source $HOME/.local/bin/env
 
 # 使用uv（从空项目开始

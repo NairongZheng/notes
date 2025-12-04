@@ -25,3 +25,5 @@
 7. CV：计算机视觉
    1. 目标检测——RCNN与YOLO系列
    2. 目标检测——R2CNN与SCRDet
+8. code_related：一些代码模板
+   1. simple_images_classification：图像二分类

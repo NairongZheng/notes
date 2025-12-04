@@ -1,10 +1,10 @@
 # dev_related
 
-1. op_and_cmd：一些操作与命令
-2. ssh
+1. ansible_test
+2. docker
 3. git
-4. ansible_test
-5. docker
+4. go_related
+5. op_and_cmd：一些操作与命令
 6. python
-7.  shell：shell脚本
-8.  gpg：文件加解密
+7. shell：shell脚本
+8. ssh
