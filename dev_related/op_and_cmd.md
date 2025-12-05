@@ -86,6 +86,7 @@ echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.bashrc
 echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bashrc
 source ~/.bashrc
 # 安装nodejs
+nvm ls-remote           # 查看可安装的包版本
 nvm install 18.18.2
 nvm use 18.18.2
 nvm alias default 18.18.2
@@ -181,6 +182,15 @@ export PATH="<new_path>:$PATH"    # 推荐将自定义工具路径加到 PATH �
 # 5. 查看系统系统区域设置（语言、字符编码、日期格式等）：locale
 # 6. 查看系统支持语言：locale -a
 # 7. 查看系统时间：date
+```
+
+**查看包信息**
+
+```shell
+# 查看所有版本的包
+which -a <包名>
+type -a <包名>
+    # 二者有点区别，which 主要是看 $PATH，type 比较全
 ```
 
 **查看进程信息**

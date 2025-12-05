@@ -1,3 +1,4 @@
+- [LLM](#llm)
 - [basic](#basic)
   - [模型文件介绍](#模型文件介绍)
   - [一些参数介绍](#一些参数介绍)
@@ -10,7 +11,14 @@
 - [查看 tensorboaed](#查看-tensorboaed)
 - [some\_pkg](#some_pkg)
   - [AutoTokenizer](#autotokenizer)
-  - [AutoConfig \& AutoConfig](#autoconfig--autoconfig)
+  - [AutoModel \& AutoConfig](#automodel--autoconfig)
+
+# LLM
+
+1. code：llm生成的一些示例代码
+2. 大模型微调
+3. Attention：LLM的注意力机制，包括MHA、MQA、GQA、MLA
+4. model_train：模型训练，主要是并行训练/分布式训练的介绍
 
 
 # basic
@@ -649,6 +657,6 @@ tensorboard --logdir <tensorboard_dir> --port <port>
 
 [示例脚本](./code/demo_AutoTokenizer.py)
 
-## AutoConfig & AutoConfig
+## AutoModel & AutoConfig
 
-[示例脚本](./code/demo_AutoConfig_and_AutoConfig.py)
+[示例脚本](./code/demo_AutoModel_and_AutoConfig.py)
