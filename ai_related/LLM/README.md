@@ -15,10 +15,11 @@
 
 # LLM
 
-1. code：llm生成的一些示例代码
+1. code: llm生成的一些示例代码
 2. 大模型微调
-3. Attention：LLM的注意力机制，包括MHA、MQA、GQA、MLA
-4. model_train：模型训练，主要是并行训练/分布式训练的介绍
+3. Attention: LLM的注意力机制，包括MHA、MQA、GQA、MLA
+4. mcp: Model Context Protocol
+5. model_train: 模型训练，主要是并行训练/分布式训练的介绍
 
 
 # basic
