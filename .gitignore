@@ -3,3 +3,4 @@ images/picture_passwd_nai.pptx
 .vscode
 .DS_Store
 __pycache__/
+.venv/
