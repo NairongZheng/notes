@@ -2,6 +2,9 @@
 - [basic](#basic)
   - [模型文件介绍](#模型文件介绍)
   - [一些参数介绍](#一些参数介绍)
+    - [seq\_len](#seq_len)
+    - [dp\_size、tp\_size、pp\_size](#dp_sizetp_sizepp_size)
+    - [temperature and top\_p](#temperature-and-top_p)
 - [部署llm](#部署llm)
 - [请求llm](#请求llm)
   - [OpenAI \& AzureOpenAI](#openai--azureopenai)
@@ -20,6 +23,7 @@
 3. Attention: LLM的注意力机制，包括MHA、MQA、GQA、MLA
 4. mcp: Model Context Protocol
 5. model_train: 模型训练，主要是并行训练/分布式训练的介绍
+6. temperature_and_top_p: Temperature跟top_p的介绍
 
 
 # basic
@@ -343,7 +347,7 @@ a n
 
 这边会介绍一些训练中可能会出现的参数
 
-**seq_len**
+### seq_len
 
 > （序列长度 / context length）
 > 单条训练样本的最大 token 长度，即模型可以看到的**上下文窗口大小**。
@@ -360,11 +364,15 @@ a n
 > - seq_len 越大，显存开销越高。
 > - 推理时也受限于此值，但训练时可以采用 RoPE scaling、YaRN、NTK scaling 允许推理更长上下文。
 
-**dp_size、tp_size、pp_size**
+### dp_size、tp_size、pp_size
 
 满足：$\text{总GPU数}=\text{dp\_size}\times\text{tp\_size}\times\text{pp\_size}$
 
 > 具体查看 [model_train](./model_train.md) 中的相关介绍。
+
+### temperature and top_p
+
+> 详见 [temperature_and_top_p](./temperature_and_top_p.md)
 
 # 部署llm
 
