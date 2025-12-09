@@ -1,4 +1,5 @@
 
+- [目录](#目录)
 - [简介](#简介)
 - [mcp server 格式说明 (\*)](#mcp-server-格式说明-)
   - [npx 系列 —— npm 上的 MCP Server](#npx-系列--npm-上的-mcp-server)
@@ -16,6 +17,13 @@
 
 
 [参考链接：https://www.bilibili.com/video/BV1uronYREWR](https://www.bilibili.com/video/BV1uronYREWR)
+
+
+# 目录
+
+- weather：mcp 官方提供的 mcp server 例子，可以看看 mcp server 怎么实现的
+- mcp_client：mcp client，可以看看 client 代码怎么实现跟 mcp server 交互
+
 
 # 简介
 
