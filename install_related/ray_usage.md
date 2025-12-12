@@ -24,12 +24,14 @@ ray start --head --port=6379 --dashboard-host=0.0.0.0 --dashboard-port=8265
 在其他节点上：
 
 ```shell
-ray start --address='${master_node_ip}:6379'
+ray start --address='${MASTER_ADDR}:6379'
 ```
 
 可以查看节点状态：
 
 ```shell
+ray status
+# 如果有 dashboard 功能，也可以：
 ray list nodes
 # 也可以在 http://${ip}:8265 查看dashboard
 ```

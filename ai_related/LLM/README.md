@@ -6,6 +6,9 @@
     - [dp\_size、tp\_size、pp\_size](#dp_sizetp_sizepp_size)
     - [temperature and top\_p](#temperature-and-top_p)
 - [部署llm](#部署llm)
+  - [使用 sglang 部署](#使用-sglang-部署)
+  - [使用 lightllm 部署](#使用-lightllm-部署)
+  - [使用 vllm 部署](#使用-vllm-部署)
 - [请求llm](#请求llm)
   - [OpenAI \& AzureOpenAI](#openai--azureopenai)
     - [请求与返回](#请求与返回)
@@ -376,10 +379,122 @@ a n
 
 # 部署llm
 
-可以用lightllm或者vllm部署。
+## 使用 sglang 部署
 
-1. vllm：[官方文档](https://docs.vllm.ai/)，[一些参数说明](https://docs.vllm.ai/en/latest/configuration/engine_args.html)
-2. lightllm：[官方文档](https://docs.litellm.ai/docs)，[一些参数说明](https://docs.litellm.ai/docs/proxy/cli)
+sglang：[官方文档(en)](https://docs.sglang.io/)
+
+**安装环境**
+
+```shell
+conda create -n sglang python=3.12 -y
+conda activate sglang
+pip install uv
+uv pip install "sglang[all]>=0.4.6.post4"
+```
+
+**启动**
+
+```shell
+python -m sglang.launch_server \
+    --model-path ${model_dir} \
+    --tp ${tp_size} \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --trust-remote-code \
+    --dist-init-addr ${MASTER_ADDR}:20000 \
+    --nnodes ${num_nodes} \
+    --node-rank ${node_rank} \
+    --tool-call-parser glm  \
+    --reasoning-parser glm45
+```
+
+## 使用 lightllm 部署
+
+lightllm：[官方文档](https://lightllm-cn.readthedocs.io/en/latest)，lightllm 的文档还是很值得看的。
+
+**安装环境**
+
+```shell
+# (推荐) 创建一个新的 conda 环境
+conda create -n lightllm python=3.10 -y
+conda activate lightllm
+
+# 下载lightllm的最新源码
+git clone https://github.com/ModelTC/lightllm.git
+cd lightllm
+
+# 安装lightllm的依赖 (cuda 12.4)
+apt-get install -y libgmp-dev libmpfr-dev libmpc-dev
+pip install uv # 使用 uv 安装较快
+uv pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu124 --index-strategy unsafe-best-match
+
+# 安装lightllm
+python setup.py install
+```
+
+**启动**
+
+[启动参数文档](https://lightllm-cn.readthedocs.io/en/latest/tutorial/api_server_args_zh.html)
+
+```shell
+python -m lightllm.server.api_server \
+    --model_dir ${model_dir} \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --tp ${GPUS_PER_NODE} \
+    --max_req_total_len 65000 \
+    --mode triton_gqa_flashdecoding \
+    --mem_fraction 0.8 \
+    --trust_remote_code \
+    --enable_multimodal \
+    --nccl_port 27938 \
+    --data_type bf16 \
+    --graph_max_batch_size 64 \
+    --use_dynamic_prompt_cache \
+    --tool_call_parser qwen25 \
+    --visual_infer_batch_size 4 \
+    --visual_gpu_ids 0 \
+    --visual_nccl_ports 29501 \
+    --cache_capacity 300
+```
+
+## 使用 vllm 部署
+
+vllm：[官方文档(en)](https://docs.vllm.ai/)，[cli参数(en)](https://docs.vllm.ai/en/latest/cli/)
+
+**安装环境**
+
+```shell
+conda create -n vllm python=3.12 -y
+conda activate vllm
+pip install uv
+uv pip install vllm=0.12.0
+# 部署的时候可能有一些包例如 numpy 的版本会冲突，改一下就行
+```
+
+**部署**
+
+```shell
+# 使用 ray 作为分布式后端
+# 1. master 节点运行
+ray start --head --port=6379 --dashboard-host=0.0.0.0 --dashboard-port=8265
+# 2. 其他 worker 节点运行
+ray start --address='${MASTER_ADDR}:6379'
+# 3. 启动-有些参数需要修改（注意所有节点的环境需要是一样的）
+vllm serve $model_dir \
+    --served-model-name ${model_name} \
+    --host 0.0.0.0 \
+    --port 8090 \
+    --distributed-executor-backend ray \
+    --tensor-parallel-size ${GPUS_PER_NODE} \
+    --pipeline-parallel-size ${num_nodes} \
+    --max-model-len 128000 \
+    --enable-auto-tool-choice \
+    --tool-call-parser glm45 \
+    --reasoning-parser glm45
+```
+
+**请求 vllm**
 
 ```shell
 # vllm serve 启动之后有类似的log
@@ -642,7 +757,11 @@ response = client.chat.completions.create(model="", messages=[], tools=[], extra
 
 ## 直接采用post请求
 
-其实就是不使用openai的sdk，直接采用requests.post的方式来调用。看[请求llm](#请求llm)最开头的介绍和脚本就懂了。
+其实 openai 的 sdk 最后也是使用 post。
+
+所以也可以不使用 openai 的 sdk，直接采用requests.post的方式来调用。
+
+看[请求llm](#请求llm)最开头的介绍和脚本就懂了。
 
 ```python
 # 请求: 正常情况下用这种方式都可以

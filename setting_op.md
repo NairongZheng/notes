@@ -83,6 +83,7 @@ set -g destroy-unattached off
 2. AppCleaner：[https://freemacsoft.net/appcleaner/](https://freemacsoft.net/appcleaner/)（卸载清理软件）
 3. iterm2：[https://iterm2.com/](https://iterm2.com/)
 4. notepad--：[https://github.com/cxasm/notepad--](https://github.com/cxasm/notepad--)
+5. keka：[https://www.keka.io/zh-cn/](https://www.keka.io/zh-cn/)（压缩与解压缩）
 
 ## 设置
 - 设置-触控板-光标与点按：轻点来点按
