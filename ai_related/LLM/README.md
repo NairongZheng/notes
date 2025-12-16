@@ -27,6 +27,7 @@
 4. mcp: Model Context Protocol
 5. model_train: 模型训练，主要是并行训练/分布式训练的介绍
 6. temperature_and_top_p: Temperature跟top_p的介绍
+7. tool_calls: 工具调用
 
 
 # basic
@@ -661,7 +662,7 @@ vllm serve $model_dir \
 
 **二者基础对比介绍**
 
-| 对比项       | OpenAI                                          | AzureOpenAI                                        |
+| 对比项       | OpenAI                                          | AzureOpenAI (继承自 OpenAI)                        |
 | ------------ | ----------------------------------------------- | -------------------------------------------------- |
 | 提供方       | 官方 OpenAI 平台（https://platform.openai.com） | 微软 Azure OpenAI 服务（https://portal.azure.com） |
 | API Base URL | https://api.openai.com/v1 （或自定义兼容服务）  | https://your-resource-name.openai.azure.com        |
@@ -674,21 +675,29 @@ vllm serve $model_dir \
 
 **二者区别对比介绍**
 
-| 项目                          | OpenAI                         | AzureOpenAI                                 |
-| ----------------------------- | ------------------------------ | ------------------------------------------- |
-| 认证方式                      | 直接使用 api_key               | 使用 api_key + azure_endpoint + api_version |
-| 模型字段                      | 直接用官方模型名（如 "gpt-4o") | 用部署名（如 "gpt4o-deploy"）               |
-| 是否要设置 api_version        | 否                             | ✅ 必须                                      |
-| Base URL                      | 默认 https://api.openai.com/v1 | 必须设置为 Azure endpoint                   |
-| 是否支持自定义网络 / 安全策略 | ❌                              | ✅ 支持企业 VNet、Private Link、合规性控制   |
-| 兼容性                        | 用于所有 OpenAI 兼容服务       | 专用于 Azure 环境                           |
+| 项目                          | OpenAI                                   | AzureOpenAI                                                                                        |
+| ----------------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| 认证方式                      | 直接使用 api_key                         | 使用 api_key + azure_endpoint + api_version                                                        |
+| 模型字段                      | 直接用官方模型名（如 "gpt-4o")           | 用部署名（如 "gpt4o-deploy"）                                                                      |
+| 是否要设置 api_version        | 否                                       | ✅ 必须                                                                                             |
+| Base URL                      | 默认 https://api.openai.com/v1           | 必须设置为 Azure endpoint                                                                          |
+| Request URL                   | 会在 bsee_url 后面拼 `/chat/completions` | 会在 base_url 后面拼 `/openai/deployments/{model_name}/chat/completions?api-version={api-version}` |
+| 是否支持自定义网络 / 安全策略 | ❌                                        | ✅ 支持企业 VNet、Private Link、合规性控制                                                          |
+| 兼容性                        | 用于所有 OpenAI 兼容服务                 | 专用于 Azure 环境                                                                                  |
 
 ### 请求与返回
 
+**请求**
+
+> 注意请求中的 extra_body 里面的各个字段实际上是解开传进去的，而不是直接传 "extra_body" 这个字段
+
+**返回**
+
+> 模型的返回，两个包都会包装好再返回，跟 requests 方式返回的 dict 有区别，但本质上一样的，因为最后都是使用的 requsets.post 发送请求的。
+
+
 ```python
 # 其实只有 client 创建方式不一样而已
-# 注意请求中的 extra_body 里面的各个字段实际上是解开传进去的，而不是直接传 "extra_body" 这个字段
-# 模型的返回，两个包都会包装好再返回，跟 requests 方式返回的 dict 有区别，但本质上一样的
 
 # OpenAI client:
 client = OpenAI(base_url="", api_key="")
