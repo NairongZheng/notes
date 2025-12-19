@@ -539,11 +539,22 @@ vllm serve $model_dir \
 
 **几个不同请求接口的介绍（重要！）**
 
-| 接口路径               | 对应模型类型                     | 输入格式                                     | 核心用途                      | 兼容对象                                       |
-| ---------------------- | -------------------------------- | -------------------------------------------- | ----------------------------- | ---------------------------------------------- |
-| `/v1/chat/completions` | Chat 类型模型（ChatML 模板）     | `messages=[{"role":"user","content":"..."}]` | 多轮对话、工具调用、Reasoning | OpenAI Chat API（GPT 系列）                    |
-| `/v1/completions`      | Base 模型（非 Chat 指令模型）    | `prompt="..."`                               | 单轮续写、补全、翻译、改写    | 旧版 OpenAI Completion API（慢慢弃用）         |
-| `/generate`            | 通用接口（厂商自定义、很灵活！） | 结构随实现不同（多为 prompt）                | 任意文本生成                  | HuggingFace / vLLM / LightLLM 风格通用生成接口 |
+| 接口路由               | 对应模型类型                     | 输入格式                                         | 核心用途                            | 兼容对象                                       |
+| ---------------------- | -------------------------------- | ------------------------------------------------ | ----------------------------------- | ---------------------------------------------- |
+| `/v1/responses`        | 新一代 OpenAI 标准接口           |                                                  | 对话 / 推理 / 工具 / 多模态统一入口 |                                                |  |
+| `/v1/chat/completions` | Chat 类型模型（ChatML 模板）     | `messages=[{"role":"user","content":"..."}]`     | 多轮对话、工具调用、Reasoning       | OpenAI Chat API（GPT 系列）                    |
+| `/v1/completions`      | Base 模型（非 Chat 指令模型）    | `prompt="..."`                                   | 单轮续写、补全、翻译、改写          | 旧版 OpenAI Completion API（慢慢弃用）         |
+| `/generate`            | 通用接口（厂商自定义、很灵活！） | 结构随实现不同（多为 chat_template 拼好的 text） | 任意文本生成                        | HuggingFace / vLLM / LightLLM 风格通用生成接口 |
+
+**/v1/responses - 新接口**
+
+> 这是新一代 OpenAI 标准接口，可以对话/推理/工具/多模态。
+> - 支持状态会话管理，可以让 API 自动维持上下文，而不需要每次从头传 messages
+> - 支持工具调用
+> - 支持结构化输出，如要求返回某个 JSON Schema，而不是自由形式文本
+> - 支持多模态输入
+> 
+> （具体查看[官方文档：https://platform.openai.com/docs/api-reference/responses](https://platform.openai.com/docs/api-reference/responses)）
 
 **/v1/chat/completion — 聊天接口（Chat 模型专用）**
 
@@ -623,7 +634,7 @@ vllm serve $model_dir \
 
 **/generate — 通用生成接口（框架自定义）**
 
-> /generate 是 LightLLM / vLLM / Text Generation WebUI / HuggingFace Transformers 等 为方便兼容不同模型而定义的通用路径。
+> /generate 是 LightLLM 等框架为方便兼容不同模型而定义的通用路径。
 > 
 > ```shell
 > # input
