@@ -700,11 +700,26 @@ vllm serve $model_dir \
 
 **请求**
 
-> 注意请求中的 extra_body 里面的各个字段实际上是解开传进去的，而不是直接传 "extra_body" 这个字段
+> 关于 `extra_body` 介绍：
+> - `OpenAI.chat.completions.create`不支持但是部分模型又需要的参数可以通过`extra_body`传
+> - `extra_body`里面的各个字段实际上是**解开传进去的**，而不是直接传 `extra_body` 这个字段
+> 
+> 可去看源码`<conda_env_path>/lib/python3.12/site-packages/openai/_base_client.py`中的`request`函数
 
 **返回**
 
 > 模型的返回，两个包都会包装好再返回，跟 requests 方式返回的 dict 有区别，但本质上一样的，因为最后都是使用的 requsets.post 发送请求的。
+> 
+> 可以从源码`<conda_env_path>/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py`一路看进去
+> 
+> 返回的类型是`ChatCompletionMessage <- BaseModel <- pydantic.BaseModel`。`pydantic.BaseModel`中：
+> - `model_fields`: 正式字段，所以会在调试的时候看到
+> - `model_extra`: 动态字段/未声明字段，所以调试的时候看不到
+> - 某些模型会有额外的返回就会放到`model_extra`中
+>
+> `OpenAI`的`BaseModel`定义的是`model_config = {"extra": "allow", "defer_build": True}`
+> 
+> 所以在拿到返回时，有些放在`model_extra`中的参数在对象展开时看不到，但是实际上是存在的，可以直接对象引用到（如下面例子中的推理内容）
 
 
 ```python
@@ -729,36 +744,23 @@ response = client.chat.completions.create(model="", messages=[], tools=[], extra
 
 > 不同平台不同提供商不同，常见有以下几种（不一定对，仅供参考）：
 > 
-> | 平台/模型      | 开启推理参数                                                    |
-> | -------------- | --------------------------------------------------------------- |
-> | OpenAI o1 / o3 | 自动启用，无需传参                                              |
-> | DeepSeek-R1    | `extra_body={"thinking":{"type":"enable"}}`                     |
-> | Qwen2.5-Think  | `enable_thinking=True` 或 `extra_body={"enable_thinking":True}` |
-> | Yi-Reasoning   | `extra_body={"reasoning_mode":"high"}`                          |
+> | 平台/模型      | 开启推理参数                                |
+> | -------------- | ------------------------------------------- |
+> | OpenAI o1 / o3 | 自动启用，无需传参                          |
+> | DeepSeek-R1    | `extra_body={"thinking":{"type":"enable"}}` |
+> | Qwen2.5-Think  | `extra_body={"enable_thinking":True}`       |
+> | Yi-Reasoning   | `extra_body={"reasoning_mode":"high"}`      |
 
 **返回**
 
-> 一般会在 `response.choices[0].message.reasoning_content`
-> 
-> 但是有时候会在 `response.choices[0].message.model_extra`
-> 
-> **为什么有的模型返回在顶层，有的在 model_extra？**
-> 
-> 在新版的 OpenAI 官方 SDK（>= v1.0） 以及兼容实现（如 Cloudsway、SiliconFlow、Qwen、DeepSeek）中：
+> 在新版的 OpenAI 官方 SDK（>= v1.0）中：
 > - OpenAI SDK 采用了严格的 Pydantic Schema 定义，
-> - 它会把「模型未定义的额外字段」自动收集到 model_extra 里。
+> - 它会把「未定义的额外字段」自动收集到`model_extra`里。
 > 
 > 也就是说：
 > - 如果服务器响应中包含了 SDK 未定义的字段；
 > - 或者返回结构扩展了（例如厂商自定义的 reasoning 字段）；
 > - 那么 SDK 不会报错，而是把这些未知字段都放进 model_extra。
-> 
-> | 模型来源                          | SDK 识别状态        | reasoning字段位置                          |
-> | --------------------------------- | ------------------- | ------------------------------------------ |
-> | OpenAI 官方（如 o1, o3, o4-mini） | ✅ SDK 已注册        | `message.reasoning_content`                |
-> | 新模型（如 DeepSeek, Qwen-Think） | ❌ SDK 未注册        | `message.model_extra['reasoning_content']` |
-> | Cloudsway / SiliconFlow 兼容API   | ❌ 兼容层不传 schema | `message.model_extra`                      |
-> | 自建模型 / proxy                  | ❌ 完全自定义返回    | 可能在任意层（甚至 `choices.model_extra`） |
 > 
 > 换句话说：
 > - 如果 SDK 不认识服务器返回的键，就会自动塞进 model_extra。
@@ -766,20 +768,18 @@ response = client.chat.completions.create(model="", messages=[], tools=[], extra
 > 
 > **最佳操作建议**
 > 
-> | 操作                | 建议                                                                                |
-> | ------------------- | ----------------------------------------------------------------------------------- |
-> | 想取推理文本        | 优先看 `message.reasoning_content`，其次 `message.model_extra["reasoning_content"]` |
-> | 想取推理元信息      | 检查 `reasoning_details`（同理在 `model_extra`）                                    |
-> | 想知道 SDK 支不支持 | 打印 `dir(response.choices[0].message)`                                             |
-> | 想兼容所有服务      | 自己写一个统一 `extract_reasoning()` 函数                                           |
-> | 想调试原始返回      | 打印 `response.model_dump()` 看全量 JSON                                            |
+> | 操作                   | 建议                                                                                |
+> | ---------------------- | ----------------------------------------------------------------------------------- |
+> | 想取推理文本           | 优先看 `message.reasoning_content`，其次 `message.model_extra["reasoning_content"]` |
+> | 想取推理元信息（若有） | 检查 `reasoning_details`（同理在 `model_extra`）                                    |
+> | **查看原始返回**       | 打印 `response.model_dump()` 看全量 JSON                                            |
 
 
 ## 直接采用post请求
 
 其实 openai 的 sdk 最后也是使用 post。
 
-所以也可以不使用 openai 的 sdk，直接采用requests.post的方式来调用。
+所以也可以不使用 openai 的 sdk，直接采用`requests.post`的方式来调用。
 
 看[请求llm](#请求llm)最开头的介绍和脚本就懂了。
 
