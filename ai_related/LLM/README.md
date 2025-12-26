@@ -5,6 +5,7 @@
     - [seq\_len](#seq_len)
     - [dp\_size、tp\_size、pp\_size](#dp_sizetp_sizepp_size)
     - [temperature and top\_p](#temperature-and-top_p)
+  - [资源计算(参数量、存储、显存)](#资源计算参数量存储显存)
 - [部署llm](#部署llm)
   - [使用 sglang 部署](#使用-sglang-部署)
   - [使用 lightllm 部署](#使用-lightllm-部署)
@@ -377,6 +378,104 @@ a n
 ### temperature and top_p
 
 > 详见 [temperature_and_top_p](./temperature_and_top_p.md)
+
+## 资源计算(参数量、存储、显存)
+
+假设现在模型参数如下：
+
+```shell
+{
+    "hidden_size": 5120,            # Transformer 主维度（d_model）
+    "intermediate_size": 17408,     # FFN 中间层
+    "num_attention_heads": 40,      # Transformer Block 数
+    "num_hidden_layers": 40,        # 注意力头数
+    "vocab_size": 151936            # 词表大小
+}
+```
+
+**参数量计算**
+
+> Attention 层参数：$4\times \text{hidden\_size}^2$
+> - Q、K、V 权重：$3\times \text{hidden\_size}^2$
+> - 线性输出层：$\text{hidden\_size}^2$
+> 
+> FFN 层（两次线性变换）参数：$2\times \text{hidden\_size} \times \text{intermediate\_size}$
+> 
+> 词表 Embedding 与输出层（量级较小）：
+> - $\text{Embedding}=\text{vocab\_size}\times\text{hidden\_size}$
+> - $\text{Output}$：可以与 Embedding 共享
+> 
+> 该例子总量计算：
+> 
+> ```shell
+> Attention per layer = 4 * 5120^2 = 4 * 26,214,400 = 104,857,600
+> FFN per layer       = 2 * 5120 * 17,408 ≈ 178,257,920
+> === per layer total ≈ 283M params
+> 
+> Total layers = 40
+> Total params from blocks = 40 * 283M ≈ 11.32B
+> 
+> + Embedding ≈ 151,936 * 5,120 ≈ 778M
+> ```
+> 
+> 加上 bias / LayerNorm，该模型大概是 14B 大小。
+
+**储存计算**
+
+> $\text{占用存储}=\text{参数量}\times\text{每参数占用字节数}$
+> 
+> 不同数据格式占用字节数：
+> 
+> | 类型        | Bytes/参数 |
+> | ----------- | ---------- |
+> | FP32        | 4          |
+> | FP16 / BF16 | 2          |
+> | INT8        | 1          |
+> | INT4        | 0.5        |
+> 
+> 该模型是 FP16 / BF16，所以大概是（换算成常见单位）：
+> 
+> ```shell
+> 14B × 2 bytes = 28 GB
+> 28 × (1000/1024)^3 ≈ 26 GiB
+> ```
+
+**训练显存计算**
+
+> 训练显存比推理要大很多，因为不仅要存参数，还要存梯度、优化器状态、激活值。
+> 
+> | 类别             | 占显存                                                        |
+> | ---------------- | ------------------------------------------------------------- |
+> | Parameters       | 模型权重                                                      |
+> | Gradients        | 与权重同量级                                                  |
+> | Optimizer states | 例如 Adam 有 2 个额外状态（一阶动量，二阶动量）               |
+> | Activations      | 前向中间值（反向传播必须使用的中间张量与 batch、seq线性相关） |
+> | 额外开销         | CUDA / 框架占用                                               |
+> 
+> 该模型训练时，大概需要显存：
+> 
+> ```shell
+> 模型权重 = 14B × 2 bytes = 28 GB
+> 梯度 = 28 GB
+> Optimizer = 14B × 4 bytes = 58 GB
+> 
+> 以上基础部分，再加上激活值、batch、seq、CUDA 开销等
+> 实际训练显存可能 > 140 GB
+> ```
+
+**推理显存计算**
+
+> 推理时不需要梯度和优化器状态，推理显存需求主要包括：
+> - 参数权重
+> - KV Cache（对长上下文）
+> - Batch / Seq / 框架开销
+> 
+> 该模型推理时，大概需要显存：
+> 
+> ```shell
+> 14B × 2 bytes × 1.1 ≈ 30.8 GB
+> ```
+
 
 # 部署llm
 
