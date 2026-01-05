@@ -430,7 +430,7 @@ git lfs ls-files
 2. scope：范围（可选）。说明本次 commit 影响的模块或范围，如果没有特定的模块，可以省略。
 3. subject：简短描述。尽量简短，不超过 50 个字符。
 4. body：详细描述（可选）。分点说明修改的细节、逻辑或副作用。
-5. footer：脚注（可选）。用于关联 issue 或标记 BREAKING CHANGE。
+5. footer：脚注（可选）。用于关联 issue、标记 BREAKING CHANGE 或添加 co-author。
 
 示例：
 
@@ -458,6 +458,41 @@ Closes #234
 | ci       | 持续集成相关                                           |
 | chore    | 杂务（不影响源代码的修改，例如修改配置文件、工具脚本） |
 | revert   | 回滚某次提交                                           |
+
+**Co-author（共同作者）**
+
+当多人协作完成某个提交时，可以在 commit 信息的 footer 中添加共同作者：
+
+```shell
+feat(auth): 实现用户登录功能
+
+1. 添加 JWT 认证
+2. 实现登录接口
+3. 添加单元测试
+
+Co-authored-by: Name1 <email1@example.com>
+Co-authored-by: Name2 <email2@example.com>
+```
+
+**命令行直接添加 Co-author：**
+
+```shell
+# 单个共同作者
+git commit -m "feat: add new feature" -m "Co-authored-by: Name <email@example.com>"
+
+# 多个共同作者
+git commit -m "feat: add new feature" \
+           -m "Co-authored-by: Name1 <email1@example.com>" \
+           -m "Co-authored-by: Name2 <email2@example.com>"
+```
+
+**注意事项：**
+
+1. Co-author 必须在 footer 部分，与 body 之间要有空行
+2. 邮箱地址必须是该用户在 GitHub/GitLab 等平台注册的邮箱
+3. GitHub 会将 Co-author 也计入该提交的贡献者
+4. 格式必须严格遵守：`Co-authored-by: Name <email@example.com>`
+   1. 也可以使用 github 提供的隐私邮箱格式：`Co-authored-by: username <username@users.noreply.github.com>`
 
 
 ### 回退

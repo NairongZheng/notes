@@ -38,7 +38,7 @@ docker compose version
 3. 停止docker服务：`systemctl stop docker`（老版用`service docker stop`）
 4. 检查docker状态：`systemctl status docker`（老版用`service docker status`）
 5. 设置docker开机自启：`systemctl enable docker`
-6. 取消docker开机自启：`systemctl disenable docker`
+6. 取消docker开机自启：`systemctl disable docker`
 7. 查看docker磁盘使用情况：`docker system df [-v]`
 8. 清理build缓存：`docker builder prune`
 9. 查看容器/镜像的详细信息：`docker inspect [container_name|image_id]`
@@ -48,7 +48,7 @@ docker compose version
 1. **运行容器**：
 
 ```bash
-sudo docker run --gpus all -it -d -rm \
+sudo docker run --gpus all -it -d --rm \
                 -p <host_port:container_port> \
                 -v <host_path:container_path> \
                 -e <var_name=val_value> \
@@ -60,7 +60,7 @@ sudo docker run --gpus all -it -d -rm \
 # --gpus all：允许容器使用所有gpu
 # -it：交互模式
 # -d：后台运行
-# -rm：运行结束删除
+# --rm：运行结束删除
 # -p：端口映射（有-p就不能有--net=host）
 # -v：数据卷映射
 # -e：环境变量
@@ -129,13 +129,23 @@ docker commit -a "damonzheng" \
 
 # 镜像相关命令
 
-1. **从Dockerfile构建镜像**：`docker build -t <image_name:image_tag> [-f </path/to/Dockerfile>] .`
+1. **查看镜像**：`docker images`
+   1. `-a`：显示所有镜像（包括中间层）
+   2. `-q`：只显示镜像ID
+   3. `--digests`：显示镜像的摘要信息
+2. **拉取镜像**：`docker pull <image_name:tag>`
+3. **推送镜像**：`docker push <image_name:tag>`
+4. **删除镜像**：`docker rmi <image_name:tag>`
+   1. `-f`：强制删除
+   2. `docker rmi $(docker images -q)`：删除所有镜像
+5. **镜像打标签**：`docker tag <source_image:tag> <target_image:tag>`
+6. **从Dockerfile构建镜像**：`docker build -t <image_name:image_tag> [-f </path/to/Dockerfile>] .`
    1. `-t`：指定tag，默认为latest
    2. `-f`：指定Dockerfile文件，没指定默认为当前路径
    3. `.`：决定了docker引擎在构建镜像时可以使用的文件和目录
-2. **保存镜像到本地文件**：`docker save -o <file_path/file_name.tar> <image_name:tag>`
-3. **加载本地保存的镜像**：`docker load -i <image_name.tar>`
-4. **查看镜像构建过程**：`docker history <image_name:tag>`
+7. **保存镜像到本地文件**：`docker save -o <file_path/file_name.tar> <image_name:tag>`
+8. **加载本地保存的镜像**：`docker load -i <image_name.tar>`
+9. **查看镜像构建过程**：`docker history <image_name:tag>`
 
 
 # volume相关
