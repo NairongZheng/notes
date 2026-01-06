@@ -10,6 +10,8 @@
   - [iterm2](#iterm2)
     - [tmux](#tmux-1)
   - [docker](#docker)
+- [Linux](#linux)
+  - [zsh 配置](#zsh-配置)
 - [Other](#other)
   - [Vscode/cursor](#vscodecursor)
     - [cursor的一些设置](#cursor的一些设置)
@@ -190,6 +192,36 @@ set -g destroy-unattached off
 brew install --cask docker # --cask: 用于安装带有图形界面的桌面应用程序。macos需要使用这个来启动docker的守护进程
 # 启动
 open /Applications/Docker.app # 或者在电脑双击打开也行
+```
+
+# Linux
+
+## zsh 配置
+
+安装配置：
+
+```shell
+# 如果只用 bash 的话，～/.bashrc 可以直接 copy
+cp /etc/skel/.bashrc ~/.bashrc
+
+# 安装 oh-my-zsh (会自动生成 ～/.zshrc)
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# 安装自动补全增强
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+# 安装语法高亮
+git clone https://github.com/zsh-users/zsh-syntax-highlighting ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+
+# 然后在 ～/.zshrc 里面添加以下配置
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+```
+
+想把命令提示符改成绝对路径的话，可以到 oh-my-zsh 使用的主题里面改，如：
+
+```shell
+#  vim ~/.oh-my-zsh/themes/$ZSH_THEME.zsh-theme
+PROMPT="%(?:%{$fg_bold[green]%}%1{➜%} :%{$fg_bold[red]%}%1{➜%} ) %{$fg[cyan]%}%d%{$reset_color%}"
+
+# 这边本来是 `%c`，改成 `%d` 就是绝对路径了
 ```
 
 # Other
