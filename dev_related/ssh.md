@@ -1,4 +1,5 @@
 - [CMD](#cmd)
+- [shell 登陆介绍](#shell-登陆介绍)
 - [ssh config配置](#ssh-config配置)
   - [ssh config文件基本结构](#ssh-config文件基本结构)
   - [ssh config文件进阶使用](#ssh-config文件进阶使用)
@@ -6,10 +7,6 @@
   - [SCP服务器间拷贝文件](#scp服务器间拷贝文件)
 - [ssh端口转发](#ssh端口转发)
   - [本地端口转发](#本地端口转发)
-    - [本地直接运行的服务](#本地直接运行的服务)
-    - [将开发机上的服务转发到本地机器](#将开发机上的服务转发到本地机器)
-    - [将开发机上容器内的服务转发到本地机器](#将开发机上容器内的服务转发到本地机器)
-    - [使用vscode进行本地端口转发](#使用vscode进行本地端口转发)
   - [远程端口转发](#远程端口转发)
   - [端口转发总结](#端口转发总结)
 - [MobaXterm配置](#mobaxterm配置)
@@ -42,6 +39,34 @@
    2. 密钥登录：`ssh <user_name>@<remote_ip> -p <remote_port> -i <private_key_path>`
    3. 密钥通过跳板机登录开发机：`ssh <user_name>@<dev_ip> -i <private_key_path> -o ProxyCommand="ssh <user_name>@<jumpserver_ip> -p <jumpserver_port> -i <private_key_path> -q -W <dev_ip>:<dev_port>"`
    4. 使用第三种有可能需要先在远程主机的`authorized_keys`中添加客户端的公钥
+
+# shell 登陆介绍
+
+所有 shell 启动行为，都由两个维度决定：
+- 是不是 login shell
+- 是不是 interactive shell
+- ssh 登录 = login + interactive
+- ssh 的 login shell 一般都是 bash
+
+**bash 作为 login shell（如 ssh）**
+
+执行顺序（只执行第一个存在的）：
+
+```shell
+# 不会自动执行 ~/.bashrc，通常在下面的文件里手动 source .bashrc
+~/.bash_profile
+~/.bash_login
+~/.profile
+```
+
+**bash 作为非 login 的交互 shell（如 tmux）**
+
+执行：
+
+```shell
+~/.bashrc
+```
+
 
 # ssh config配置
 
@@ -242,7 +267,7 @@ scp -3 <Server1>:</path/to/file_source> <Server2>:</path/to/file_destination>
 需要在本地访问开发机上的服务，或者容器内的服务。需要用到本地端口转发。
 
 
-### 本地直接运行的服务
+**本地直接运行的服务**
 
 假设现在有一个http服务的python代码如下：
 
@@ -261,7 +286,7 @@ if __name__ == "__main__":
 
 在本地windows运行之后，可以在`http://localhost:8080`上查看到内容
 
-### 将开发机上的服务转发到本地机器
+**将开发机上的服务转发到本地机器**
 
 假设现在**在开发机上**运行了以下代码：
 
@@ -306,7 +331,7 @@ ssh -L 8080:localhost:60011 -J damonzheng@jumpserver damonzheng@zn-dev01-1 # 会
 # Windows默认会同时监听 IPv4 和 IPv6。
 ```
 
-### 将开发机上容器内的服务转发到本地机器
+**将开发机上容器内的服务转发到本地机器**
 
 假设现在**在开发机上的容器内**运行了以下代码：
 
@@ -353,7 +378,7 @@ ssh -L 8080:localhost:12312 -J damonzheng@jumpserver damonzheng@zn-dev01-1
 
 运行之后，仍然可以在`http://localhost:8080`上查看到内容，但是这个服务是运行在开发机上容器内的，不是在本地，也不是在开发机上。
 
-### 使用vscode进行本地端口转发
+**使用vscode进行本地端口转发**
 
 其实不管是开发机还是开发机上的容器，只要ssh能连接上的，都可以通过vscode来转发。
 

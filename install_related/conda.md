@@ -8,8 +8,6 @@
 ```shell
 wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
 bash Miniconda3-py38_4.12.0-Linux-x86_64.sh -b -p ~/miniconda3
-# echo "export PATH=~/miniconda3/bin:$PATH" >> ~/.bashrc
-# source ~/.bashrc
 ```
 
 **初始化 conda**
@@ -19,7 +17,11 @@ bash Miniconda3-py38_4.12.0-Linux-x86_64.sh -b -p ~/miniconda3
 # 需要查看 ～/.bashrc 或者 ～/.zshrc 中是否有：
 . <path_to_conda_install>/etc/profile.d/conda.sh
 # 然后再运行：
-conda init
+conda init [zsh | bash]
+
+# 正常来说经过上面的步骤就不需要下面这个了
+# echo "export PATH=~/miniconda3/bin:$PATH" >> ~/.bashrc
+# source ~/.bashrc
 ```
 
 **创建环境与安装包**
@@ -58,4 +60,19 @@ conda remove -n <env_name> --all
 
 ```
 
+# 环境迁移
 
+## 跨机器迁移
+
+```shell
+# 在旧机器
+conda activate <env_name>
+conda env export --from-history > environment.yml    # --from-history: 只导出手动装过的包，不会锁死平台细节（不会导出 pip 安装的）
+pip freeze > requirements.txt
+
+# 在新机器
+conda env create -f environment.yml
+conda activate <env_name>
+pip install uv
+uv pip install -r requirements.txt   # 用 uv 安装比较快
+```

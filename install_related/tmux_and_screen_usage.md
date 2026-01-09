@@ -14,8 +14,72 @@
 **安装**
 
 ```bash
+# 有 root 权限直接 apt install
 apt install -y tmux
 ```
+
+<!-- **从源码安装**
+
+```shell
+# 没有 root 权限
+
+# 1. 创建文件夹
+mkdir -p ~/.local/{bin,lib,include,src}
+
+# 2. 编译依赖 libevent
+cd ~/.local/src
+wget https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
+tar -xzf libevent-2.1.12-stable.tar.gz
+cd libevent-2.1.12-stable
+./configure --prefix=$HOME/.local --disable-openssl
+make -j
+make install
+
+# 3. 编译依赖 ncurses
+cd ~/.local/src
+wget https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
+tar -xzf ncurses-6.4.tar.gz
+cd ncurses-6.4
+./configure  --prefix=$HOME/.local  --with-shared  --with-termlib  --enable-pc-files --with-pkg-config-libdir=$HOME/.local/lib/pkgconfig
+make -j
+make install
+
+# 编译依赖 m4
+cd ~/.local/src
+wget https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.gz
+tar -xzf m4-1.4.19.tar.gz
+cd m4-1.4.19
+./configure --prefix=$HOME/.local
+make -j
+make install
+
+# 4. 编译依赖 bison
+cd ~/.local/src
+wget https://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.gz
+tar -xzf bison-3.8.2.tar.gz
+cd bison-3.8.2
+export PATH=$HOME/.local/bin:$PATH
+export M4=$HOME/.local/bin/m4
+./configure --prefix=$HOME/.local
+make -j
+make install
+
+# 5. 编译 tmux
+cd ~/.local/src
+wget https://github.com/tmux/tmux/releases/download/3.4/tmux-3.4.tar.gz
+tar -xzf tmux-3.4.tar.gz
+cd tmux-3.4
+# 临时创建下编译的环境变量
+export CPPFLAGS="-I$HOME/.local/include"
+export LDFLAGS="-L$HOME/.local/lib"
+export PKG_CONFIG_PATH="$HOME/.local/lib/pkgconfig"
+export YACC=/mnt/afs_toolcall/zhengnairong/.local/bin/bison
+export YFLAGS="-y"
+# 配置并编译安装
+./configure --prefix=$HOME/.local
+make -j
+make install
+``` -->
 
 **启动与退出**
 
@@ -42,10 +106,13 @@ Tmux 窗口有大量的快捷键。所有快捷键都要通过前缀键唤起。
 
 # 启用鼠标支持（选择文本、调整面板、切换窗口等）
 set -g mouse on
-
 # 自定义状态栏显示内容
 set -g status-left "Session: #S | Windows: #W"
 set -g status-right "Time: %H:%M:%S | Date: %Y-%m-%d"
+# 设置xterm-keys
+set -g xterm-keys on
+# 保留会话，关闭时不会销毁
+set -g destroy-unattached off
 
 # 激活配置: tmux source-file ~/.tmux.conf
 ```
