@@ -1,4 +1,5 @@
 - [命令操作](#命令操作)
+- [调试变量查看](#调试变量查看)
 - [pip包管理](#pip包管理)
 - [代码质量工具](#代码质量工具)
 - [项目管理](#项目管理)
@@ -7,6 +8,39 @@
 1. 打包：`pyinstaller --onefile --noconsole <py_file_path>`
 2. proto编译：`cd <proto_file_path>`&&`python -m grpc_tools.protoc -I./ --python_out=./ --grpc_python_out=./ ./<proto_file_name.proto>`（`pip install grpcio-tools==1.47.0`这个版本编译完有类型声明，新版本没有。新版本好像高效一点，但是可读性差一些）
 3. 生成代码关系结构：`pip install pylint`&&`sudo apt-get install graphviz`&&`pyreverse -o png -p <pic_name> <folder_or_file_path>`
+
+
+## 调试变量查看
+
+遇到一个不认识的变量，按“从快到慢、从粗到细”三步走：
+
+1) 速查（最快）
+   - 看类型：`type(x)`
+   - 看接口：`dir(x)`（找 `__iter__`, `keys`, `items` 等）
+   - 打印样例：`print(repr(x))`
+
+2) 判断是否可迭代
+   - 最稳妥：
+     ```py
+     from collections.abc import Iterable
+     isinstance(x, Iterable)
+     ```
+     注意：字符串也是可迭代的。
+   - 快速试法：`iter(x)` —— 不报错即可迭代。
+   - 也可用：`hasattr(x, "__iter__")`。
+
+3) 看内部结构（按常见类型）
+   - list/tuple/dict: `len(x)`, `x[0]`, `x.keys()`
+   - pandas.DataFrame: `x.head()`, `x.columns`, `x.dtypes`
+   - numpy / torch: `x.shape`, `x.dtype`（torch 还有 `x.device`）
+   - HuggingFace `datasets.Dataset`: `x.column_names`, `x.features`, `x[0]`
+
+常用的“Pythonic 判断套路”速查：
+- 容器：`hasattr(x, "__len__") and hasattr(x, "__iter__")`
+- 映射（mapping）：`hasattr(x, "keys") and hasattr(x, "items")`
+- 序列：`hasattr(x, "__getitem__") and hasattr(x, "__len__")`
+- 迭代器：`isinstance(x, collections.abc.Iterator)`
+
 
 ## pip包管理
 
