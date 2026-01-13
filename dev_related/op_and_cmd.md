@@ -573,14 +573,24 @@ Linux的用户和组信息存储在以下文件中：
 
 **新建用户**
 ```bash
-# 创建用户（不创建主目录）
-sudo useradd <user_name>
+sudo useradd [OPTIONS] <user_name>
+    # -M: 不创建 home 目录
+    # -m: 创建 home 目录
+    # -d: 指定 home 目录
+    # -g: 指定 gid，主组
+    # -G: 指定附加组
+    # -u: 指定 uid
+    # -s: 指定登录 shell
+
 # 创建用户，并自动创建主目录
 sudo useradd -m <user_name>
 # 创建用户，并自动创建主目录，并指定默认shell为bash
 sudo useradd -m -s /bin/bash <user_name>
 # 创建用户，指定 UID 和 GID
 sudo useradd -u <uid> -g <gid> <user_name>
+
+# 创建用户，指定用户路径、id 和 shell
+useradd -M -d /path/to/home/of/<username>  -u <uid> -s `which bash` <username>
 ```
 
 **删除用户**
