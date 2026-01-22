@@ -1,8 +1,17 @@
 - [CMD](#cmd)
-- [linux](#linux)
-- [windows的mobaXterm](#windows的mobaxterm)
 - [vim使用](#vim使用)
+  - [vim模式选择](#vim模式选择)
+  - [vim 的“公式思维”（关键）](#vim-的公式思维关键)
+    - [常见操作符](#常见操作符)
+    - [常见动作](#常见动作)
+  - [vim基础操作](#vim基础操作)
+    - [移动光标（很关键）](#移动光标很关键)
+    - [删除、复制、粘贴](#删除复制粘贴)
+    - [搜索与替换](#搜索与替换)
   - [vimdiff](#vimdiff)
+- [vim 配置](#vim-配置)
+  - [linux](#linux)
+  - [windows的mobaXterm](#windows的mobaxterm)
 
 # CMD
 
@@ -21,7 +30,174 @@
    3. `Ctrl-w >`：增加当前分屏的宽度。
    4. `Ctrl-w <`：减少当前分屏的宽度。
 
-# linux
+
+# vim使用
+
+## vim模式选择
+
+vim 有以下几种模式：
+
+| 模式                | 作用                         | 进入方式                                                           | 退出方式 |
+| ------------------- | ---------------------------- | ------------------------------------------------------------------ | -------- |
+| 普通模式（Normal）  | 移动光标、删除、复制、粘贴   | 打开 vim 默认就是                                                  |
+| 插入模式（Insert）  | 真正输入文字                 | i：在光标前插入 <br> a：在光标后插入 <br> o：新起一行并插入        | Esc      |
+| 可视模式（Visual）  | 选中文本                     | v：字符级选择 <br> V：整行选择 <br> Ctrl + v：块选择（列编辑神器） | Esc      |
+| 命令模式（Command） | 执行命令（保存、退出、搜索） | 普通模式下输入 `:`                                                 | Esc      |
+
+## vim 的“公式思维”（关键）
+
+**“公式”**
+
+```shell
+vim 命令 = 操作符 + 动作
+
+d + w = 删除一个单词
+y + $ = 复制到行尾
+c + w = 删除一个单词并进入插入模式
+```
+
+### 常见操作符
+
+| 操作符 | 含义              |
+| ------ | ----------------- |
+| d      | 删除              |
+| y      | 复制              |
+| c      | 修改（删 + 插入） |
+
+### 常见动作
+
+| 动作 | 含义             |
+| ---- | ---------------- |
+| w    | 单词             |
+| $    | 行尾             |
+| 0    | 行首             |
+| i    | inside（如 ci"） |
+
+
+## vim基础操作
+
+### 移动光标（很关键）
+
+**基本移动**
+
+```shell
+h  ←
+l  →
+j  ↓
+k  ↑
+```
+
+**单词级移动**
+
+```shell
+w: 下一个单词开头（word）
+b: 上一个单词开头（back / backward）
+e: 当前单词结尾（end）
+```
+
+**行内移动**
+
+```shell
+0: 行首
+^: 行首第一个非空字符
+$: 行尾
+```
+
+**页面级移动**
+
+```shell
+gg: 文件开头（其实是一个操作符+命令）
+G: 文件结尾
+Ctrl + d: 向下翻半页（down）
+Ctrl + u: 向上翻半页（up）
+Ctrl + f: 向下翻一页（forward）
+Ctrl + b: 向上翻一页（backward）
+```
+
+### 删除、复制、粘贴
+
+**删除（d/delete）**
+
+```shell
+dd: 删除一整行
+dw: 删除一个单词
+d$: 删除到行尾
+d0: 删除到行首
+```
+
+**复制（y/yank）**
+
+```shell
+yy: 复制一行
+yw: 复制一个单词
+y$: 复制到行尾
+```
+
+**粘贴（p/paste）**
+
+```shell
+P: 光标后粘贴（大写）
+p: 光标前粘贴（小写）
+```
+
+**撤销 & 重做**
+
+```shell
+u: 撤销
+Ctrl + r: 重做
+```
+
+### 搜索与替换
+
+**搜索**
+
+```shell
+/word: 向下搜索
+?word: 向上搜索
+n: 下一个
+N: 上一个
+```
+
+**替换（非常强）**
+
+```shell
+:%s/旧/新/g
+
+%：全文
+s：替换
+g：全局
+```
+
+
+## vimdiff
+
+vimdiff的一些设置：
+
+```shell
+# 命令行模式下
+
+## 有时候没配置的话高亮太难看，可以改主题
+:colorscheme desert
+:colorscheme evening
+:colorscheme elflord
+:colorscheme industry
+
+## 相同内容折叠与否（需要两边都设置一下）
+:set nofoldenable   # 相同内容不折叠
+:set foldenable     # 相同内容折叠
+
+## 是否换行显示
+:set wrap           # 换行显示
+:set nowrap         # 关闭换行显示
+```
+
+# vim 配置
+
+可以直接参考 repo：[https://github.com/amix/vimrc](https://github.com/amix/vimrc)
+
+下面给一些我之前用的配置（需要插件），没必要其实。
+
+## linux
 
 1. 创建文件`~/.vimrc`（里面有些地方可以改的，看看注释）
 
@@ -231,7 +407,7 @@ def PythonSysPath( **kwargs ):
    3. 切换到YCM路径：`cd ~/.vim/bundle/YouCompleteMe`
    4. 安装：`python install.py [--force-sudo]`
 
-# windows的mobaXterm
+## windows的mobaXterm
 
 1. 流程是一样的，但是在mobaXterm操作的时候，会出现错误`E492: 不是编辑器的命令: ^M`，这是因为linux和windows文件换行的区别，需要将这些文件从dos装成unix，采用以下命令（有些系统的dos2unix工具不一样，看看下面哪个能用就用哪个）：
    1. `dos2unix -o -r /path/to/your/folder`
@@ -242,28 +418,3 @@ def PythonSysPath( **kwargs ):
    1. 安装nodejs：`curl -sL install-node.now.sh/lts | bash`
    2. 安装yarn：`curl --compressed -o- -L https://yarnpkg.com/install.sh | bash`
    3. 安装另一个插件管理器：`curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim`（不要改，就这样）
-
-
-# vim使用
-
-## vimdiff
-
-vimdiff的一些设置：
-
-```shell
-# 命令行模式下
-
-## 有时候没配置的话高亮太难看，可以改主题
-:colorscheme desert
-:colorscheme evening
-:colorscheme elflord
-:colorscheme industry
-
-## 相同内容折叠与否（需要两边都设置一下）
-:set nofoldenable   # 相同内容不折叠
-:set foldenable     # 相同内容折叠
-
-## 是否换行显示
-:set wrap           # 换行显示
-:set nowrap         # 关闭换行显示
-```
