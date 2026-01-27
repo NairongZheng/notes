@@ -84,21 +84,21 @@
 > 
 > - **准确率（Accuracy）**：对于给定的测试数据集，分类正确的样本数与总样本数之比
 >   
-> $$
-> \frac{TP+TN}{总样本数}
-> $$
+$$
+\frac{TP+TN}{总样本数}
+$$
 > 
 > - **精确率/查准率（Precision）**：预测为正的样本中，又多少是真正的正样本（说人话：预测是True的到底多少是True）
 > 
-> $$
-> \frac{TP}{TP+FP}
-> $$
+$$
+\frac{TP}{TP+FP}
+$$
 > 
 > - **召回率/查全率（Recall）**：样本中有多少正例被预测正确了（说人话：有没有漏掉True）
 > 
-> $$
-> \frac{TP}{TP+FN}
-> $$
+$$
+\frac{TP}{TP+FN}
+$$
 > 
 > 
 > **查准率和查全率是一对矛盾的度量**。
@@ -145,9 +145,9 @@
 
 > 均方误差（MSE, Mean Squared Error）
 > 
-> $$
-> Loss_{MSE}=\frac{1}{n} \sum_{n=1}^n (y_i-\hat{y_i})^2
-> $$
+$$
+Loss_{MSE}=\frac{1}{n} \sum_{n=1}^n (y_i-\hat{y_i})^2
+$$
 > 
 > - 用途：最常见的回归损失
 > - 特点：
@@ -160,15 +160,15 @@
 > 
 > 对于二分类（Binary）：
 > 
-> $$
-> Loss_{BCE}=-[y\log{(\hat{y})} + (1-y)\log{(1-\hat{y})}]
-> $$
+$$
+Loss_{BCE}=-[y\log{(\hat{y})} + (1-y)\log{(1-\hat{y})}]
+$$
 > 
 > 对于多分类（Multi-class）：
 > 
-> $$
-> Loss_{CE}=-\sum_{i=1}^C y_i \log{(\hat{y_i})}
-> $$
+$$
+Loss_{CE}=-\sum_{i=1}^C y_i \log{(\hat{y_i})}
+$$
 > 
 > - 用途：分类任务中最常用
 > - 特点：
@@ -177,18 +177,18 @@
 > 
 > **KL 散度（Kullback–Leibler Divergence）**
 > 
-> $$
-> Loss_{KL}(P||Q)=\sum_i{P(i)\log{\frac{P(i)}{Q(i)}}}
-> $$
+$$
+Loss_{KL}(P||Q)=\sum_i{P(i)\log{\frac{P(i)}{Q(i)}}}
+$$
 > 
 > - 用途：衡量两个概率分布的差异
 > - 应用：知识蒸馏、语言模型对齐等
 > 
 > **Focal Loss（用于不平衡类别）**
 > 
-> $$
-> Loss_{focal}=-\alpha_t(1-p_t)^{\gamma}\log{p_t}
-> $$
+$$
+Loss_{focal}=-\alpha_t(1-p_t)^{\gamma}\log{p_t}
+$$
 > 
 > - 用途：目标检测、处理类别不均衡
 > - 特点：
@@ -205,11 +205,11 @@
 
 **Sigmoid 函数（S 型函数）**
 
-> $$
-> \sigma(x)=\frac{1}{1+e^{-x}}
-> $$
+$$
+\sigma(x)=\frac{1}{1+e^{-x}}
+$$
 > 
-> - 输出范围：$(0, 1)$
+- 输出范围：$(0, 1)$
 > - 优点：
 >   - 可解释为概率
 >   - 平滑、连续、可导
@@ -219,9 +219,9 @@
 
 **Softmax（分类输出层专用）**
 
-> $$
-> softmax=\frac{e^{x_i}}{\sum_{j=1}^{n}{e^{x_j}}}
-> $$
+$$
+softmax=\frac{e^{x_i}}{\sum_{j=1}^{n}{e^{x_j}}}
+$$
 > 
 > - 作用：将输出向量转换为概率分布
 > - 常用于：分类网络最后一层
@@ -238,8 +238,8 @@
 > **Sigmoid 适合二分类的原因**
 > 
 > 用在二分类时（例如“是猫” vs “不是猫”）：
-> - 网络输出层只有一个神经元，输出一个值$x$
-> - 使用 sigmoid 函数把这个值压缩到$(0,1)$
+- 网络输出层只有一个神经元，输出一个值$x$
+- 使用 sigmoid 函数把这个值压缩到$(0,1)$
 > - 可以解释为“样本属于正类的概率”
 > 
 > 例如：
@@ -302,62 +302,62 @@
 
 > 链式法则（Chain Rule）是反向传播的数学基础：
 > 
-> $$
-> \frac{dL}{dW}=\frac{dL}{da} · \frac{da}{dz} · \frac{dz}{dW}
-> $$
+$$
+\frac{dL}{dW}=\frac{dL}{da} · \frac{da}{dz} · \frac{dz}{dW}
+$$
 > 
 > 每一层只需“局部”计算自己的导数，然后乘上传来的“梯度链”。
 
 **基本梯度下降**
 
-> $$
-> \theta \leftarrow \theta - \eta \frac{\partial{L}}{\partial{\theta}}
-> $$
+$$
+\theta \leftarrow \theta - \eta \frac{\partial{L}}{\partial{\theta}}
+$$
 > 
 > 其中：
-> - $\theta$：一个参数，比如$W$
-> - $\eta$：学习率，控制每次更新的步长
-> - $\frac{\partial{L}}{\partial{\theta}}$：反向传播得到的梯度
+- $\theta$：一个参数，比如$W$
+- $\eta$：学习率，控制每次更新的步长
+- $\frac{\partial{L}}{\partial{\theta}}$：反向传播得到的梯度
 > - 梯度下降就是用梯度告诉我们“往哪走能让损失更小”，然后我们每次沿那个方向“走一小步”，直到找到最小值。
 
 **示例：数值举例**
 
 > **设定**：
-> - 输入：$x=2.0$
-> - 权重：$W=1.0$
-> - 偏置：$b=0$
-> - 标签：$y=0$
-> - 激活函数：恒等函数（线性激活）$\hat{y}=z=Wx+b$（演示而已，不给太复杂的）
-> - 损失函数：均方误差（MSE）：$Loss=\frac{1}{2}(\hat{y}-y)^2$
-> - 学习率：$0.1$
+- 输入：$x=2.0$
+- 权重：$W=1.0$
+- 偏置：$b=0$
+- 标签：$y=0$
+- 激活函数：恒等函数（线性激活）$\hat{y}=z=Wx+b$（演示而已，不给太复杂的）
+- 损失函数：均方误差（MSE）：$Loss=\frac{1}{2}(\hat{y}-y)^2$
+- 学习率：$0.1$
 > 
 > **前向传播**：
-> $$
-> \begin{gather*}
->     z=Wx+b=1.0\times2.0+0=2.0 \\
->     \hat{y}=z=2.0 \\
->     Loss=\frac{1}{2}(2.0-0)^2=2.0
-> \end{gather*}
-> $$
+$$
+\begin{gather*}
+    z=Wx+b=1.0\times2.0+0=2.0 \\
+    \hat{y}=z=2.0 \\
+    Loss=\frac{1}{2}(2.0-0)^2=2.0
+\end{gather*}
+$$
 > 
 > **反向传播计算导数**：
 > 
 > 使用链式法则：
 > 
-> $$
-> \begin{align*}
->     \frac{dL}{dW}&=\frac{dL}{d\hat{y}} · \frac{d\hat{y}}{dz} · \frac{dz}{dW} \\
->     &=(\hat{y}-y) · 1 · x \\
->     &=2.0 · 1 · 2.0 \\
->     &=4.0
-> \end{align*}
-> $$
+$$
+\begin{align*}
+    \frac{dL}{dW}&=\frac{dL}{d\hat{y}} · \frac{d\hat{y}}{dz} · \frac{dz}{dW} \\
+    &=(\hat{y}-y) · 1 · x \\
+    &=2.0 · 1 · 2.0 \\
+    &=4.0
+\end{align*}
+$$
 > 
 > **使用这个梯度更新 W**
 > 
-> $$
-> W_{new}=W-\eta · \frac{\partial{L}}{\partial{W}}=1.0-0.1 · 4.0=0.6
-> $$
+$$
+W_{new}=W-\eta · \frac{\partial{L}}{\partial{W}}=1.0-0.1 · 4.0=0.6
+$$
 
 
 </details>
@@ -369,14 +369,14 @@
 
 **基本梯度下降**
 
-> $$
-> \theta \leftarrow \theta - \eta \frac{\partial{L}}{\partial{\theta}}
-> $$
+$$
+\theta \leftarrow \theta - \eta \frac{\partial{L}}{\partial{\theta}}
+$$
 > 
 > 其中：
-> - $\theta$：一个参数，比如$W$
-> - $\eta$：学习率，控制每次更新的步长
-> - $\frac{\partial{L}}{\partial{\theta}}$：反向传播得到的梯度
+- $\theta$：一个参数，比如$W$
+- $\eta$：学习率，控制每次更新的步长
+- $\frac{\partial{L}}{\partial{\theta}}$：反向传播得到的梯度
 > - 梯度下降就是用梯度告诉我们“往哪走能让损失更小”，然后我们每次沿那个方向“走一小步”，直到找到最小值。
 
 **Batch Gradient Descent（BGD 批量梯度下降）**
@@ -384,15 +384,15 @@
 > - 每轮迭代**用全部训练数据计算梯度**。
 > - 更新稳定，但每次计算开销大，不适合大数据集。
 > 
-> $$
-> \theta \leftarrow \theta - \eta · \frac{1}{N} \sum_{i=1}^N \nabla_\theta L(x_i,y_i) \\
-> \theta \leftarrow \theta - \eta · \frac{1}{N} \sum_{i=1}^N \frac{\partial L^{(i)}}{\partial \theta} \\
-> $$
+$$
+\theta \leftarrow \theta - \eta · \frac{1}{N} \sum_{i=1}^N \nabla_\theta L(x_i,y_i) \\
+\theta \leftarrow \theta - \eta · \frac{1}{N} \sum_{i=1}^N \frac{\partial L^{(i)}}{\partial \theta} \\
+$$
 > 
 > 其中：
-> - $\eta$：学习率（learning rate）
-> - $N$：样本总数
-> - $L^{(i)}$：第$i$个样本的损失函数
+- $\eta$：学习率（learning rate）
+- $N$：样本总数
+- $L^{(i)}$：第$i$个样本的损失函数
 > 
 > 优点：更新方向精确、收敛平稳
 > 缺点：内存占用高，速度慢
@@ -401,10 +401,10 @@
 
 > - 每次迭代只使用一个样本计算梯度
 > 
-> $$
-> \theta \leftarrow \theta - \eta · \nabla_\theta L(x_i,y_i) \\
-> \theta \leftarrow \theta - \eta · \frac{\partial L^{(i)}}{\partial \theta} \\
-> $$
+$$
+\theta \leftarrow \theta - \eta · \nabla_\theta L(x_i,y_i) \\
+\theta \leftarrow \theta - \eta · \frac{\partial L^{(i)}}{\partial \theta} \\
+$$
 > 
 > 优点：迭代快，适合大数据、在线学习
 > 缺点：波动大、不稳定、可能收敛到局部最优
@@ -413,10 +413,10 @@
 
 > - 每次迭代用一个小批量（如 32 或 64）样本：
 > 
-> $$
-> \theta \leftarrow \theta - \eta · \frac{1}{m} \sum_{i=1}^m \nabla_\theta L(x_i,y_i) \\
-> \theta \leftarrow \theta - \eta · \frac{1}{m} \sum_{i=1}^m \frac{\partial L^{(i)}}{\partial \theta} \\
-> $$
+$$
+\theta \leftarrow \theta - \eta · \frac{1}{m} \sum_{i=1}^m \nabla_\theta L(x_i,y_i) \\
+\theta \leftarrow \theta - \eta · \frac{1}{m} \sum_{i=1}^m \frac{\partial L^{(i)}}{\partial \theta} \\
+$$
 > 
 > 优点：比 batch 快，且比 SGD 稳定，GPU 上更高效（张量并行）。现代神经网络中最常用的形式
 
@@ -434,10 +434,10 @@
 > - 类似物理中“惯性”的概念。给参数一个速度变量v
 > - 先更新动量，再更新参数
 > 
-> $$
-> v_t=\gamma v_{t-1}+\eta · \nabla_\theta L(\theta) \\
-> \theta_t \leftarrow \theta_{t-1} - v_t
-> $$
+$$
+v_t=\gamma v_{t-1}+\eta · \nabla_\theta L(\theta) \\
+\theta_t \leftarrow \theta_{t-1} - v_t
+$$
 > 
 > - **让参数更新沿着长期一致的下降方向加速，避免被局部波动干扰**
 > - 在“平坦区”加快收敛，减少摆动，整体收敛更快更稳定
@@ -446,24 +446,24 @@
 
 > **核心理念**：给每个参数一个自适应的学习率，让更新频繁的参数学习率变小，更新不频繁的参数保持较大学习率。
 > 
-> $$
-> G_{t,i}=G_{t-1,i}+(\nabla_{\theta_i} L(\theta))^2 \\
-> \theta_i \leftarrow \theta_i - \frac{\eta}{\sqrt{G_{t,i}}+\epsilon} · \nabla_{\theta_i} L(\theta)
-> $$
+$$
+G_{t,i}=G_{t-1,i}+(\nabla_{\theta_i} L(\theta))^2 \\
+\theta_i \leftarrow \theta_i - \frac{\eta}{\sqrt{G_{t,i}}+\epsilon} · \nabla_{\theta_i} L(\theta)
+$$
 > 
-> - 对于每个参数$\theta_i$，我们记录其历史所有梯度的平方和（只对该参数维度）。
-> - $G_{t,i}$是标量，表示$\theta_i$在迄今为止每一轮的梯度平方的累计值。
-> - 随着训练进行，$G_{t,i}$会越来越大（或保持不变）。
-> - 每个参数$\theta$拥有自己专属的学习率$\frac{\eta}{\sqrt{G_{t,i}}+\epsilon}$
->   - 如果某个参数的梯度一直很大，$G_{t,i}$增长很快，则学习率下降得很快。
->   - 如果某个参数的梯度一直很小，$G_{t,i}$增长缓慢，则学习率下降得慢。
+- 对于每个参数$\theta_i$，我们记录其历史所有梯度的平方和（只对该参数维度）。
+- $G_{t,i}$是标量，表示$\theta_i$在迄今为止每一轮的梯度平方的累计值。
+- 随着训练进行，$G_{t,i}$会越来越大（或保持不变）。
+- 每个参数$\theta$拥有自己专属的学习率$\frac{\eta}{\sqrt{G_{t,i}}+\epsilon}$
+  - 如果某个参数的梯度一直很大，$G_{t,i}$增长很快，则学习率下降得很快。
+  - 如果某个参数的梯度一直很小，$G_{t,i}$增长缓慢，则学习率下降得慢。
 > 
 > **利用历史梯度自动调整每个参数的学习率**：
 > - 频繁更新的参数 -> 学习率自动变小（趋于稳定）
 > - 更新较少的参数 -> 学习率保持较大（继续探索）
 > 
 > 优点：对稀疏特征（如 NLP）特别有效
-> 缺点：$G_{t,i}$是累计和，训练时间长后会很大，导致学习率不断变小，甚至趋近于 0；
+缺点：$G_{t,i}$是累计和，训练时间长后会很大，导致学习率不断变小，甚至趋近于 0；
 
 **RMSProp（Root Mean Square Propagation）**
 
@@ -472,17 +472,17 @@
 > - 改进 AdaGrad 的“过早衰减”问题
 > - 使用指数衰减平均
 > 
-> $$
-> E[g^2]_t=\gamma E[g^2]_{t-1}+(1-\gamma) · (\nabla_\theta L)^2 \\
-> \theta_i \leftarrow \theta_i - \frac{\eta}{\sqrt{E[g^2]_t}+\epsilon} · \nabla_{\theta} L
-> $$
+$$
+E[g^2]_t=\gamma E[g^2]_{t-1}+(1-\gamma) · (\nabla_\theta L)^2 \\
+\theta_i \leftarrow \theta_i - \frac{\eta}{\sqrt{E[g^2]_t}+\epsilon} · \nabla_{\theta} L
+$$
 > 
 > 其中：
-> - $\gamma$：衰减率（典型值：0.9）
+- $\gamma$：衰减率（典型值：0.9）
 > - 当前梯度平方被加入历史梯度平方的加权平均中，权重递减
 > 
-> 梯度变化剧烈 -> $E[g^2]_t$大 -> 更新幅度减小（更稳定）
-> 梯度变化平缓 -> $E[g^2]_t$小 -> 更新幅度保留（更敏感）
+梯度变化剧烈 -> $E[g^2]_t$大 -> 更新幅度减小（更稳定）
+梯度变化平缓 -> $E[g^2]_t$小 -> 更新幅度保留（更敏感）
 
 **Adam（Adaptive Moment Estimation）**
 
@@ -495,13 +495,13 @@
 > - 二阶矩估计：RMSProp 思想（梯度平方的滑动平均）
 > - 然后通过这些估计动态调整学习率。
 > 
-> $$
-> 初始化：m_0=0,v_0=0,t=0 \\
-> 更新一阶矩估计（类似动量）：m_t=\beta_1 · m_{t-1}+(1-\beta_1) · g_t \\
-> 更新二阶矩估计（类似RMSProp）：v_t=\beta_2 · v_{t-1}+(1-\beta_2) · g_t^2 \\
-> 计算偏差修正项：\hat{m_t}=\frac{m_t}{1-\beta_1^t},\hat{v_t}=\frac{v_t}{1-\beta_2^t} \\
-> 更新参数：\theta_t \leftarrow \theta_{t-1} - \eta · \frac{\hat{m_t}}{\sqrt{\hat{v_t}}+\epsilon}
-> $$
+$$
+初始化：m_0=0,v_0=0,t=0 \\
+更新一阶矩估计（类似动量）：m_t=\beta_1 · m_{t-1}+(1-\beta_1) · g_t \\
+更新二阶矩估计（类似RMSProp）：v_t=\beta_2 · v_{t-1}+(1-\beta_2) · g_t^2 \\
+计算偏差修正项：\hat{m_t}=\frac{m_t}{1-\beta_1^t},\hat{v_t}=\frac{v_t}{1-\beta_2^t} \\
+更新参数：\theta_t \leftarrow \theta_{t-1} - \eta · \frac{\hat{m_t}}{\sqrt{\hat{v_t}}+\epsilon}
+$$
 
 </details>
 
@@ -519,17 +519,17 @@
 > 
 > 没有正则化时，梯度更新是：
 > 
-> $$
-> \theta \leftarrow \theta - \eta · \frac{\partial L_0}{\partial \theta}
-> $$
+$$
+\theta \leftarrow \theta - \eta · \frac{\partial L_0}{\partial \theta}
+$$
 
 **L1正则化**
 
 > 原理：在损失函数中加入所有参数的绝对值之和：
 > 
-> $$
-> L=L_0+\lambda \sum_i|w_i|
-> $$
+$$
+L=L_0+\lambda \sum_i|w_i|
+$$
 > 
 > 特点：
 > - 会使部分权重变为 0，具有特征选择能力；
@@ -539,17 +539,17 @@
 > 
 > 此时梯度更新变成了：
 > 
-> $$
-> \theta \leftarrow \theta - \eta (\frac{\partial L_0}{\partial \theta}+\lambda · sign(\theta))
-> $$
+$$
+\theta \leftarrow \theta - \eta (\frac{\partial L_0}{\partial \theta}+\lambda · sign(\theta))
+$$
 
 **L2正则化**
 
 > 原理：在损失函数中加入所有参数的平方和：
 > 
-> $$
-> L=L_0+\lambda \sum_i w_i^2
-> $$
+$$
+L=L_0+\lambda \sum_i w_i^2
+$$
 > 
 > 特点：
 > - 会让参数变小，但不为零；
@@ -559,9 +559,9 @@
 > 
 > 此时梯度更新变成了：
 > 
-> $$
-> \theta \leftarrow \theta - \eta (\frac{\partial L_0}{\partial \theta}+\lambda · 2\theta)
-> $$
+$$
+\theta \leftarrow \theta - \eta (\frac{\partial L_0}{\partial \theta}+\lambda · 2\theta)
+$$
 > 
 > 这就相当于：
 > - 除了“让损失更小”的方向，还加了一个“**让参数变小**”的力，小的参数通常表示“更简单的模型”，而简单的模型更不容易过拟合，泛化能力更强。
@@ -569,9 +569,9 @@
 
 **λ（正则化强度）怎么选？**
 
-> - $\lambda$越大，正则化越强，模型越简单，可能欠拟合；
-> - $\lambda$越小，正则化越弱，模型越复杂，可能过拟合；
-> - 通常通过交叉验证（Cross Validation）来调节$\lambda$；
+- $\lambda$越大，正则化越强，模型越简单，可能欠拟合；
+- $\lambda$越小，正则化越弱，模型越复杂，可能过拟合；
+- 通常通过交叉验证（Cross Validation）来调节$\lambda$；
 > - 在深度学习中，也可以通过学习率调度器或 weight decay 来间接调控。
 
 **Dropout 正则化（非参数化）**
@@ -609,14 +609,14 @@
 > 
 > **优化方式**
 > 
-> - 学习一个函数$Q(s,a)$：在状态$s$下选择动作$a$的预期收益
-> - 每次尝试后根据新的经验调整$Q$值，比如`Qlearning`：
+- 学习一个函数$Q(s,a)$：在状态$s$下选择动作$a$的预期收益
+- 每次尝试后根据新的经验调整$Q$值，比如`Qlearning`：
 > 
-> $$
-> Q(s,a){\leftarrow} Q(s,a)+\alpha[r+{\gamma} \mathop{\max}\limits_{a'} Q(s',a')-Q(s,a)]
-> $$
+$$
+Q(s,a){\leftarrow} Q(s,a)+\alpha[r+{\gamma} \mathop{\max}\limits_{a'} Q(s',a')-Q(s,a)]
+$$
 > 
-> - 目标是学到一个好用的$Q$函数，之后只要“贪心”地选$Q$值最大的动作即可。
+- 目标是学到一个好用的$Q$函数，之后只要“贪心”地选$Q$值最大的动作即可。
 > 
 > **特点总结**
 > 
@@ -638,12 +638,12 @@
 > 
 > **优化方式**
 > 
-> - 直接学习一个策略函数$\pi (a|s;\theta)$，输出某状态下采取各个动作的概率。
-> - 用“策略梯度”算法来优化参数$\theta$，让高奖励的动作概率变大。例如：
+- 直接学习一个策略函数$\pi (a|s;\theta)$，输出某状态下采取各个动作的概率。
+- 用“策略梯度”算法来优化参数$\theta$，让高奖励的动作概率变大。例如：
 > 
-> $$
-> \nabla_\theta J(\theta)=E[\nabla_\theta\log {\pi_{\theta}(a|s)}·R]
-> $$
+$$
+\nabla_\theta J(\theta)=E[\nabla_\theta\log {\pi_{\theta}(a|s)}·R]
+$$
 > 
 > - 调整参数方向，使得带来高奖励的动作更有可能被选中。
 > 
@@ -718,11 +718,11 @@
 
 > 在策略梯度方法（如 REINFORCE）中，直接优化期望回报：
 > 
-> $$
-> J(\theta)=E_{\tau \sim \pi_{\theta}}[\sum_t\log\pi_{\theta}(a_t|s_t)·A_t]
-> $$
+$$
+J(\theta)=E_{\tau \sim \pi_{\theta}}[\sum_t\log\pi_{\theta}(a_t|s_t)·A_t]
+$$
 > 
-> 这些方法的基本思想是：通过采样和优化，使策略参数$\theta$让策略$\pi_{\theta}(a|s)$更倾向于带来高回报的动作。
+这些方法的基本思想是：通过采样和优化，使策略参数$\theta$让策略$\pi_{\theta}(a|s)$更倾向于带来高回报的动作。
 > 
 > 当我们对策略进行更新时，如果步长（learning rate）或梯度本身太大，就可能导致 策略突然发生巨大变化。具体原因解释如下：
 > 
@@ -734,7 +734,7 @@
 > 
 > **原因2：REINFORCE / A2C 的目标函数是无约束的**
 > 
-> - REINFORCE 要最大化：$E_{\tau \sim \pi_{\theta}}[\sum_t\log\pi_{\theta}(a_t|s_t)·A_t]$
+- REINFORCE 要最大化：$E_{\tau \sim \pi_{\theta}}[\sum_t\log\pi_{\theta}(a_t|s_t)·A_t]$
 > - 这个目标函数没有限制策略变化的幅度，所以在更新参数的时候，哪怕变化很大，也不会受到惩罚。
 > 
 > **原因3：剧烈变化导致不稳定训练**
@@ -749,14 +749,14 @@
 > 
 > **PPO 的核心目标函数**：
 > 
-> $$
-> L_{CLIP}(\theta)=E_t[\min(r_t(\theta)·A_t,clip(r_t(\theta),1-\epsilon,1+\epsilon)·A_t)]
-> $$
+$$
+L_{CLIP}(\theta)=E_t[\min(r_t(\theta)·A_t,clip(r_t(\theta),1-\epsilon,1+\epsilon)·A_t)]
+$$
 > 
 > 其中：
-> - $r_t(\theta)=\frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$：新旧策略的概率比
-> - $A_t$：优势函数（估计当前行为是否优于平均）
-> - clip 约束策略变化在$[1-\epsilon,1+\epsilon]$内
+- $r_t(\theta)=\frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$：新旧策略的概率比
+- $A_t$：优势函数（估计当前行为是否优于平均）
+- clip 约束策略变化在$[1-\epsilon,1+\epsilon]$内
 > 
 > 这种方式能有效防止策略更新“越界”，让学习更稳定。
 
@@ -780,11 +780,11 @@
 > GAE（Generalized Advantage Estimation）是一种对 Advantage 函数的更稳定估计方式；
 > PPO 支持这种估计方法，更准确、更稳定；
 > 
-> $$
-> A_t^{GAE}=\sum_{l=0}^{\infty}(\gamma\lambda)^l\delta_{t+l}
-> $$
+$$
+A_t^{GAE}=\sum_{l=0}^{\infty}(\gamma\lambda)^l\delta_{t+l}
+$$
 > 
-> 其中：$\delta_t=r_t+\gamma V(s_{t+1})-V(s_t)$
+其中：$\delta_t=r_t+\gamma V(s_{t+1})-V(s_t)$
 > 
 > **优化4：可以结合多个损失项一起训练（Actor-Critic）**
 > 
@@ -795,9 +795,9 @@
 > 
 > PPO 总损失函数一般如下：
 > 
-> $$
-> L=L_{policy}^{CLIP}+c_1·L_{value}-c_2·Entropy
-> $$
+$$
+L=L_{policy}^{CLIP}+c_1·L_{value}-c_2·Entropy
+$$
 > 
 > **总结**
 > 
@@ -813,11 +813,11 @@
 
 > **PPO 为什么是 on-policy？**
 > 
-> PPO 是一个策略优化器，它优化的是当前策略$\pi_\theta$
+PPO 是一个策略优化器，它优化的是当前策略$\pi_\theta$
 > 
 > 虽然它“缓解”了 on-policy 的一些缺点，但它本质仍然是 on-policy，因为：
-> - 它的经验采集仍然依赖当前策略$\pi$；
-> - 策略更新仍基于当前$\pi$与旧策略$\pi_{old}$的比值；
+- 它的经验采集仍然依赖当前策略$\pi$；
+- 策略更新仍基于当前$\pi$与旧策略$\pi_{old}$的比值；
 > - 即使允许小幅偏离，也不允许用完全无关的旧数据。
 > 
 > **那 PPO 为什么样本效率高？哪来的？**
@@ -826,10 +826,10 @@
 > > 
 > > **机制1：重复使用旧数据（小范围）——“软”on-policy**
 > > 
-> > 虽然 PPO 是 on-policy，但它使用了一个$\pi_{old}$机制：$r_t(\theta)=\frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$
+虽然 PPO 是 on-policy，但它使用了一个$\pi_{old}$机制：$r_t(\theta)=\frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$
 > > 
 > > - 它允许我们用 多个 epoch 重复利用同一批样本；
-> > - 只要保证$\pi$与$\pi_{old}$不偏差太大，就不会影响训练质量；
+- 只要保证$\pi$与$\pi_{old}$不偏差太大，就不会影响训练质量；
 > > - 这种策略更新方式叫做 “trust region” 近似。
 > > 
 > > **机制2：Clip 策略让“轻微 off-policy”（容忍策略漂移）安全可行**
@@ -938,8 +938,8 @@
 > 
 > **第二步：准备两个模型**
 > 
-> - 当前模型 $\pi$（要训练的模型）
-> - 参考模型 $\pi_{ref}$（固定的，不训练，用来当参照物）
+- 当前模型 $\pi$（要训练的模型）
+- 参考模型 $\pi_{ref}$（固定的，不训练，用来当参照物）
 > 
 > **第三步：给两个回答打分（模型算概率）**
 > 
@@ -954,9 +954,9 @@
 > 
 > **第四步：计算“谁更好”的损失函数**
 > 
-> $$
-> L=-\log \sigma (\beta · [\log \pi (y^+) - \log \pi (y^-) - (\log \pi_{ref} (y^+) - \log \pi_{ref} (y^-))])
-> $$
+$$
+L=-\log \sigma (\beta · [\log \pi (y^+) - \log \pi (y^-) - (\log \pi_{ref} (y^+) - \log \pi_{ref} (y^-))])
+$$
 
 **DPO 损失函数详解**
 
@@ -964,41 +964,41 @@
 > 
 > 用 log-prob（对数概率）来表示模型对两个回答的倾向：
 > 
-> $$
-> \Delta_{\pi}=\log \pi (y^+) - \log \pi (y^-)
-> $$
+$$
+\Delta_{\pi}=\log \pi (y^+) - \log \pi (y^-)
+$$
 > 
 > 如果这个值越大，说明模型越偏向好回答。
 > 
 > **第二步：减去参考模型的偏好差**
 > 
-> 如果我们有一个参考模型（比如 SFT 模型 $\pi_{ref}$），我们可以只优化“比参考模型更好的那部分”：
+如果我们有一个参考模型（比如 SFT 模型 $\pi_{ref}$），我们可以只优化“比参考模型更好的那部分”：
 > 
-> $$
-> \Delta_{diff}=\Delta_{\pi} - \Delta_{\pi_{ref}}
-> $$
+$$
+\Delta_{diff}=\Delta_{\pi} - \Delta_{\pi_{ref}}
+$$
 > 
 > **第三步：放进 sigmoid + log 中变成分类损失**
 > 
-> $$
-> L=-\log \sigma (\beta · (\Delta_{\pi} - \Delta_{\pi_{ref}}))
-> $$
+$$
+L=-\log \sigma (\beta · (\Delta_{\pi} - \Delta_{\pi_{ref}}))
+$$
 > 
 > 其中：
-> - $\sigma(z) = \frac{1}{1 + e^{-z}}$是 sigmoid 函数；
-> - $\beta$ 是一个温度参数，控制 sharpness（一般取 1.0）。
+- $\sigma(z) = \frac{1}{1 + e^{-z}}$是 sigmoid 函数；
+- $\beta$ 是一个温度参数，控制 sharpness（一般取 1.0）。
 > 
 > 所以最后就是：
 > 
-> $$
-> L=-\log \sigma (\beta · [\log \pi (y^+) - \log \pi (y^-) - (\log \pi_{ref} (y^+) - \log \pi_{ref} (y^-))])
-> $$
+$$
+L=-\log \sigma (\beta · [\log \pi (y^+) - \log \pi (y^-) - (\log \pi_{ref} (y^+) - \log \pi_{ref} (y^-))])
+$$
 > 
 > 也可以用softmax的形式表示：
 > 
-> $$
-> L=-\log (\frac{e^{\beta (\log \pi (y^+) - \log \pi_{ref} (y^+))}}{e^{\beta (\log \pi (y^+) - \log \pi_{ref} (y^+))} + e^{\beta (\log \pi (y^-) - \log \pi_{ref} (y^-))}})
-> $$
+$$
+L=-\log (\frac{e^{\beta (\log \pi (y^+) - \log \pi_{ref} (y^+))}}{e^{\beta (\log \pi (y^+) - \log \pi_{ref} (y^+))} + e^{\beta (\log \pi (y^-) - \log \pi_{ref} (y^-))}})
+$$
 
 **DPO 相对于 RLHF 的优点总结**
 
@@ -1044,10 +1044,10 @@
 
 **TRPO 的算法流程**
 
-> 1. 采样：用当前策略$\pi_{old}$与环境交互，收集一批轨迹（state, action, reward）。
-> 2. 估计优势函数：用 GAE（Generalized Advantage Estimation）等方法估算每个动作的优势$A_t$。
+1. 采样：用当前策略$\pi_{old}$与环境交互，收集一批轨迹（state, action, reward）。
+2. 估计优势函数：用 GAE（Generalized Advantage Estimation）等方法估算每个动作的优势$A_t$。
 > 3. 构建目标函数：最大化新旧策略概率比加权的优势期望。
-> 4. 信赖域约束：约束新旧策略的平均 KL 散度不超过$\delta$（如 0.01）。
+4. 信赖域约束：约束新旧策略的平均 KL 散度不超过$\delta$（如 0.01）。
 > 5. 求解优化问题：用二阶优化（如共轭梯度法）近似求解带约束的最大化问题，得到新的策略参数。
 > 6. 更新策略：用新参数替换旧策略，进入下一轮。
 
@@ -1055,18 +1055,18 @@
 
 > TRPO 的优化目标是：
 >
-> $$
-> \max_{\theta} \ \mathbb{E}{s,a \sim \pi{\text{old}}} \left[ \frac{\pi_{\theta}(a|s)}{\pi_{\text{old}}(a|s)} A^{\pi_{\text{old}}}(s,a) \right]
-> $$
+$$
+\max_{\theta} \ \mathbb{E}{s,a \sim \pi{\text{old}}} \left[ \frac{\pi_{\theta}(a|s)}{\pi_{\text{old}}(a|s)} A^{\pi_{\text{old}}}(s,a) \right]
+$$
 >
-> 同时约束新旧策略的平均 KL 散度不超过阈值$\delta$：
+同时约束新旧策略的平均 KL 散度不超过阈值$\delta$：
 >
-> $$
-> \text{subject to} \ \mathbb{E}{s \sim \pi{\text{old}}} \left[ D_{KL}(\pi_{\text{old}}(\cdot|s) \| \pi_{\theta}(\cdot|s)) \right] \leq \delta
-> $$
+$$
+\text{subject to} \ \mathbb{E}{s \sim \pi{\text{old}}} \left[ D_{KL}(\pi_{\text{old}}(\cdot|s) \| \pi_{\theta}(\cdot|s)) \right] \leq \delta
+$$
 >
-> - 其中 $A^{\pi_{\text{old}}}(s,a)$ 是优势函数。
-> - $D_{KL}$ 是 KL 散度，衡量新旧策略的“距离”。
+- 其中 $A^{\pi_{\text{old}}}(s,a)$ 是优势函数。
+- $D_{KL}$ 是 KL 散度，衡量新旧策略的“距离”。
 > - δ 是一个超参数，控制每次更新的最大幅度。
 
 **TRPO 的优缺点总结**
@@ -1138,56 +1138,56 @@
 > 
 > 对同一提示（prompt）生成K个响应构成一个组：
 > 
-> $$
-> G=((y_1,r_1),(y_2,r_2),...,(y_K,r_K))
-> $$
+$$
+G=((y_1,r_1),(y_2,r_2),...,(y_K,r_K))
+$$
 > 
-> 其中，$r_i=R(y_i|x)$为响应$y_i$的奖励值
+其中，$r_i=R(y_i|x)$为响应$y_i$的奖励值
 > 
 > **2. 相对优势计算**
 > 
 > 组内标准化优势函数：
 > 
-> $$
-> \tilde{A_i}=\frac{r_i-\mu_G}{\sigma_G}
-> $$
+$$
+\tilde{A_i}=\frac{r_i-\mu_G}{\sigma_G}
+$$
 > 
 > 其中：
-> - $\mu_G=\frac{1}{K}\sum_{j=i}^K r_j$为组内平均奖励
-> - $\sigma_G=\sqrt{\frac{1}{K}\sum_{j=1}^K (r_j-\mu_G)^2}$为组内标准差
+- $\mu_G=\frac{1}{K}\sum_{j=i}^K r_j$为组内平均奖励
+- $\sigma_G=\sqrt{\frac{1}{K}\sum_{j=1}^K (r_j-\mu_G)^2}$为组内标准差
 > 
 > 相对排名优势：
 > 
-> $$
-> A_i^{rank}=\frac{rank(r_i)-(K+1)/2}{K/2}
-> $$
+$$
+A_i^{rank}=\frac{rank(r_i)-(K+1)/2}{K/2}
+$$
 > 
-> 其中，$rank(r_i)$为$r_i$在组内的排名（1到K）
+其中，$rank(r_i)$为$r_i$在组内的排名（1到K）
 > 
 > **3. 混合优势函数**
 > 
 > 最终优势函数为标准化优势与排名优势的加权和：
 > 
-> $$
-> A_i^{GRPO}=\lambda \tilde{A_i}+(1-\lambda)A_i^{rank}
-> $$
+$$
+A_i^{GRPO}=\lambda \tilde{A_i}+(1-\lambda)A_i^{rank}
+$$
 > 
-> （实验表明$\lambda=0.7$效果最佳）
+（实验表明$\lambda=0.7$效果最佳）
 
 **GRPO目标函数设计**
 
 > GRPO的损失函数与PPO类似，也包含一个**策略比率（Policy Ratio）**和**KL散度约束**。
 > 
-> 策略比率 $r_t(\theta) = \frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$。
+策略比率 $r_t(\theta) = \frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$。
 > 
 > GRPO的损失函数可以表示为：
 > 
-> $L(\theta) = \mathbb{E}_{s, a \sim \pi_{\theta_{old}}} \left[ \min(r_t(\theta) A_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) A_t) - \beta \text{KL}(\pi_{\theta_{old}}(\cdot|s_t), \pi_{\theta}(\cdot|s_t)) \right]$
+$L(\theta) = \mathbb{E}_{s, a \sim \pi_{\theta_{old}}} \left[ \min(r_t(\theta) A_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) A_t) - \beta \text{KL}(\pi_{\theta_{old}}(\cdot|s_t), \pi_{\theta}(\cdot|s_t)) \right]$
 > 
 > 其中：
-> - $A_t$ 是通过组内采样计算得到的优势函数。
-> - $\epsilon$ 是裁剪参数，用于限制策略更新的幅度。
-> - $\beta$ 是KL散度项的权重，用于控制新旧策略之间的距离。
+- $A_t$ 是通过组内采样计算得到的优势函数。
+- $\epsilon$ 是裁剪参数，用于限制策略更新的幅度。
+- $\beta$ 是KL散度项的权重，用于控制新旧策略之间的距离。
 > 
 > 这个损失函数的目标是最大化相对优势，同时通过裁剪和KL散度约束来确保策略更新的稳定性。
 
@@ -1542,13 +1542,13 @@ class TransformerEncoder(nn.Module):
 > 
 > 将 Q 和 K 的每一对维度当成一个二维向量，乘以一个旋转矩阵：
 > 
-> $$
-> R(\theta)=
-> \begin{bmatrix}
-> cos\theta & -sin\theta \\
-> sin\theta & cos\theta
-> \end{bmatrix}
-> $$
+$$
+R(\theta)=
+\begin{bmatrix}
+cos\theta & -sin\theta \\
+sin\theta & cos\theta
+\end{bmatrix}
+$$
 > 
 > 这样，每个位置的向量就像顺时针旋转一定角度，而这个角度是基于其位置 `p` 和频率 `f` 设定的。
 > 结果，注意力中的 Query 和 Key 相乘时，就带上了相对位置信息。
@@ -1565,18 +1565,18 @@ class TransformerEncoder(nn.Module):
 
 > 在Transformer的自注意力（Self-Attention）机制中，计算注意力分数时有如下公式：
 > 
-> $$
-> \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
-> $$
+$$
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+$$
 > 
-> 其中，$Q$（Query）、$K$（Key）、$V$（Value）是通过输入和参数矩阵线性变换得到的，$d_k$是Key向量的维度。
+其中，$Q$（Query）、$K$（Key）、$V$（Value）是通过输入和参数矩阵线性变换得到的，$d_k$是Key向量的维度。
 
 **如果不除，会发生什么？**
 
-> 设 $Q$ 和 $K$ 是随机初始化的，元素是独立的零均值高斯变量，维度为 $d_k$，则它们的点积 $Q \cdot K$ 的期望和方差如下：
-> 期望：$E[Q \cdot K] = 0$
-> 方差：$\text{Var}[Q \cdot K] = d_k$
-> 也就是说：维度越高，点积值就越大（方差正比于 $d_k$）。
+设 $Q$ 和 $K$ 是随机初始化的，元素是独立的零均值高斯变量，维度为 $d_k$，则它们的点积 $Q \cdot K$ 的期望和方差如下：
+期望：$E[Q \cdot K] = 0$
+方差：$\text{Var}[Q \cdot K] = d_k$
+也就是说：维度越高，点积值就越大（方差正比于 $d_k$）。
 > 结果是：
 > - 点积过大 -> softmax 输出变成 one-hot
 > - 梯度传播变得不稳定（几乎只对一个位置有梯度）
@@ -1584,19 +1584,19 @@ class TransformerEncoder(nn.Module):
 
 **为什么除以 $\sqrt{d_k}$ 有用？**
 
-> 这是为了把 $Q \cdot K^T$ 的值“标准化”到一个比较稳定的范围。
-> 如果点积期望方差为 $d_k$，那么除以 $\sqrt{d_k}$ 后：
-> - 方差变成 $\text{Var}[Q \cdot K] / d_k = 1$（随机变量 $X$ 除以常数 $c$，其 方差变化为：$\text{Var}(X / c) = \text{Var}(X) / c^2$）
+这是为了把 $Q \cdot K^T$ 的值“标准化”到一个比较稳定的范围。
+如果点积期望方差为 $d_k$，那么除以 $\sqrt{d_k}$ 后：
+- 方差变成 $\text{Var}[Q \cdot K] / d_k = 1$（随机变量 $X$ 除以常数 $c$，其 方差变化为：$\text{Var}(X / c) = \text{Var}(X) / c^2$）
 > - 保证 softmax 输入值的尺度稳定在一个合理区间（比如 -4 到 +4）
 > - softmax 输出更平滑，不至于极端化，利于训练
 
 **举个极端例子（数值说明）**
 
-> 假设没有除以 $\sqrt{d_k}$，某一对 $QK$ 点积值为 50，而其他值为 1：
-> - $softmax([50, 1, 1, 1]) ≈ [~1, 0, 0, 0]$ -> 几乎 one-hot
+假设没有除以 $\sqrt{d_k}$，某一对 $QK$ 点积值为 50，而其他值为 1：
+- $softmax([50, 1, 1, 1]) ≈ [~1, 0, 0, 0]$ -> 几乎 one-hot
 > - 梯度集中在一个位置，模型变得不稳定
 > 
-> 而如果我们除以 $\sqrt{d_k}$（比如 $\sqrt{64} = 8$），点积值变成 6.25，softmax 输出就会更加平滑。
+而如果我们除以 $\sqrt{d_k}$（比如 $\sqrt{64} = 8$），点积值变成 6.25，softmax 输出就会更加平滑。
 
 </details>
 
@@ -1630,9 +1630,9 @@ class TransformerEncoder(nn.Module):
 
 > 以 `7B` 模型，参数精度 `fp16` 为例：
 > 
-> $$
-> 显存 = 参数数量 \times 精度(bytes) = 7 \times 10^9 \times 2 bytes = 14 GB（模型权重）
-> $$
+$$
+显存 = 参数数量 \times 精度(bytes) = 7 \times 10^9 \times 2 bytes = 14 GB（模型权重）
+$$
 > 
 > **如果是训练，还需要加上**：
 > 
@@ -1656,9 +1656,9 @@ class TransformerEncoder(nn.Module):
 > 
 > 因此显存占用大致与 batch size 成线性关系：
 > 
-> $$
-> 显存 \propto BatchSize
-> $$
+$$
+显存 \propto BatchSize
+$$
 
 **显存与序列长度（seq_len）的关系**
 
@@ -1669,9 +1669,9 @@ class TransformerEncoder(nn.Module):
 > 
 > 因此注意力的显存增长为**平方级别**：
 > 
-> $$
-> 显存 \propto {SeqLen}^2
-> $$
+$$
+显存 \propto {SeqLen}^2
+$$
 
 </details>
 
@@ -1718,16 +1718,16 @@ class TransformerEncoder(nn.Module):
 **如果输入序列很长，注意力矩阵的计算量和显存占用会迅速膨胀，如何解决计算量问题？**
 
 > 注意力矩阵的维度是：`[batch_size,n_heads,seq_len,seq_len]`
-> 计算复杂度：$O(SeqLen^2)$
+计算复杂度：$O(SeqLen^2)$
 > 
 > 解决方法（**减少计算量/减少精度两种方式**）：
 > 
-> 1. **稀疏注意力**：复杂度从 $O(n^2)$ 降低到 $O(n \cdot \sqrt{n})$ 或 $O(n \cdot \log n)$
+1. **稀疏注意力**：复杂度从 $O(n^2)$ 降低到 $O(n \cdot \sqrt{n})$ 或 $O(n \cdot \log n)$
 >    1. Longformer：局部窗口 + 全局 token 关注机制
 >    2. BigBird：局部 + 稀疏跳跃 + 全局 token，理论上具备 Transformer 表达能力
 >    3. Sparse Transformer：使用规则设计的稀疏注意力模式
 >    4. Reformer：使用 LSH（局部敏感哈希）减少注意力计算
-> 2. **线性注意力**：复杂度降为 $O(n)$，但可能会损失精度
+2. **线性注意力**：复杂度降为 $O(n)$，但可能会损失精度
 >    1. Performer：利用核函数重写注意力为线性形式
 >    2. Linformer：假设注意力矩阵是低秩的，对 K/V 做降维
 >    3. Linear Transformer：修改注意力定义为线性形式

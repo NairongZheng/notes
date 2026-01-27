@@ -31,21 +31,21 @@
 > 
 > - **准确率（Accuracy）**：对于给定的测试数据集，分类正确的样本数与总样本数之比
 >   
-> $$
-> \frac{TP+TN}{总样本数}
-> $$
+$$
+\frac{TP+TN}{总样本数}
+$$
 > 
 > - **精确率/查准率（Precision）**：预测为正的样本中，又多少是真正的正样本（说人话：预测是True的到底多少是True）
 > 
-> $$
-> \frac{TP}{TP+FP}
-> $$
+$$
+\frac{TP}{TP+FP}
+$$
 > 
 > - **召回率/查全率（Recall）**：样本中有多少正例被预测正确了（说人话：有没有漏掉True）
 > 
-> $$
-> \frac{TP}{TP+FN}
-> $$
+$$
+\frac{TP}{TP+FN}
+$$
 > 
 > 
 > **查准率和查全率是一对矛盾的度量**。
@@ -92,9 +92,9 @@
 
 > 均方误差（MSE, Mean Squared Error）
 > 
-> $$
-> Loss_{MSE}=\frac{1}{n} \sum_{n=1}^n (y_i-\hat{y_i})^2
-> $$
+$$
+Loss_{MSE}=\frac{1}{n} \sum_{n=1}^n (y_i-\hat{y_i})^2
+$$
 > 
 > - 用途：最常见的回归损失
 > - 特点：
@@ -107,15 +107,15 @@
 > 
 > 对于二分类（Binary）：
 > 
-> $$
-> Loss_{BCE}=-[y\log{(\hat{y})} + (1-y)\log{(1-\hat{y})}]
-> $$
+$$
+Loss_{BCE}=-[y\log{(\hat{y})} + (1-y)\log{(1-\hat{y})}]
+$$
 > 
 > 对于多分类（Multi-class）：
 > 
-> $$
-> Loss_{CE}=-\sum_{i=1}^C y_i \log{(\hat{y_i})}
-> $$
+$$
+Loss_{CE}=-\sum_{i=1}^C y_i \log{(\hat{y_i})}
+$$
 > 
 > - 用途：分类任务中最常用
 > - 特点：
@@ -124,18 +124,18 @@
 > 
 > **KL 散度（Kullback–Leibler Divergence）**
 > 
-> $$
-> Loss_{KL}(P||Q)=\sum_i{P(i)\log{\frac{P(i)}{Q(i)}}}
-> $$
+$$
+Loss_{KL}(P||Q)=\sum_i{P(i)\log{\frac{P(i)}{Q(i)}}}
+$$
 > 
 > - 用途：衡量两个概率分布的差异
 > - 应用：知识蒸馏、语言模型对齐等
 > 
 > **Focal Loss（用于不平衡类别）**
 > 
-> $$
-> Loss_{focal}=-\alpha_t(1-p_t)^{\gamma}\log{p_t}
-> $$
+$$
+Loss_{focal}=-\alpha_t(1-p_t)^{\gamma}\log{p_t}
+$$
 > 
 > - 用途：目标检测、处理类别不均衡
 > - 特点：
@@ -152,11 +152,11 @@
 
 **Sigmoid 函数（S 型函数）**
 
-> $$
-> \sigma(x)=\frac{1}{1+e^{-x}}
-> $$
+$$
+\sigma(x)=\frac{1}{1+e^{-x}}
+$$
 > 
-> - 输出范围：$(0, 1)$
+- 输出范围：$(0, 1)$
 > - 优点：
 >   - 可解释为概率
 >   - 平滑、连续、可导
@@ -166,9 +166,9 @@
 
 **Softmax（分类输出层专用）**
 
-> $$
-> softmax=\frac{e^{x_i}}{\sum_{j=1}^{n}{e^{x_j}}}
-> $$
+$$
+softmax=\frac{e^{x_i}}{\sum_{j=1}^{n}{e^{x_j}}}
+$$
 > 
 > - 作用：将输出向量转换为概率分布
 > - 常用于：分类网络最后一层
@@ -185,8 +185,8 @@
 > **Sigmoid 适合二分类的原因**
 > 
 > 用在二分类时（例如“是猫” vs “不是猫”）：
-> - 网络输出层只有一个神经元，输出一个值$x$
-> - 使用 sigmoid 函数把这个值压缩到$(0,1)$
+- 网络输出层只有一个神经元，输出一个值$x$
+- 使用 sigmoid 函数把这个值压缩到$(0,1)$
 > - 可以解释为“样本属于正类的概率”
 > 
 > 例如：
@@ -249,62 +249,62 @@
 
 > 链式法则（Chain Rule）是反向传播的数学基础：
 > 
-> $$
-> \frac{dL}{dW}=\frac{dL}{da} · \frac{da}{dz} · \frac{dz}{dW}
-> $$
+$$
+\frac{dL}{dW}=\frac{dL}{da} · \frac{da}{dz} · \frac{dz}{dW}
+$$
 > 
 > 每一层只需“局部”计算自己的导数，然后乘上传来的“梯度链”。
 
 **基本梯度下降**
 
-> $$
-> \theta \leftarrow \theta - \eta \frac{\partial{L}}{\partial{\theta}}
-> $$
+$$
+\theta \leftarrow \theta - \eta \frac{\partial{L}}{\partial{\theta}}
+$$
 > 
 > 其中：
-> - $\theta$：一个参数，比如$W$
-> - $\eta$：学习率，控制每次更新的步长
-> - $\frac{\partial{L}}{\partial{\theta}}$：反向传播得到的梯度
+- $\theta$：一个参数，比如$W$
+- $\eta$：学习率，控制每次更新的步长
+- $\frac{\partial{L}}{\partial{\theta}}$：反向传播得到的梯度
 > - 梯度下降就是用梯度告诉我们“往哪走能让损失更小”，然后我们每次沿那个方向“走一小步”，直到找到最小值。
 
 **示例：数值举例**
 
 > **设定**：
-> - 输入：$x=2.0$
-> - 权重：$W=1.0$
-> - 偏置：$b=0$
-> - 标签：$y=0$
-> - 激活函数：恒等函数（线性激活）$\hat{y}=z=Wx+b$（演示而已，不给太复杂的）
-> - 损失函数：均方误差（MSE）：$Loss=\frac{1}{2}(\hat{y}-y)^2$
-> - 学习率：$0.1$
+- 输入：$x=2.0$
+- 权重：$W=1.0$
+- 偏置：$b=0$
+- 标签：$y=0$
+- 激活函数：恒等函数（线性激活）$\hat{y}=z=Wx+b$（演示而已，不给太复杂的）
+- 损失函数：均方误差（MSE）：$Loss=\frac{1}{2}(\hat{y}-y)^2$
+- 学习率：$0.1$
 > 
 > **前向传播**：
-> $$
-> \begin{gather*}
->     z=Wx+b=1.0\times2.0+0=2.0 \\
->     \hat{y}=z=2.0 \\
->     Loss=\frac{1}{2}(2.0-0)^2=2.0
-> \end{gather*}
-> $$
+$$
+\begin{gather*}
+    z=Wx+b=1.0\times2.0+0=2.0 \\
+    \hat{y}=z=2.0 \\
+    Loss=\frac{1}{2}(2.0-0)^2=2.0
+\end{gather*}
+$$
 > 
 > **反向传播计算导数**：
 > 
 > 使用链式法则：
 > 
-> $$
-> \begin{align*}
->     \frac{dL}{dW}&=\frac{dL}{d\hat{y}} · \frac{d\hat{y}}{dz} · \frac{dz}{dW} \\
->     &=(\hat{y}-y) · 1 · x \\
->     &=2.0 · 1 · 2.0 \\
->     &=4.0
-> \end{align*}
-> $$
+$$
+\begin{align*}
+    \frac{dL}{dW}&=\frac{dL}{d\hat{y}} · \frac{d\hat{y}}{dz} · \frac{dz}{dW} \\
+    &=(\hat{y}-y) · 1 · x \\
+    &=2.0 · 1 · 2.0 \\
+    &=4.0
+\end{align*}
+$$
 > 
 > **使用这个梯度更新 W**
 > 
-> $$
-> W_{new}=W-\eta · \frac{\partial{L}}{\partial{W}}=1.0-0.1 · 4.0=0.6
-> $$
+$$
+W_{new}=W-\eta · \frac{\partial{L}}{\partial{W}}=1.0-0.1 · 4.0=0.6
+$$
 
 
 </details>
@@ -316,14 +316,14 @@
 
 **基本梯度下降**
 
-> $$
-> \theta \leftarrow \theta - \eta \frac{\partial{L}}{\partial{\theta}}
-> $$
+$$
+\theta \leftarrow \theta - \eta \frac{\partial{L}}{\partial{\theta}}
+$$
 > 
 > 其中：
-> - $\theta$：一个参数，比如$W$
-> - $\eta$：学习率，控制每次更新的步长
-> - $\frac{\partial{L}}{\partial{\theta}}$：反向传播得到的梯度
+- $\theta$：一个参数，比如$W$
+- $\eta$：学习率，控制每次更新的步长
+- $\frac{\partial{L}}{\partial{\theta}}$：反向传播得到的梯度
 > - 梯度下降就是用梯度告诉我们“往哪走能让损失更小”，然后我们每次沿那个方向“走一小步”，直到找到最小值。
 
 **Batch Gradient Descent（BGD 批量梯度下降）**
@@ -331,15 +331,15 @@
 > - 每轮迭代**用全部训练数据计算梯度**。
 > - 更新稳定，但每次计算开销大，不适合大数据集。
 > 
-> $$
-> \theta \leftarrow \theta - \eta · \frac{1}{N} \sum_{i=1}^N \nabla_\theta L(x_i,y_i) \\
-> \theta \leftarrow \theta - \eta · \frac{1}{N} \sum_{i=1}^N \frac{\partial L^{(i)}}{\partial \theta} \\
-> $$
+$$
+\theta \leftarrow \theta - \eta · \frac{1}{N} \sum_{i=1}^N \nabla_\theta L(x_i,y_i) \\
+\theta \leftarrow \theta - \eta · \frac{1}{N} \sum_{i=1}^N \frac{\partial L^{(i)}}{\partial \theta} \\
+$$
 > 
 > 其中：
-> - $\eta$：学习率（learning rate）
-> - $N$：样本总数
-> - $L^{(i)}$：第$i$个样本的损失函数
+- $\eta$：学习率（learning rate）
+- $N$：样本总数
+- $L^{(i)}$：第$i$个样本的损失函数
 > 
 > 优点：更新方向精确、收敛平稳
 > 缺点：内存占用高，速度慢
@@ -348,10 +348,10 @@
 
 > - 每次迭代只使用一个样本计算梯度
 > 
-> $$
-> \theta \leftarrow \theta - \eta · \nabla_\theta L(x_i,y_i) \\
-> \theta \leftarrow \theta - \eta · \frac{\partial L^{(i)}}{\partial \theta} \\
-> $$
+$$
+\theta \leftarrow \theta - \eta · \nabla_\theta L(x_i,y_i) \\
+\theta \leftarrow \theta - \eta · \frac{\partial L^{(i)}}{\partial \theta} \\
+$$
 > 
 > 优点：迭代快，适合大数据、在线学习
 > 缺点：波动大、不稳定、可能收敛到局部最优
@@ -360,10 +360,10 @@
 
 > - 每次迭代用一个小批量（如 32 或 64）样本：
 > 
-> $$
-> \theta \leftarrow \theta - \eta · \frac{1}{m} \sum_{i=1}^m \nabla_\theta L(x_i,y_i) \\
-> \theta \leftarrow \theta - \eta · \frac{1}{m} \sum_{i=1}^m \frac{\partial L^{(i)}}{\partial \theta} \\
-> $$
+$$
+\theta \leftarrow \theta - \eta · \frac{1}{m} \sum_{i=1}^m \nabla_\theta L(x_i,y_i) \\
+\theta \leftarrow \theta - \eta · \frac{1}{m} \sum_{i=1}^m \frac{\partial L^{(i)}}{\partial \theta} \\
+$$
 > 
 > 优点：比 batch 快，且比 SGD 稳定，GPU 上更高效（张量并行）。现代神经网络中最常用的形式
 
@@ -381,10 +381,10 @@
 > - 类似物理中“惯性”的概念。给参数一个速度变量v
 > - 先更新动量，再更新参数
 > 
-> $$
-> v_t=\gamma v_{t-1}+\eta · \nabla_\theta L(\theta) \\
-> \theta_t \leftarrow \theta_{t-1} - v_t
-> $$
+$$
+v_t=\gamma v_{t-1}+\eta · \nabla_\theta L(\theta) \\
+\theta_t \leftarrow \theta_{t-1} - v_t
+$$
 > 
 > - **让参数更新沿着长期一致的下降方向加速，避免被局部波动干扰**
 > - 在“平坦区”加快收敛，减少摆动，整体收敛更快更稳定
@@ -393,24 +393,24 @@
 
 > **核心理念**：给每个参数一个自适应的学习率，让更新频繁的参数学习率变小，更新不频繁的参数保持较大学习率。
 > 
-> $$
-> G_{t,i}=G_{t-1,i}+(\nabla_{\theta_i} L(\theta))^2 \\
-> \theta_i \leftarrow \theta_i - \frac{\eta}{\sqrt{G_{t,i}}+\epsilon} · \nabla_{\theta_i} L(\theta)
-> $$
+$$
+G_{t,i}=G_{t-1,i}+(\nabla_{\theta_i} L(\theta))^2 \\
+\theta_i \leftarrow \theta_i - \frac{\eta}{\sqrt{G_{t,i}}+\epsilon} · \nabla_{\theta_i} L(\theta)
+$$
 > 
-> - 对于每个参数$\theta_i$，我们记录其历史所有梯度的平方和（只对该参数维度）。
-> - $G_{t,i}$是标量，表示$\theta_i$在迄今为止每一轮的梯度平方的累计值。
-> - 随着训练进行，$G_{t,i}$会越来越大（或保持不变）。
-> - 每个参数$\theta$拥有自己专属的学习率$\frac{\eta}{\sqrt{G_{t,i}}+\epsilon}$
->   - 如果某个参数的梯度一直很大，$G_{t,i}$增长很快，则学习率下降得很快。
->   - 如果某个参数的梯度一直很小，$G_{t,i}$增长缓慢，则学习率下降得慢。
+- 对于每个参数$\theta_i$，我们记录其历史所有梯度的平方和（只对该参数维度）。
+- $G_{t,i}$是标量，表示$\theta_i$在迄今为止每一轮的梯度平方的累计值。
+- 随着训练进行，$G_{t,i}$会越来越大（或保持不变）。
+- 每个参数$\theta$拥有自己专属的学习率$\frac{\eta}{\sqrt{G_{t,i}}+\epsilon}$
+  - 如果某个参数的梯度一直很大，$G_{t,i}$增长很快，则学习率下降得很快。
+  - 如果某个参数的梯度一直很小，$G_{t,i}$增长缓慢，则学习率下降得慢。
 > 
 > **利用历史梯度自动调整每个参数的学习率**：
 > - 频繁更新的参数 -> 学习率自动变小（趋于稳定）
 > - 更新较少的参数 -> 学习率保持较大（继续探索）
 > 
 > 优点：对稀疏特征（如 NLP）特别有效
-> 缺点：$G_{t,i}$是累计和，训练时间长后会很大，导致学习率不断变小，甚至趋近于 0；
+缺点：$G_{t,i}$是累计和，训练时间长后会很大，导致学习率不断变小，甚至趋近于 0；
 
 **RMSProp（Root Mean Square Propagation）**
 
@@ -419,17 +419,17 @@
 > - 改进 AdaGrad 的“过早衰减”问题
 > - 使用指数衰减平均
 > 
-> $$
-> E[g^2]_t=\gamma E[g^2]_{t-1}+(1-\gamma) · (\nabla_\theta L)^2 \\
-> \theta_i \leftarrow \theta_i - \frac{\eta}{\sqrt{E[g^2]_t}+\epsilon} · \nabla_{\theta} L
-> $$
+$$
+E[g^2]_t=\gamma E[g^2]_{t-1}+(1-\gamma) · (\nabla_\theta L)^2 \\
+\theta_i \leftarrow \theta_i - \frac{\eta}{\sqrt{E[g^2]_t}+\epsilon} · \nabla_{\theta} L
+$$
 > 
 > 其中：
-> - $\gamma$：衰减率（典型值：0.9）
+- $\gamma$：衰减率（典型值：0.9）
 > - 当前梯度平方被加入历史梯度平方的加权平均中，权重递减
 > 
-> 梯度变化剧烈 -> $E[g^2]_t$大 -> 更新幅度减小（更稳定）
-> 梯度变化平缓 -> $E[g^2]_t$小 -> 更新幅度保留（更敏感）
+梯度变化剧烈 -> $E[g^2]_t$大 -> 更新幅度减小（更稳定）
+梯度变化平缓 -> $E[g^2]_t$小 -> 更新幅度保留（更敏感）
 
 **Adam（Adaptive Moment Estimation）**
 
@@ -442,13 +442,13 @@
 > - 二阶矩估计：RMSProp 思想（梯度平方的滑动平均）
 > - 然后通过这些估计动态调整学习率。
 > 
-> $$
-> 初始化：m_0=0,v_0=0,t=0 \\
-> 更新一阶矩估计（类似动量）：m_t=\beta_1 · m_{t-1}+(1-\beta_1) · g_t \\
-> 更新二阶矩估计（类似RMSProp）：v_t=\beta_2 · v_{t-1}+(1-\beta_2) · g_t^2 \\
-> 计算偏差修正项：\hat{m_t}=\frac{m_t}{1-\beta_1^t},\hat{v_t}=\frac{v_t}{1-\beta_2^t} \\
-> 更新参数：\theta_t \leftarrow \theta_{t-1} - \eta · \frac{\hat{m_t}}{\sqrt{\hat{v_t}}+\epsilon}
-> $$
+$$
+初始化：m_0=0,v_0=0,t=0 \\
+更新一阶矩估计（类似动量）：m_t=\beta_1 · m_{t-1}+(1-\beta_1) · g_t \\
+更新二阶矩估计（类似RMSProp）：v_t=\beta_2 · v_{t-1}+(1-\beta_2) · g_t^2 \\
+计算偏差修正项：\hat{m_t}=\frac{m_t}{1-\beta_1^t},\hat{v_t}=\frac{v_t}{1-\beta_2^t} \\
+更新参数：\theta_t \leftarrow \theta_{t-1} - \eta · \frac{\hat{m_t}}{\sqrt{\hat{v_t}}+\epsilon}
+$$
 
 </details>
 
@@ -466,17 +466,17 @@
 > 
 > 没有正则化时，梯度更新是：
 > 
-> $$
-> \theta \leftarrow \theta - \eta · \frac{\partial L_0}{\partial \theta}
-> $$
+$$
+\theta \leftarrow \theta - \eta · \frac{\partial L_0}{\partial \theta}
+$$
 
 **L1正则化**
 
 > 原理：在损失函数中加入所有参数的绝对值之和：
 > 
-> $$
-> L=L_0+\lambda \sum_i|w_i|
-> $$
+$$
+L=L_0+\lambda \sum_i|w_i|
+$$
 > 
 > 特点：
 > - 会使部分权重变为 0，具有特征选择能力；
@@ -486,17 +486,17 @@
 > 
 > 此时梯度更新变成了：
 > 
-> $$
-> \theta \leftarrow \theta - \eta (\frac{\partial L_0}{\partial \theta}+\lambda · sign(\theta))
-> $$
+$$
+\theta \leftarrow \theta - \eta (\frac{\partial L_0}{\partial \theta}+\lambda · sign(\theta))
+$$
 
 **L2正则化**
 
 > 原理：在损失函数中加入所有参数的平方和：
 > 
-> $$
-> L=L_0+\lambda \sum_i w_i^2
-> $$
+$$
+L=L_0+\lambda \sum_i w_i^2
+$$
 > 
 > 特点：
 > - 会让参数变小，但不为零；
@@ -506,9 +506,9 @@
 > 
 > 此时梯度更新变成了：
 > 
-> $$
-> \theta \leftarrow \theta - \eta (\frac{\partial L_0}{\partial \theta}+\lambda · 2\theta)
-> $$
+$$
+\theta \leftarrow \theta - \eta (\frac{\partial L_0}{\partial \theta}+\lambda · 2\theta)
+$$
 > 
 > 这就相当于：
 > - 除了“让损失更小”的方向，还加了一个“**让参数变小**”的力，小的参数通常表示“更简单的模型”，而简单的模型更不容易过拟合，泛化能力更强。
@@ -516,9 +516,9 @@
 
 **λ（正则化强度）怎么选？**
 
-> - $\lambda$越大，正则化越强，模型越简单，可能欠拟合；
-> - $\lambda$越小，正则化越弱，模型越复杂，可能过拟合；
-> - 通常通过交叉验证（Cross Validation）来调节$\lambda$；
+- $\lambda$越大，正则化越强，模型越简单，可能欠拟合；
+- $\lambda$越小，正则化越弱，模型越复杂，可能过拟合；
+- 通常通过交叉验证（Cross Validation）来调节$\lambda$；
 > - 在深度学习中，也可以通过学习率调度器或 weight decay 来间接调控。
 
 **Dropout 正则化（非参数化）**
