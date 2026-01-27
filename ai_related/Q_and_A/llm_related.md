@@ -40,8 +40,8 @@
 > 
 > **第二步：准备两个模型**
 > 
-- 当前模型 $\pi$（要训练的模型）
-- 参考模型 $\pi_{ref}$（固定的，不训练，用来当参照物）
+> - 当前模型 $\pi$（要训练的模型）
+> - 参考模型 $\pi_{ref}$（固定的，不训练，用来当参照物）
 > 
 > **第三步：给两个回答打分（模型算概率）**
 > 
@@ -56,9 +56,9 @@
 > 
 > **第四步：计算“谁更好”的损失函数**
 > 
-$$
-L=-\log \sigma (\beta · [\log \pi (y^+) - \log \pi (y^-) - (\log \pi_{ref} (y^+) - \log \pi_{ref} (y^-))])
-$$
+> $$
+> L=-\log \sigma (\beta · [\log \pi (y^+) - \log \pi (y^-) - (\log \pi_{ref} (y^+) - \log \pi_{ref} (y^-))])
+> $$
 
 **DPO 损失函数详解**
 
@@ -66,41 +66,41 @@ $$
 > 
 > 用 log-prob（对数概率）来表示模型对两个回答的倾向：
 > 
-$$
-\Delta_{\pi}=\log \pi (y^+) - \log \pi (y^-)
-$$
+> $$
+> \Delta_{\pi}=\log \pi (y^+) - \log \pi (y^-)
+> $$
 > 
 > 如果这个值越大，说明模型越偏向好回答。
 > 
 > **第二步：减去参考模型的偏好差**
 > 
-如果我们有一个参考模型（比如 SFT 模型 $\pi_{ref}$），我们可以只优化“比参考模型更好的那部分”：
+> 如果我们有一个参考模型（比如 SFT 模型 $\pi_{ref}$），我们可以只优化“比参考模型更好的那部分”：
 > 
-$$
-\Delta_{diff}=\Delta_{\pi} - \Delta_{\pi_{ref}}
-$$
+> $$
+> \Delta_{diff}=\Delta_{\pi} - \Delta_{\pi_{ref}}
+> $$
 > 
 > **第三步：放进 sigmoid + log 中变成分类损失**
 > 
-$$
-L=-\log \sigma (\beta · (\Delta_{\pi} - \Delta_{\pi_{ref}}))
-$$
+> $$
+> L=-\log \sigma (\beta · (\Delta_{\pi} - \Delta_{\pi_{ref}}))
+> $$
 > 
 > 其中：
-- $\sigma(z) = \frac{1}{1 + e^{-z}}$是 sigmoid 函数；
-- $\beta$ 是一个温度参数，控制 sharpness（一般取 1.0）。
+> - $\sigma(z) = \frac{1}{1 + e^{-z}}$ 是 sigmoid 函数；
+> - $\beta$ 是一个温度参数，控制 sharpness（一般取 1.0）。
 > 
 > 所以最后就是：
 > 
-$$
-L=-\log \sigma (\beta · [\log \pi (y^+) - \log \pi (y^-) - (\log \pi_{ref} (y^+) - \log \pi_{ref} (y^-))])
-$$
+> $$
+> L=-\log \sigma (\beta · [\log \pi (y^+) - \log \pi (y^-) - (\log \pi_{ref} (y^+) - \log \pi_{ref} (y^-))])
+> $$
 > 
 > 也可以用softmax的形式表示：
 > 
-$$
-L=-\log (\frac{e^{\beta (\log \pi (y^+) - \log \pi_{ref} (y^+))}}{e^{\beta (\log \pi (y^+) - \log \pi_{ref} (y^+))} + e^{\beta (\log \pi (y^-) - \log \pi_{ref} (y^-))}})
-$$
+> $$
+> L=-\log (\frac{e^{\beta (\log \pi (y^+) - \log \pi_{ref} (y^+))}}{e^{\beta (\log \pi (y^+) - \log \pi_{ref} (y^+))} + e^{\beta (\log \pi (y^-) - \log \pi_{ref} (y^-))}})
+> $$
 
 **DPO 相对于 RLHF 的优点总结**
 
@@ -146,10 +146,10 @@ $$
 
 **TRPO 的算法流程**
 
-1. 采样：用当前策略$\pi_{old}$与环境交互，收集一批轨迹（state, action, reward）。
-2. 估计优势函数：用 GAE（Generalized Advantage Estimation）等方法估算每个动作的优势$A_t$。
+> 1. 采样：用当前策略 $\pi_{old}$ 与环境交互，收集一批轨迹（state, action, reward）。
+> 2. 估计优势函数：用 GAE（Generalized Advantage Estimation）等方法估算每个动作的优势 $A_t$。
 > 3. 构建目标函数：最大化新旧策略概率比加权的优势期望。
-4. 信赖域约束：约束新旧策略的平均 KL 散度不超过$\delta$（如 0.01）。
+> 4. 信赖域约束：约束新旧策略的平均 KL 散度不超过 $\delta$（如 0.01）。
 > 5. 求解优化问题：用二阶优化（如共轭梯度法）近似求解带约束的最大化问题，得到新的策略参数。
 > 6. 更新策略：用新参数替换旧策略，进入下一轮。
 
@@ -157,18 +157,18 @@ $$
 
 > TRPO 的优化目标是：
 >
-$$
-\max_{\theta} \ \mathbb{E}{s,a \sim \pi{\text{old}}} \left[ \frac{\pi_{\theta}(a|s)}{\pi_{\text{old}}(a|s)} A^{\pi_{\text{old}}}(s,a) \right]
-$$
+> $$
+> \max_{\theta} \ \mathbb{E}{s,a \sim \pi{\text{old}}} \left[ \frac{\pi_{\theta}(a|s)}{\pi_{\text{old}}(a|s)} A^{\pi_{\text{old}}}(s,a) \right]
+> $$
 >
-同时约束新旧策略的平均 KL 散度不超过阈值$\delta$：
+> 同时约束新旧策略的平均 KL 散度不超过阈值 $\delta$：
 >
-$$
-\text{subject to} \ \mathbb{E}{s \sim \pi{\text{old}}} \left[ D_{KL}(\pi_{\text{old}}(\cdot|s) \| \pi_{\theta}(\cdot|s)) \right] \leq \delta
-$$
+> $$
+> \text{subject to} \ \mathbb{E}{s \sim \pi{\text{old}}} \left[ D_{KL}(\pi_{\text{old}}(\cdot|s) \| \pi_{\theta}(\cdot|s)) \right] \leq \delta
+> $$
 >
-- 其中 $A^{\pi_{\text{old}}}(s,a)$ 是优势函数。
-- $D_{KL}$ 是 KL 散度，衡量新旧策略的“距离”。
+> - 其中 $A^{\pi_{\text{old}}}(s,a)$ 是优势函数。
+> - $D_{KL}$ 是 KL 散度，衡量新旧策略的“距离”。
 > - δ 是一个超参数，控制每次更新的最大幅度。
 
 **TRPO 的优缺点总结**
@@ -240,56 +240,56 @@ $$
 > 
 > 对同一提示（prompt）生成K个响应构成一个组：
 > 
-$$
-G=((y_1,r_1),(y_2,r_2),...,(y_K,r_K))
-$$
+> $$
+> G=((y_1,r_1),(y_2,r_2),...,(y_K,r_K))
+> $$
 > 
-其中，$r_i=R(y_i|x)$为响应$y_i$的奖励值
+> 其中，$r_i=R(y_i|x)$ 为响应 $y_i$ 的奖励值
 > 
 > **2. 相对优势计算**
 > 
 > 组内标准化优势函数：
 > 
-$$
-\tilde{A_i}=\frac{r_i-\mu_G}{\sigma_G}
-$$
+> $$
+> \tilde{A_i}=\frac{r_i-\mu_G}{\sigma_G}
+> $$
 > 
 > 其中：
-- $\mu_G=\frac{1}{K}\sum_{j=i}^K r_j$为组内平均奖励
-- $\sigma_G=\sqrt{\frac{1}{K}\sum_{j=1}^K (r_j-\mu_G)^2}$为组内标准差
+> - $\mu_G=\frac{1}{K}\sum_{j=i}^K r_j$ 为组内平均奖励
+> - $\sigma_G=\sqrt{\frac{1}{K}\sum_{j=1}^K (r_j-\mu_G)^2}$ 为组内标准差
 > 
 > 相对排名优势：
 > 
-$$
-A_i^{rank}=\frac{rank(r_i)-(K+1)/2}{K/2}
-$$
+> $$
+> A_i^{rank}=\frac{rank(r_i)-(K+1)/2}{K/2}
+> $$
 > 
-其中，$rank(r_i)$为$r_i$在组内的排名（1到K）
+> 其中，$rank(r_i)$ 为$r_i$ 在组内的排名（1到K）
 > 
 > **3. 混合优势函数**
 > 
 > 最终优势函数为标准化优势与排名优势的加权和：
 > 
-$$
-A_i^{GRPO}=\lambda \tilde{A_i}+(1-\lambda)A_i^{rank}
-$$
+> $$
+> A_i^{GRPO}=\lambda \tilde{A_i}+(1-\lambda)A_i^{rank}
+> $$
 > 
-（实验表明$\lambda=0.7$效果最佳）
+> （实验表明 $\lambda=0.7$ 效果最佳）
 
 **GRPO目标函数设计**
 
 > GRPO的损失函数与PPO类似，也包含一个**策略比率（Policy Ratio）**和**KL散度约束**。
 > 
-策略比率 $r_t(\theta) = \frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$。
+> 策略比率 $r_t(\theta) = \frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$。
 > 
 > GRPO的损失函数可以表示为：
 > 
-$L(\theta) = \mathbb{E}_{s, a \sim \pi_{\theta_{old}}} \left[ \min(r_t(\theta) A_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) A_t) - \beta \text{KL}(\pi_{\theta_{old}}(\cdot|s_t), \pi_{\theta}(\cdot|s_t)) \right]$
+> $L(\theta) = \mathbb{E}_{s, a \sim \pi_{\theta_{old}}} \left[ \min(r_t(\theta) A_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) A_t) - \beta \text{KL}(\pi_{\theta_{old}}(\cdot|s_t), \pi_{\theta}(\cdot|s_t)) \right]$
 > 
 > 其中：
-- $A_t$ 是通过组内采样计算得到的优势函数。
-- $\epsilon$ 是裁剪参数，用于限制策略更新的幅度。
-- $\beta$ 是KL散度项的权重，用于控制新旧策略之间的距离。
+> - $A_t$ 是通过组内采样计算得到的优势函数。
+> - $\epsilon$ 是裁剪参数，用于限制策略更新的幅度。
+> - $\beta$ 是KL散度项的权重，用于控制新旧策略之间的距离。
 > 
 > 这个损失函数的目标是最大化相对优势，同时通过裁剪和KL散度约束来确保策略更新的稳定性。
 
@@ -644,13 +644,13 @@ class TransformerEncoder(nn.Module):
 > 
 > 将 Q 和 K 的每一对维度当成一个二维向量，乘以一个旋转矩阵：
 > 
-$$
-R(\theta)=
-\begin{bmatrix}
-cos\theta & -sin\theta \\
-sin\theta & cos\theta
-\end{bmatrix}
-$$
+> $$
+> R(\theta)=
+> \begin{bmatrix}
+> cos\theta & -sin\theta \\
+> sin\theta & cos\theta
+> \end{bmatrix}
+> $$
 > 
 > 这样，每个位置的向量就像顺时针旋转一定角度，而这个角度是基于其位置 `p` 和频率 `f` 设定的。
 > 结果，注意力中的 Query 和 Key 相乘时，就带上了相对位置信息。
@@ -667,18 +667,18 @@ $$
 
 > 在Transformer的自注意力（Self-Attention）机制中，计算注意力分数时有如下公式：
 > 
-$$
-\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
-$$
+> $$
+> \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+> $$
 > 
-其中，$Q$（Query）、$K$（Key）、$V$（Value）是通过输入和参数矩阵线性变换得到的，$d_k$是Key向量的维度。
+> 其中，$Q$（Query）、$K$（Key）、$V$（Value）是通过输入和参数矩阵线性变换得到的，$d_k$ 是Key向量的维度。
 
 **如果不除，会发生什么？**
 
-设 $Q$ 和 $K$ 是随机初始化的，元素是独立的零均值高斯变量，维度为 $d_k$，则它们的点积 $Q \cdot K$ 的期望和方差如下：
-期望：$E[Q \cdot K] = 0$
-方差：$\text{Var}[Q \cdot K] = d_k$
-也就是说：维度越高，点积值就越大（方差正比于 $d_k$）。
+> 设 $Q$ 和 $K$ 是随机初始化的，元素是独立的零均值高斯变量，维度为 $d_k$，则它们的点积 $Q \cdot K$ 的期望和方差如下：
+> 期望：$E[Q \cdot K] = 0$
+> 方差：$\text{Var}[Q \cdot K] = d_k$
+> 也就是说：维度越高，点积值就越大（方差正比于 $d_k$）。
 > 结果是：
 > - 点积过大 -> softmax 输出变成 one-hot
 > - 梯度传播变得不稳定（几乎只对一个位置有梯度）
@@ -686,19 +686,19 @@ $$
 
 **为什么除以 $\sqrt{d_k}$ 有用？**
 
-这是为了把 $Q \cdot K^T$ 的值“标准化”到一个比较稳定的范围。
-如果点积期望方差为 $d_k$，那么除以 $\sqrt{d_k}$ 后：
-- 方差变成 $\text{Var}[Q \cdot K] / d_k = 1$（随机变量 $X$ 除以常数 $c$，其 方差变化为：$\text{Var}(X / c) = \text{Var}(X) / c^2$）
+> 这是为了把 $Q \cdot K^T$ 的值“标准化”到一个比较稳定的范围。
+> 如果点积期望方差为 $d_k$，那么除以 $\sqrt{d_k}$ 后：
+> - 方差变成 $\text{Var}[Q \cdot K] / d_k = 1$（随机变量 $X$ 除以常数 $c$，其 方差变化为：$\text{Var}(X / c) = \text{Var}(X) / c^2$）
 > - 保证 softmax 输入值的尺度稳定在一个合理区间（比如 -4 到 +4）
 > - softmax 输出更平滑，不至于极端化，利于训练
 
 **举个极端例子（数值说明）**
 
-假设没有除以 $\sqrt{d_k}$，某一对 $QK$ 点积值为 50，而其他值为 1：
-- $softmax([50, 1, 1, 1]) ≈ [~1, 0, 0, 0]$ -> 几乎 one-hot
+> 假设没有除以 $\sqrt{d_k}$，某一对 $QK$ 点积值为 50，而其他值为 1：
+> - $softmax([50, 1, 1, 1]) ≈ [~1, 0, 0, 0]$ -> 几乎 one-hot
 > - 梯度集中在一个位置，模型变得不稳定
 > 
-而如果我们除以 $\sqrt{d_k}$（比如 $\sqrt{64} = 8$），点积值变成 6.25，softmax 输出就会更加平滑。
+> 而如果我们除以 $\sqrt{d_k}$（比如 $\sqrt{64} = 8$），点积值变成 6.25，softmax 输出就会更加平滑。
 
 </details>
 
@@ -732,9 +732,9 @@ $$
 
 > 以 `7B` 模型，参数精度 `fp16` 为例：
 > 
-$$
-显存 = 参数数量 \times 精度(bytes) = 7 \times 10^9 \times 2 bytes = 14 GB（模型权重）
-$$
+> $$
+> 显存 = 参数数量 \times 精度(bytes) = 7 \times 10^9 \times 2 bytes = 14 GB（模型权重）
+> $$
 > 
 > **如果是训练，还需要加上**：
 > 
@@ -758,9 +758,9 @@ $$
 > 
 > 因此显存占用大致与 batch size 成线性关系：
 > 
-$$
-显存 \propto BatchSize
-$$
+> $$
+> 显存 \propto BatchSize
+> $$
 
 **显存与序列长度（seq_len）的关系**
 
@@ -771,9 +771,9 @@ $$
 > 
 > 因此注意力的显存增长为**平方级别**：
 > 
-$$
-显存 \propto {SeqLen}^2
-$$
+> $$
+> 显存 \propto {SeqLen}^2
+> $$
 
 </details>
 
@@ -820,16 +820,16 @@ $$
 **如果输入序列很长，注意力矩阵的计算量和显存占用会迅速膨胀，如何解决计算量问题？**
 
 > 注意力矩阵的维度是：`[batch_size,n_heads,seq_len,seq_len]`
-计算复杂度：$O(SeqLen^2)$
+> 计算复杂度：$O(SeqLen^2)$
 > 
 > 解决方法（**减少计算量/减少精度两种方式**）：
 > 
-1. **稀疏注意力**：复杂度从 $O(n^2)$ 降低到 $O(n \cdot \sqrt{n})$ 或 $O(n \cdot \log n)$
+> 1. **稀疏注意力**：复杂度从 $O(n^2)$ 降低到 $O(n \cdot \sqrt{n})$ 或 $O(n \cdot \log n)$
 >    1. Longformer：局部窗口 + 全局 token 关注机制
 >    2. BigBird：局部 + 稀疏跳跃 + 全局 token，理论上具备 Transformer 表达能力
 >    3. Sparse Transformer：使用规则设计的稀疏注意力模式
 >    4. Reformer：使用 LSH（局部敏感哈希）减少注意力计算
-2. **线性注意力**：复杂度降为 $O(n)$，但可能会损失精度
+> 2. **线性注意力**：复杂度降为 $O(n)$，但可能会损失精度
 >    1. Performer：利用核函数重写注意力为线性形式
 >    2. Linformer：假设注意力矩阵是低秩的，对 K/V 做降维
 >    3. Linear Transformer：修改注意力定义为线性形式

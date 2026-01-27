@@ -19,14 +19,14 @@
 > 
 > **优化方式**
 > 
-- 学习一个函数$Q(s,a)$：在状态$s$下选择动作$a$的预期收益
-- 每次尝试后根据新的经验调整$Q$值，比如`Qlearning`：
+> - 学习一个函数 $Q(s,a)$：在状态 $s$ 下选择动作 $a$ 的预期收益
+> - 每次尝试后根据新的经验调整 $Q$ 值，比如`Qlearning`：
 > 
-$$
-Q(s,a){\leftarrow} Q(s,a)+\alpha[r+{\gamma} \mathop{\max}\limits_{a'} Q(s',a')-Q(s,a)]
-$$
+> $$
+> Q(s,a){\leftarrow} Q(s,a)+\alpha[r+{\gamma} \mathop{\max}\limits_{a'} Q(s',a')-Q(s,a)]
+> $$
 > 
-- 目标是学到一个好用的$Q$函数，之后只要“贪心”地选$Q$值最大的动作即可。
+> - 目标是学到一个好用的 $Q$ 函数，之后只要“贪心”地选 $Q$ 值最大的动作即可。
 > 
 > **特点总结**
 > 
@@ -48,12 +48,12 @@ $$
 > 
 > **优化方式**
 > 
-- 直接学习一个策略函数$\pi (a|s;\theta)$，输出某状态下采取各个动作的概率。
-- 用“策略梯度”算法来优化参数$\theta$，让高奖励的动作概率变大。例如：
+> - 直接学习一个策略函数 $\pi (a|s;\theta)$，输出某状态下采取各个动作的概率。
+> - 用“策略梯度”算法来优化参数 $\theta$，让高奖励的动作概率变大。例如：
 > 
-$$
-\nabla_\theta J(\theta)=E[\nabla_\theta\log {\pi_{\theta}(a|s)}·R]
-$$
+> $$
+> \nabla_\theta J(\theta)=E[\nabla_\theta\log {\pi_{\theta}(a|s)}·R]
+> $$
 > 
 > - 调整参数方向，使得带来高奖励的动作更有可能被选中。
 > 
@@ -128,11 +128,11 @@ $$
 
 > 在策略梯度方法（如 REINFORCE）中，直接优化期望回报：
 > 
-$$
-J(\theta)=E_{\tau \sim \pi_{\theta}}[\sum_t\log\pi_{\theta}(a_t|s_t)·A_t]
-$$
+> $$
+> J(\theta)=E_{\tau \sim \pi_{\theta}}[\sum_t\log\pi_{\theta}(a_t|s_t)·A_t]
+> $$
 > 
-这些方法的基本思想是：通过采样和优化，使策略参数$\theta$让策略$\pi_{\theta}(a|s)$更倾向于带来高回报的动作。
+> 这些方法的基本思想是：通过采样和优化，使策略参数 $\theta$ 让策略 $\pi_{\theta}(a|s)$ 更倾向于带来高回报的动作。
 > 
 > 当我们对策略进行更新时，如果步长（learning rate）或梯度本身太大，就可能导致 策略突然发生巨大变化。具体原因解释如下：
 > 
@@ -144,7 +144,7 @@ $$
 > 
 > **原因2：REINFORCE / A2C 的目标函数是无约束的**
 > 
-- REINFORCE 要最大化：$E_{\tau \sim \pi_{\theta}}[\sum_t\log\pi_{\theta}(a_t|s_t)·A_t]$
+> - REINFORCE 要最大化：$E_{\tau \sim \pi_{\theta}}[\sum_t\log\pi_{\theta}(a_t|s_t)·A_t]$
 > - 这个目标函数没有限制策略变化的幅度，所以在更新参数的时候，哪怕变化很大，也不会受到惩罚。
 > 
 > **原因3：剧烈变化导致不稳定训练**
@@ -159,14 +159,14 @@ $$
 > 
 > **PPO 的核心目标函数**：
 > 
-$$
-L_{CLIP}(\theta)=E_t[\min(r_t(\theta)·A_t,clip(r_t(\theta),1-\epsilon,1+\epsilon)·A_t)]
-$$
+> $$
+> L_{CLIP}(\theta)=E_t[\min(r_t(\theta)·A_t,clip(r_t(\theta),1-\epsilon,1+\epsilon)·A_t)]
+> $$
 > 
 > 其中：
-- $r_t(\theta)=\frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$：新旧策略的概率比
-- $A_t$：优势函数（估计当前行为是否优于平均）
-- clip 约束策略变化在$[1-\epsilon,1+\epsilon]$内
+> - $r_t(\theta)=\frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$：新旧策略的概率比
+> - $A_t$：优势函数（估计当前行为是否优于平均）
+> - clip 约束策略变化在 $[1-\epsilon,1+\epsilon]$ 内
 > 
 > 这种方式能有效防止策略更新“越界”，让学习更稳定。
 
@@ -190,11 +190,11 @@ $$
 > GAE（Generalized Advantage Estimation）是一种对 Advantage 函数的更稳定估计方式；
 > PPO 支持这种估计方法，更准确、更稳定；
 > 
-$$
-A_t^{GAE}=\sum_{l=0}^{\infty}(\gamma\lambda)^l\delta_{t+l}
-$$
+> $$
+> A_t^{GAE}=\sum_{l=0}^{\infty}(\gamma\lambda)^l\delta_{t+l}
+> $$
 > 
-其中：$\delta_t=r_t+\gamma V(s_{t+1})-V(s_t)$
+> 其中：$\delta_t=r_t+\gamma V(s_{t+1})-V(s_t)$
 > 
 > **优化4：可以结合多个损失项一起训练（Actor-Critic）**
 > 
@@ -205,9 +205,9 @@ $$
 > 
 > PPO 总损失函数一般如下：
 > 
-$$
-L=L_{policy}^{CLIP}+c_1·L_{value}-c_2·Entropy
-$$
+> $$
+> L=L_{policy}^{CLIP}+c_1·L_{value}-c_2·Entropy
+> $$
 > 
 > **总结**
 > 
@@ -223,11 +223,11 @@ $$
 
 > **PPO 为什么是 on-policy？**
 > 
-PPO 是一个策略优化器，它优化的是当前策略$\pi_\theta$
+> PPO 是一个策略优化器，它优化的是当前策略 $\pi_\theta$
 > 
 > 虽然它“缓解”了 on-policy 的一些缺点，但它本质仍然是 on-policy，因为：
-- 它的经验采集仍然依赖当前策略$\pi$；
-- 策略更新仍基于当前$\pi$与旧策略$\pi_{old}$的比值；
+> - 它的经验采集仍然依赖当前策略 $\pi$；
+> - 策略更新仍基于当前 $\pi$ 与旧策略 $\pi_{old}$ 的比值；
 > - 即使允许小幅偏离，也不允许用完全无关的旧数据。
 > 
 > **那 PPO 为什么样本效率高？哪来的？**
@@ -236,10 +236,10 @@ PPO 是一个策略优化器，它优化的是当前策略$\pi_\theta$
 > > 
 > > **机制1：重复使用旧数据（小范围）——“软”on-policy**
 > > 
-虽然 PPO 是 on-policy，但它使用了一个$\pi_{old}$机制：$r_t(\theta)=\frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$
+> > 虽然 PPO 是 on-policy，但它使用了一个 $\pi_{old}$ 机制：$r_t(\theta)=\frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$
 > > 
 > > - 它允许我们用 多个 epoch 重复利用同一批样本；
-- 只要保证$\pi$与$\pi_{old}$不偏差太大，就不会影响训练质量；
+> > - 只要保证 $\pi$ 与$\pi_{old}$ 不偏差太大，就不会影响训练质量；
 > > - 这种策略更新方式叫做 “trust region” 近似。
 > > 
 > > **机制2：Clip 策略让“轻微 off-policy”（容忍策略漂移）安全可行**
