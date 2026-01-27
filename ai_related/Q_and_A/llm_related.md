@@ -87,7 +87,7 @@
 > $$
 > 
 > 其中：
-> - $\sigma(z) = \frac{1}{1 + e^{-z}}$是 sigmoid 函数；
+> - $\sigma(z) = \frac{1}{1 + e^{-z}}$ 是 sigmoid 函数；
 > - $\beta$ 是一个温度参数，控制 sharpness（一般取 1.0）。
 > 
 > 所以最后就是：
@@ -146,10 +146,10 @@
 
 **TRPO 的算法流程**
 
-> 1. 采样：用当前策略$\pi_{old}$与环境交互，收集一批轨迹（state, action, reward）。
-> 2. 估计优势函数：用 GAE（Generalized Advantage Estimation）等方法估算每个动作的优势$A_t$。
+> 1. 采样：用当前策略 $\pi_{old}$ 与环境交互，收集一批轨迹（state, action, reward）。
+> 2. 估计优势函数：用 GAE（Generalized Advantage Estimation）等方法估算每个动作的优势 $A_t$。
 > 3. 构建目标函数：最大化新旧策略概率比加权的优势期望。
-> 4. 信赖域约束：约束新旧策略的平均 KL 散度不超过$\delta$（如 0.01）。
+> 4. 信赖域约束：约束新旧策略的平均 KL 散度不超过 $\delta$（如 0.01）。
 > 5. 求解优化问题：用二阶优化（如共轭梯度法）近似求解带约束的最大化问题，得到新的策略参数。
 > 6. 更新策略：用新参数替换旧策略，进入下一轮。
 
@@ -161,7 +161,7 @@
 > \max_{\theta} \ \mathbb{E}{s,a \sim \pi{\text{old}}} \left[ \frac{\pi_{\theta}(a|s)}{\pi_{\text{old}}(a|s)} A^{\pi_{\text{old}}}(s,a) \right]
 > $$
 >
-> 同时约束新旧策略的平均 KL 散度不超过阈值$\delta$：
+> 同时约束新旧策略的平均 KL 散度不超过阈值 $\delta$：
 >
 > $$
 > \text{subject to} \ \mathbb{E}{s \sim \pi{\text{old}}} \left[ D_{KL}(\pi_{\text{old}}(\cdot|s) \| \pi_{\theta}(\cdot|s)) \right] \leq \delta
@@ -244,7 +244,7 @@
 > G=((y_1,r_1),(y_2,r_2),...,(y_K,r_K))
 > $$
 > 
-> 其中，$r_i=R(y_i|x)$为响应$y_i$的奖励值
+> 其中，$r_i=R(y_i|x)$ 为响应 $y_i$ 的奖励值
 > 
 > **2. 相对优势计算**
 > 
@@ -255,8 +255,8 @@
 > $$
 > 
 > 其中：
-> - $\mu_G=\frac{1}{K}\sum_{j=i}^K r_j$为组内平均奖励
-> - $\sigma_G=\sqrt{\frac{1}{K}\sum_{j=1}^K (r_j-\mu_G)^2}$为组内标准差
+> - $\mu_G=\frac{1}{K}\sum_{j=i}^K r_j$ 为组内平均奖励
+> - $\sigma_G=\sqrt{\frac{1}{K}\sum_{j=1}^K (r_j-\mu_G)^2}$ 为组内标准差
 > 
 > 相对排名优势：
 > 
@@ -264,7 +264,7 @@
 > A_i^{rank}=\frac{rank(r_i)-(K+1)/2}{K/2}
 > $$
 > 
-> 其中，$rank(r_i)$为$r_i$在组内的排名（1到K）
+> 其中，$rank(r_i)$ 为$r_i$ 在组内的排名（1到K）
 > 
 > **3. 混合优势函数**
 > 
@@ -274,7 +274,7 @@
 > A_i^{GRPO}=\lambda \tilde{A_i}+(1-\lambda)A_i^{rank}
 > $$
 > 
-> （实验表明$\lambda=0.7$效果最佳）
+> （实验表明 $\lambda=0.7$ 效果最佳）
 
 **GRPO目标函数设计**
 
@@ -671,7 +671,7 @@ class TransformerEncoder(nn.Module):
 > \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
 > $$
 > 
-> 其中，$Q$（Query）、$K$（Key）、$V$（Value）是通过输入和参数矩阵线性变换得到的，$d_k$是Key向量的维度。
+> 其中，$Q$（Query）、$K$（Key）、$V$（Value）是通过输入和参数矩阵线性变换得到的，$d_k$ 是Key向量的维度。
 
 **如果不除，会发生什么？**
 
