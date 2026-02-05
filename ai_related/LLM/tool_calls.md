@@ -34,7 +34,7 @@ JSON Schema 官方链接：[https://json-schema.org/learn/getting-started-step-b
 - `array`: JSON 数组。`[1, 2, 3]`
 - `string`: JSON 字符串。`"hello"`
 - `number`: JSON 数字（整数+小数）。`1`, `3.14`
-- `integet`: JSON 整数（number 子集）。`1`, `42`
+- `integer`: JSON 整数（number 子集）。`1`, `42`
 - `boolean`: JSON 布尔值。`true`, `false`
 - `null`: JSON 空值。`null`
 

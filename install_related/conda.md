@@ -1,3 +1,20 @@
+- [conda 常用命令](#conda-常用命令)
+- [conda 下载与配置](#conda-下载与配置)
+- [环境迁移](#环境迁移)
+  - [跨机器迁移](#跨机器迁移)
+
+# conda 常用命令
+
+```shell
+# 创建环境
+conda create -n <env_name> python=<python_version> -y [--dry-run]
+# 克隆环境（-v 可以查看过程）
+conda create -n <new_env_name> --clone <old_env_name/or/old_env_path> -v
+# 查看环境
+conda info -e
+# 删除环境
+conda remove -n <env_name> --all
+```
 
 # conda 下载与配置
 

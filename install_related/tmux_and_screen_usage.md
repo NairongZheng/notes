@@ -164,6 +164,9 @@ set -g destroy-unattached off
 # 关闭当前窗格: Ctrl+b & x
 # 将当前窗格拆分为一个独立窗口: Ctrl+b & !
 # 显示窗格编号: Ctrl+b & q
+
+# =========== 其他 =========== #
+# 进入滚动/复制模式: Ctrl+b & [
 ```
 
 # screen

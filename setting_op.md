@@ -212,13 +212,13 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-m
 git clone https://github.com/zsh-users/zsh-syntax-highlighting ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 
 # 然后在 ～/.zshrc 里面添加以下配置
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+# plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 ```
 
 想把命令提示符改成绝对路径的话，可以到 oh-my-zsh 使用的主题里面改，如：
 
 ```shell
-#  vim ~/.oh-my-zsh/themes/$ZSH_THEME.zsh-theme
+# vim ~/.oh-my-zsh/themes/$ZSH_THEME.zsh-theme
 PROMPT="%(?:%{$fg_bold[green]%}%1{➜%} :%{$fg_bold[red]%}%1{➜%} ) %{$fg[cyan]%}%d%{$reset_color%}"
 
 # 这边本来是 `%c`，改成 `%d` 就是绝对路径了
