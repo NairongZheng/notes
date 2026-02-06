@@ -27,8 +27,9 @@
 3. Attention: LLM的注意力机制，包括MHA、MQA、GQA、MLA
 4. mcp: Model Context Protocol
 5. model_train: 模型训练，主要是并行训练/分布式训练的介绍
-6. temperature_and_top_p: Temperature跟top_p的介绍
-7. tool_calls: 工具调用
+6. transformer: 详细介绍 transformer 的各个部分
+7. temperature_and_top_p: Temperature跟top_p的介绍
+8. tool_calls: 工具调用
 
 
 # basic
