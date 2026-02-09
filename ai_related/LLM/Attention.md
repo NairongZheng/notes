@@ -59,6 +59,7 @@ $$
 <summary>Scaled Dot-Product Attention代码实现</summary>
 
 ```python
+import math
 import torch
 import torch.nn.functional as F
 
@@ -72,11 +73,15 @@ def scaled_dot_product_attention(Q, K, V, mask=None):
     d_k = Q.size(-1)
     
     # Step 1: 计算 raw attention scores: Q @ K^T
-    scores = torch.matmul(Q, K.transpose(-2, -1)) / torch.sqrt(torch.tensor(d_k, dtype=torch.float32))
+    scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(d_k)
 
     # Step 2: 应用 mask（可选）
     if mask is not None:
-        scores = scores.masked_fill(mask == 0, float('-inf'))
+        # scores = scores.masked_fill(mask, float('-inf'))  # 尽量不要硬编码成 -inf
+        # 确保 mask 为 bool，避免类型不匹配
+        if mask.dtype != torch.bool:
+            mask = mask.to(torch.bool)
+        scores = scores.masked_fill(mask, torch.finfo(scores.dtype).min)
 
     # Step 3: softmax over key dimension
     attn_weights = F.softmax(scores, dim=-1)
@@ -97,8 +102,12 @@ def main():
     K = torch.rand(batch_size, num_heads, seq_len, d_k)
     V = torch.rand(batch_size, num_heads, seq_len, d_v)
 
-    # mask 也可以测试下，比如让某些位置为 0
-    mask = torch.ones(batch_size, num_heads, seq_len, seq_len)  # 全 1 表示没有 mask
+    # ✅ 不加 mask（全部可见）
+    mask = None
+
+    # ✅ 如果想测试 causal mask，打开下面这段
+    # causal_mask = torch.triu(torch.ones(seq_len, seq_len, dtype=torch.bool), diagonal=1)
+    # mask = causal_mask.unsqueeze(0).unsqueeze(0).expand(batch_size, num_heads, seq_len, seq_len)
 
     output, attn_weights = scaled_dot_product_attention(Q, K, V, mask)
 
@@ -152,17 +161,31 @@ import torch.nn.functional as F
 import math
 
 class ScaledDotProductAttention(nn.Module):
-    def __init__(self):
+    def __init__(self, dropout=0.1):
         super().__init__()
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, Q, K, V, mask=None):
         d_k = Q.size(-1)
         scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(d_k)
 
         if mask is not None:
-            scores = scores.masked_fill(mask == 0, float('-inf'))
+            # 支持 [B, Lk] / [B, Lq, Lk] / [B, 1, Lq, Lk] / [B, H, Lq, Lk]
+            if mask.dtype != torch.bool:
+                mask = mask.to(torch.bool)
+            if mask.dim() == 2:
+                mask = mask[:, None, None, :]
+            elif mask.dim() == 3:
+                mask = mask[:, None, :, :]
+            # 用当前 dtype 能表示的最小值，而不是硬编码 -inf，防止溢出
+            # scores = scores.masked_fill(mask, float('-inf'))
+            scores = scores.masked_fill(mask, torch.finfo(scores.dtype).min)
+        
+        # 手动实现 saft softamx（现在都是 torch 标配）
+        scores = scores - scores.max(dim=-1, keepdim=True).values
 
         attn_weights = F.softmax(scores, dim=-1)
+        attn_weights = self.dropout(attn_weights)
         output = torch.matmul(attn_weights, V)
         return output, attn_weights
 
@@ -214,7 +237,7 @@ def main():
     # 输入 shape: [batch, seq_len, embed_dim]
     x = torch.rand(batch_size, seq_len, embed_dim)
 
-    # 可选 mask，形状应为 [batch_size, num_heads, seq_len, seq_len]，不加也行
+    # 可选 mask，形状应为 [batch_size, num_heads, seq_len, seq_len]
     output, attn_weights = mha(x, x, x)
 
     print("output.shape:", output.shape)          # [batch_size, seq_len, embed_dim]    # [2, 10, 32]
@@ -284,7 +307,9 @@ class MQA(nn.Module):
         # 所有头共享一个 K 和 V
         self.W_k = nn.Linear(embed_dim, self.head_dim)
         self.W_v = nn.Linear(embed_dim, self.head_dim)
-        
+
+        self.dropout = nn.Dropout(0.1)
+
         # 输出映射
         self.W_o = nn.Linear(embed_dim, embed_dim)
 
@@ -301,9 +326,18 @@ class MQA(nn.Module):
         # Attention score: Q @ K^T
         scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(self.head_dim)  # [B, H, L, L]    # [2, 8, 10, 10]
         if mask is not None:
-            scores = scores.masked_fill(mask == 0, float('-inf'))
-
+            # 支持 [B, L] / [B, L, L] / [B, 1, L, L] / [B, H, L, L]
+            if mask.dtype != torch.bool:
+                mask = mask.to(torch.bool)
+            if mask.dim() == 2:
+                mask = mask[:, None, None, :]
+            elif mask.dim() == 3:
+                mask = mask[:, None, :, :]
+            scores = scores.masked_fill(mask, torch.finfo(scores.dtype).min)
+        
+        scores = scores - scores.max(dim=-1, keepdim=True).values
         attn_weights = F.softmax(scores, dim=-1)  # [B, H, L, L]
+        attn_weights = self.dropout(attn_weights)
         out = torch.matmul(attn_weights, V)       # [B, H, L, D/H]
 
         # 拼接 heads
@@ -381,7 +415,7 @@ import torch.nn.functional as F
 import math
 
 class GQA(nn.Module):
-    def __init__(self, embed_dim, num_heads, num_kv_groups):
+    def __init__(self, embed_dim, num_heads, num_kv_groups, dropout=0.1):
         super().__init__()
         assert embed_dim % num_heads == 0, "embed_dim 必须能被 num_heads 整除"
         assert num_heads % num_kv_groups == 0, "num_heads 必须能被 num_kv_groups 整除"
@@ -399,37 +433,56 @@ class GQA(nn.Module):
         self.W_k = nn.Linear(embed_dim, self.head_dim * num_kv_groups)
         self.W_v = nn.Linear(embed_dim, self.head_dim * num_kv_groups)
 
+        self.dropout = nn.Dropout(dropout)
+
         # 输出线性层
         self.W_o = nn.Linear(embed_dim, embed_dim)
 
     def forward(self, x, mask=None):
-        batch_size, seq_len, _ = x.size()
+        batch_size, seq_len, _ = x.size()       # x: [B, L, D]  # [2, 10, 64]
 
         # 1. Q: 每个 head 独立
-        Q = self.W_q(x).view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)  # [B, H, L, D/H]
+        Q = self.W_q(x).view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)  # [B, H, L, D/H]  # [2, 8, 10, 8]
 
         # 2. K/V: 每个 group 一组，共 num_kv_groups 个
         K = self.W_k(x).view(batch_size, seq_len, self.num_kv_groups, self.head_dim).transpose(1, 2)  # [B, G, L, D/H]  # [2, 2, 10, 8]
         V = self.W_v(x).view(batch_size, seq_len, self.num_kv_groups, self.head_dim).transpose(1, 2)  # [B, G, L, D/H]  # [2, 2, 10, 8]
 
-        # 3. 将 K/V 按 group 复制给对应的 head
-        K = K.repeat_interleave(self.group_size, dim=1)  # [B, H, L, D/H]   # [2, 8, 10, 8]
-        V = V.repeat_interleave(self.group_size, dim=1)  # [B, H, L, D/H]   # [2, 8, 10, 8]
+        # 3. 用 broadcast，而不是复制，让 K/V 在同一组内的 head 共享
+        Q = Q.view(batch_size, self.num_kv_groups, self.group_size, seq_len, self.head_dim)   # [B, G, gs, L, D/H]   # [2, 2, 4, 10, 8]
+        K = K.unsqueeze(2).expand(-1, -1, self.group_size, -1, -1)  # [B, G, gs, L, D/H]   # [2, 2, 4, 10, 8]
+        V = V.unsqueeze(2).expand(-1, -1, self.group_size, -1, -1)  # [B, G, gs, L, D/H]   # [2, 2, 4, 10, 8]
 
         # 4. Attention
-        scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(self.head_dim)  # [B, H, L, L]    # [2, 8, 10, 10]
+        scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(self.head_dim)  # [B, G, gs, L, L]    # [2, 2, 4, 10, 10]
 
         if mask is not None:
-            scores = scores.masked_fill(mask == 0, float('-inf'))
+            # 支持 [B, L] / [B, L, L] / [B, 1, 1, L] / [B, 1, L, L] / [B, H, L, L] / [B, G, gs, L, L]
+            if mask.dtype != torch.bool:
+                mask = mask.to(torch.bool)
+            if mask.dim() == 2:
+                mask = mask[:, None, None, None, :]
+            elif mask.dim() == 3:
+                mask = mask[:, None, None, :, :]
+            elif mask.dim() == 4:
+                mask = mask.unsqueeze(2)
+            scores = scores.masked_fill(mask, torch.finfo(scores.dtype).min)
+
+        scores = scores - scores.max(dim=-1, keepdim=True).values
 
         attn_weights = F.softmax(scores, dim=-1)
-        out = torch.matmul(attn_weights, V)  # [B, H, L, D/H]   # [2, 8, 10, 8]
+        attn_weights = self.dropout(attn_weights)
+        out = torch.matmul(attn_weights, V)  # [B, G, gs, L, D/H]   # [2, 2, 4, 10, 8]
 
         # 5. 拼接输出
-        out = out.transpose(1, 2).contiguous().view(batch_size, seq_len, self.embed_dim)
+        out = out.reshape(batch_size, self.num_heads, seq_len, self.head_dim)   # [B, H, L, D/H]   # [2, 8, 10, 8]
+        out = out.transpose(1, 2).contiguous().view(batch_size, seq_len, self.embed_dim)    # [B, L, D]   # [2, 10, 64]
         out = self.W_o(out)
 
-        return out, attn_weights
+        # 返回时把 attn 的 G 和 group_size 展平成 H 方便观察
+        attn = attn_weights.reshape(batch_size, self.num_heads, seq_len, seq_len)   # [B, H, L, L]   # [2, 8, 10, 10]
+
+        return out, attn
 
 
 def main():
@@ -523,7 +576,14 @@ class MLA(nn.Module):
 
         scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(self.head_dim)  # [B, H, num_latents, L]
         if mask is not None:
-            scores = scores.masked_fill(mask == 0, float('-inf'))
+            # 支持 [B, L] / [B, 1, 1, L] / [B, H, 1, L]
+            if mask.dtype != torch.bool:
+                mask = mask.to(torch.bool)
+            if mask.dim() == 2:
+                mask = mask[:, None, None, :]
+            scores = scores.masked_fill(mask, torch.finfo(scores.dtype).min)
+
+        scores = scores - scores.max(dim=-1, keepdim=True).values
 
         attn_weights = F.softmax(scores, dim=-1)                   # [B, H, num_latents, L]
         latent_out = torch.matmul(attn_weights, V)                # [B, H, num_latents, D/H]
