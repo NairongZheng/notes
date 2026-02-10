@@ -1,6 +1,4 @@
 
-1. layer normalization 原理是什么，跟 batch normalization 的区别
-
 - [transformer](#transformer)
   - [tokenize 分词](#tokenize-分词)
     - [BPE 分词](#bpe-分词)
@@ -17,6 +15,7 @@
   - [前馈层](#前馈层)
     - [transformer 中的前馈层](#transformer-中的前馈层)
     - [MoE (Mixture of Experts)](#moe-mixture-of-experts)
+  - [normalization](#normalization)
 
 
 # transformer
@@ -786,3 +785,58 @@ if __name__ == "__main__":
     print("output:", y.shape)
 ```
 </details>
+
+## normalization
+
+**Layer Normalization 原理**
+
+> **核心思想**：对**每个样本的每个 token**在特征维度上做归一化，使其均值为 0、方差为 1，再用可学习的缩放/平移恢复表达能力。
+> 
+> 对单个 token 向量 $x\in\mathbb{R}^{d_{model}}$：
+> 
+> $$
+> \mu=\frac{1}{d_{model}}\sum_{i=1}^{d_{model}}x_i,\quad
+> \sigma^2=\frac{1}{d_{model}}\sum_{i=1}^{d_{model}}(x_i-\mu)^2
+> $$
+> 
+> $$
+> {LN}(x)=\gamma\odot\frac{x-\mu}{\sqrt{\sigma^2+\epsilon}}+\beta
+> $$
+> 
+> 其中 $\gamma,\beta$ 是可学习参数，$\epsilon$ 用于数值稳定。
+> 
+> **为什么适合 Transformer**：
+> - 序列长度可变，LN 不依赖 batch 统计量，训练/推理一致；
+> - 对每个 token 的特征做归一化，稳定注意力与 FFN 的分布；
+> - 小 batch 或单样本推理也稳定。
+
+**LayerNorm vs BatchNorm**
+
+> | 对比维度        | LayerNorm                              | BatchNorm                             |
+> | --------------- | -------------------------------------- | ------------------------------------- |
+> | 归一化维度      | **特征维度**（每个样本/每个 token 内） | **batch 维度**（同一特征在 batch 内） |
+> | 依赖 batch 大小 | 不依赖，稳定                           | 强依赖，小 batch 不稳定               |
+> | 训练/推理一致性 | 一致（无需运行时统计）                 | 推理需要运行均值/方差                 |
+> | 适用场景        | NLP/Transformer/序列建模               | CNN/视觉/固定长度特征                 |
+> | 对序列长度变化  | 不受影响                               | 需要小心处理                          |
+> 
+> **一句话总结**：
+> 
+> - BatchNorm 让“同一特征在不同样本之间”分布稳定；
+> - LayerNorm 让“同一样本内部各特征”分布稳定。
+
+**LN 在 Transformer 中的放置**
+
+> 常见两种结构：
+> 
+> 1. **Post-LN**（原始 Transformer）：子层后再归一化
+>    1. 结构：$x+\text{Sublayer}(x)$ 之后再做 LN。
+>    2. 优点：早期实践里收敛快、效果好。
+>    3. 缺点：深层时梯度更容易不稳定，训练变难。
+> 2. **Pre-LN**（现代主流）：先 LN 再进子层，梯度更稳定、训练更容易
+>    1. 结构：先做 LN，再进入子层，最后残差相加。
+>    2. 优点：梯度通路更顺畅，深层模型更稳定，训练更“省心”。
+>    3. 缺点：早期可能收敛略慢，但总体更稳定可控。
+> 
+> 实践中，Pre-LN 在深层模型中更稳定，几乎成为默认选择。
+
