@@ -1,4 +1,5 @@
 - [环境配置](#环境配置)
+  - [使用第三方 API](#使用第三方-api)
 - [使用](#使用)
   - [终端使用](#终端使用)
   - [vscode 使用 claudecode 插件](#vscode-使用-claudecode-插件)
@@ -50,7 +51,25 @@ claude install 2.1.17
 }
 ```
 
-**使用外部 API（若需）**
+## 使用第三方 API
+
+**编辑`~/.claude/setting.json`文件**
+
+```shell
+{
+    "env": {
+        "ANTHROPIC_BASE_URL": "xxx",
+        "ANTHROPIC_AUTH_TOKEN": "xxx",
+        "API_TIMEOUT_MS": "3000000",
+        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1,
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "xxx",
+        "ANTHROPIC_DEFAULT_SONNET_MODEL": "xxx",
+        "ANTHROPIC_DEFAULT_OPUS_MODEL": "xxx"
+    }
+}
+```
+
+其实本质上就是添加环境变量，一般填`ANTHROPIC_BASE_URL`跟`ANTHROPIC_AUTH_TOKEN`即可：
 
 ```shell
 # 添加如下环境变量
@@ -64,6 +83,15 @@ export ANTHROPIC_API_KEY="xxx"
 
 # 请求发送是这种方式（我没有验证）：POST {ANTHROPIC_BASE_URL}/v1/messages
 # claudecode 官方的 api url 是：https://api.anthropic.com
+```
+
+**配置跳过引导（可选）**
+
+```shell
+# vim ~/.claude.json
+{
+    "hasCompleteOnboarding": true
+}
 ```
 
 # 使用
@@ -141,16 +169,12 @@ exit
 # 定义个人偏好、常用库和代码风格，这会全局应用
 ~/.claude/claude.md
 
-# 配置好之后跟 claudecode 聊天会发现他是可以识别到的
-# ❯ 请问我的代码风格是什么呢？
-
-# ⏺ 根据您的全局配置文件（~/.claude/CLAUDE.md），您的代码风格偏好是：
-
-#   1. 喜欢写注释解释每个函数 - 为每个函数添加说明性注释
-#   2. 函数内部关键逻辑也会添加注释 - 不仅在函数层面，关键的内部逻辑也需要注释说明
-#   3. 不喜欢一个代码文件太长，需要做好模块化 - 偏好将代码拆分成合理的模块，保持文件精简
-
-#   这些偏好强调了代码的可读性和可维护性，通过充分的注释和合理的模块化来提高代码质量。
+# 比如：
+需要给每个函数添加注释
+函数内部关键逻辑也需要添加注释
+单一代码文件不能太长，需要做好模块化
+把开发思路写在项目中的plan.md等相关文件里
+每次运行都需要做好文件管理，特别是文档管理，不要随意放在根目录。
 ```
 
 **项目上下文**
