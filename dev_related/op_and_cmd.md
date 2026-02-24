@@ -453,6 +453,7 @@ find ${base_path} -name ${file_name} [options]
     # -perm：查找特定权限文件，如 -perm 755
     # -user：查找指定用户文件
     # -ls：列出详细信息
+    # -o：逻辑运算的“或”，满足左边条件或右边条件，都算匹配。
 ```
 
 **grep查找文本行**
