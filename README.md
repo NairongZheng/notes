@@ -1,6 +1,7 @@
 
 # notes
-[markdown数学公式和符号表](https://zhuanlan.zhihu.com/p/450465546)
+
+markdown数学公式和符号表：[参考链接1](https://zhuanlan.zhihu.com/p/450465546)，[参考链接2](https://blog.csdn.net/konglongdanfo1/article/details/85204312)
 
 1. ai_related：ai相关
 2. dev_related：开发过程中的笔记
