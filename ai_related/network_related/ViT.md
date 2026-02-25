@@ -50,7 +50,7 @@ transformer网络结构如下图所示：
 ### 2.2. patch embedding（结构图的2）
 **那么问题来了**。第二步中，patch 怎么转化成 token embedding 的？？？
 其实第二步又分为两个小步骤：
-<img src="../../images/20211127/20211127_ViT_patch拉平.png" style="zoom:80%;" />
+<img src="../../images/20211127/20211127_ViT_patch拉平.jpg" style="zoom:80%;" />
 
 
 
