@@ -1,8 +1,88 @@
+- [shell 登陆介绍](#shell-登陆介绍)
 - [基础shell语法](#基础shell语法)
 - [regexp](#regexp)
 - [cURL](#curl)
 - [wscat](#wscat)
 - [nc (netcat)](#nc-netcat)
+
+# shell 登陆介绍
+
+（下面主要用 bash 来介绍，不同的 shell 有自己的启动链，最后有图）
+
+**先介绍两种 shell**
+
+> 1. 登录 shell（login shell）：这是**用户会话初始化**
+>    1. ssh 登陆
+>    2. tty 登陆
+>    3. su - 切用户
+>    4. 图形终端“作为登陆 shell”启动
+> 2. 非登录 shell（non-login shell）：这是**已有会话里的子 shell** (interactive shell)
+>    1. 打开一个新的终端 tab
+>    2. 在 shell 里执行 bash
+>    3. VSCode 终端
+>    4. tmux 新窗口
+
+**登录 shell 的执行顺序**
+
+```shell
+/etc/profile        # 系统级
+~/.bash_profile     # 用户级（优先）
+~/.bash_login       # 次选
+~/.profile          # 再次选
+~/.bashrc           # 可能被上面文件主动调用
+
+# 只会执行其中一个，优先级是：.bash_profile > .bash_login > .profile
+# 不会自动执行 ~/.bashrc，通常在上面的文件里手动 source .bashrc
+```
+
+**非登陆 shell 的执行顺序**
+
+```shell
+/etc/bash.bashrc
+~/.bashrc
+```
+
+**不同 shell 登陆启动链**
+
+```shell
+                    用户登录 (SSH / TTY / GUI)
+                             │
+                             ▼
+                        /etc/profile
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                    │
+        ▼                    ▼                    ▼
+      sh 登录              bash 登录             zsh 登录
+        │                    │                    │
+        ▼                    ▼                    ▼
+   ~/.profile        找第一个存在的：           ~/.zprofile
+                         │                        │
+                         ├─ ~/.bash_profile       ▼
+                         ├─ ~/.bash_login     ~/.zshrc
+                         └─ ~/.profile            │
+                               │                  ▼
+                               ▼              ~/.zlogin
+                           (通常会执行)
+                            ~/.bashrc
+```
+
+1. 用户登陆默认 shell 是在 `/etc/passwd` 里面指定的，如：`zhengnairong:x:10082:10082::/mnt/afs_toolcall/zhengnairong:/usr/bin/bash`
+2. 如果不指定的话，就默认用`sh`
+3. 所以在没有指定的情况下，可以在 `~/.profile` 里面指定使用的 shell，如：
+
+```shell
+# ~/.profile
+
+# 基础环境变量
+export EDITOR=vim
+export LANG=en_US.UTF-8
+
+# 自动选择 shell（优先 zsh）
+if [ -z "$ZSH_VERSION" ] && command -v zsh >/dev/null 2>&1; then
+    exec "$(command -v zsh)"
+fi
+```
 
 # 基础shell语法
 

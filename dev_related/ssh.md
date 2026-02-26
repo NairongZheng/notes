@@ -1,5 +1,4 @@
 - [CMD](#cmd)
-- [shell 登陆介绍](#shell-登陆介绍)
 - [ssh config配置](#ssh-config配置)
   - [ssh config文件基本结构](#ssh-config文件基本结构)
   - [ssh config文件进阶使用](#ssh-config文件进阶使用)
@@ -39,34 +38,6 @@
    2. 密钥登录：`ssh <user_name>@<remote_ip> -p <remote_port> -i <private_key_path>`
    3. 密钥通过跳板机登录开发机：`ssh <user_name>@<dev_ip> -i <private_key_path> -o ProxyCommand="ssh <user_name>@<jumpserver_ip> -p <jumpserver_port> -i <private_key_path> -q -W <dev_ip>:<dev_port>"`
    4. 使用第三种有可能需要先在远程主机的`authorized_keys`中添加客户端的公钥
-
-# shell 登陆介绍
-
-所有 shell 启动行为，都由两个维度决定：
-- 是不是 login shell
-- 是不是 interactive shell
-- ssh 登录 = login + interactive
-- ssh 的 login shell 一般都是 bash
-
-**bash 作为 login shell（如 ssh）**
-
-执行顺序（只执行第一个存在的）：
-
-```shell
-# 不会自动执行 ~/.bashrc，通常在下面的文件里手动 source .bashrc
-~/.bash_profile
-~/.bash_login
-~/.profile
-```
-
-**bash 作为非 login 的交互 shell（如 tmux）**
-
-执行：
-
-```shell
-~/.bashrc
-```
-
 
 # ssh config配置
 

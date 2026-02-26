@@ -5,6 +5,7 @@
   - [分支相关](#分支相关)
   - [标签相关](#标签相关)
   - [子模块相关](#子模块相关)
+  - [git worktree](#git-worktree)
   - [git lfs](#git-lfs)
   - [其他](#其他)
     - [commit规范](#commit规范)
@@ -372,6 +373,41 @@ rm -rf <path/to/submodule>
 vim .gitmodules
 # Step 5: 提交更改
 git commit -m "Remove submodule <name>"
+```
+
+## git worktree
+
+**查看当前 worktree**
+
+```shell
+git worktree list
+```
+
+**创建新的 worktree**
+
+```shell
+# 从已有分支创建
+git worktree add ../<repo-branch_name> <branch_name>
+# 创建新分支并 checkout
+git worktree add ../<repo-branch_name> -b <branch_name>
+# 从某个 commit 创建
+git worktree add ../<repo-branch_name> <commit_hash>
+```
+
+**删除 worktree**
+
+```shell
+# 普通删除（没有未提交代码、分支未锁定）
+git worktree remove ../<repo-branch_name>
+# 强制删除
+git worktree remove --force ../<repo-branch_name>
+```
+
+**清理失效 worktree**
+
+```shell
+# 如果手动删除了目录，需要用以下命令清理，git 会清理记录
+git worktree prune
 ```
 
 
