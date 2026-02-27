@@ -17,9 +17,10 @@
 13. mysql_usage：mysql使用
 14. postgresql_usage：PostgreSQL使用
 15. ray_usage：ray的使用
-16. redis_usage：redis使用
-17. tmux_and_screen_usage：tmux跟screen的使用
-18. uv_usage：uv环境的使用
-19. vim配置
-20. vscode：vscode的配置
-21. WSL
+16. rclone_usage：rclone的使用
+17. redis_usage：redis使用
+18. tmux_and_screen_usage：tmux跟screen的使用
+19. uv_usage：uv环境的使用
+20. vim配置
+21. vscode：vscode的配置
+22. WSL
