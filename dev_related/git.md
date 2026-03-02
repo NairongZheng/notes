@@ -12,7 +12,7 @@
     - [回退](#回退)
     - [merge和rebase](#merge和rebase)
     - [clone部分仓库](#clone部分仓库)
-    - [git-filter-repo重写git历史](#git-filter-repo重写git历史)
+    - [git-filter-repo](#git-filter-repo)
 
 # git命令
 
@@ -584,7 +584,9 @@ git sparse-checkout set <folder_or_filepath> # 文件用 --no-cone, 文件夹用
 curl -O https://raw.githubusercontent.com/...
 ```
 
-### git-filter-repo重写git历史
+### git-filter-repo
+
+**使用 git-filter-repo 删除文件**
 
 ！！！危险操作！！！
 
@@ -603,4 +605,23 @@ git filter-repo --path <relative_path1> --path <relative_path2> --invert-paths
 # 由于 hash 都变了，所以别人同步的时候需要重新覆盖本地
 git fetch origin
 git reset --hard origin/main
+```
+
+**使用 git-filter-repo 将子文件夹独立成 repo**
+
+假如需要把某个 git 仓库里面的 `<sub_dir>` 独立成一个仓库：
+
+```shell
+# 安装
+brew install git-filter-repo
+# 重新克隆，不要在原来的仓库上操作
+git clone <repo_url> <new_repo_dir>
+cd <new_repo_dir>
+# 过滤出需要的文件夹跟文件，并把文件夹移动到根目录
+git filter-repo --subdirectory-filter <sub_dir>
+    # 删除其他所有目录
+    # 只保留 <sub_dir> 的历史
+    # 把 <sub_dir> 提升到仓库根目录
+    # 重写 commit 历史（但内容不丢）
+# 重新添加 .gitignore 等文件
 ```

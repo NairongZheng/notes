@@ -15,12 +15,13 @@
 11. make_milvus：编译milvus (*)
 12. milvus_usage：milvus使用（上面的自行编译不好用，看这个就行）
 13. mysql_usage：mysql使用
-14. postgresql_usage：PostgreSQL使用
-15. ray_usage：ray的使用
-16. rclone_usage：rclone的使用
-17. redis_usage：redis使用
-18. tmux_and_screen_usage：tmux跟screen的使用
-19. uv_usage：uv环境的使用
-20. vim配置
-21. vscode：vscode的配置
-22. WSL
+14. openclaw：openclaw使用
+15. postgresql_usage：PostgreSQL使用
+16. ray_usage：ray的使用
+17. rclone_usage：rclone的使用
+18. redis_usage：redis使用
+19. tmux_and_screen_usage：tmux跟screen的使用
+20. uv_usage：uv环境的使用
+21. vim配置
+22. vscode：vscode的配置
+23. WSL
