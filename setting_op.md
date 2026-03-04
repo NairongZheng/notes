@@ -12,6 +12,7 @@
   - [docker](#docker)
 - [Linux](#linux)
   - [zsh 配置](#zsh-配置)
+  - [~/.zshrc 追加示例](#zshrc-追加示例)
 - [Other](#other)
   - [Vscode/cursor](#vscodecursor)
     - [cursor的一些设置](#cursor的一些设置)
@@ -222,6 +223,22 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting ${ZSH_CUSTOM:-~/.
 PROMPT="%(?:%{$fg_bold[green]%}%1{➜%} :%{$fg_bold[red]%}%1{➜%} ) %{$fg[cyan]%}%d%{$reset_color%}"
 
 # 这边本来是 `%c`，改成 `%d` 就是绝对路径了
+```
+
+## ~/.zshrc 追加示例
+
+```shell
+# 可以放在单独的文件，然后在 ~/.zshrc 里面 source 防止误删
+
+# 添加环境变量
+export PATH=$HOME/.local/bin:$PATH
+# 设置中文编码
+export LANG=C.UTF-8
+export LC_ALL=C.UTF-8
+# 设置 alias
+alias git-log='git log --pretty=oneline --all --graph --abbrev-commit'
+# 其他操作
+conda activate dev
 ```
 
 # Other

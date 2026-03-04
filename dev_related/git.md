@@ -22,7 +22,7 @@
 
 ```shell
 # vim ~/.bashrc，添加：
-alias git-log='git log --pretty=oneline --all --graph --abbrev-commit
+alias git-log='git log --pretty=oneline --all --graph --abbrev-commit'
     # -all：显示所有分支
     # -pretty=oneline：将提交信息显示为一行
     # -abbrev-commit：是的输出的commit更简短

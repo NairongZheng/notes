@@ -375,12 +375,12 @@ response = client.chat.completions.create(model="", messages=[], tools=[], extra
 
 > 不同平台不同提供商不同，常见有以下几种（不一定对，仅供参考）：
 > 
-> | 平台/模型      | 开启推理参数                                |
-> | -------------- | ------------------------------------------- |
-> | OpenAI o1 / o3 | 自动启用，无需传参                          |
-> | DeepSeek-R1    | `extra_body={"thinking":{"type":"enable"}}` |
-> | Qwen2.5-Think  | `extra_body={"enable_thinking":True}`       |
-> | Yi-Reasoning   | `extra_body={"reasoning_mode":"high"}`      |
+> | 平台/模型      | 开启推理参数                                 |
+> | -------------- | -------------------------------------------- |
+> | OpenAI o1 / o3 | 自动启用，无需传参                           |
+> | DeepSeek-R1    | `extra_body={"thinking":{"type":"enabled"}}` |
+> | Qwen2.5-Think  | `extra_body={"enable_thinking":True}`        |
+> | Yi-Reasoning   | `extra_body={"reasoning_mode":"high"}`       |
 
 **返回**
 
