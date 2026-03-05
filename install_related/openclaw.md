@@ -1,44 +1,29 @@
-- [OpenClaw 使用指南](#openclaw-使用指南)
-  - [简介](#简介)
-  - [安装](#安装)
-  - [首次运行](#首次运行)
-  - [基本命令](#基本命令)
-  - [核心概念](#核心概念)
-  - [子会话详解](#子会话详解)
-  - [目录结构](#目录结构)
+- [安装](#安装)
+- [与 openclaw 交互](#与-openclaw-交互)
+- [初始化设置](#初始化设置)
+  - [一键设置](#一键设置)
+  - [网关](#网关)
   - [模型配置](#模型配置)
-  - [Telegram 配置](#telegram-配置)
-  - [网关使用](#网关使用)
-  - [记忆系统](#记忆系统)
-  - [常见问题](#常见问题)
-  - [进阶技巧](#进阶技巧)
-  - [资源链接](#资源链接)
+  - [channels 配置](#channels-配置)
+- [使用](#使用)
+  - [会话管理](#会话管理)
+  - [agent 管理](#agent-管理)
+- [基本命令](#基本命令)
+- [目录结构](#目录结构)
+- [记忆系统](#记忆系统)
+- [常见问题](#常见问题)
+- [进阶技巧](#进阶技巧)
+- [资源链接](#资源链接)
 
-
-# OpenClaw 使用指南
 
 > 开源的个人 AI 助手平台，运行在你自己的设备上
+> 
+> 官网: https://openclaw.ai/
+> 
+> 中文文档: https://openclawcn.cn/docs.html
+> 
+> 社区: https://discord.com/invite/clawd
 
-官网: https://openclaw.ai/ | 中文文档: https://openclawcn.cn/docs.html | 社区: https://discord.com/invite/clawd
-
-## 简介
-
-OpenClaw 是一个开源的个人 AI 助手框架，让 AI 真正融入你的工作流。
-
-**核心特性**
-- 本地优先 - 数据存储在本地，完全掌控隐私
-- 多平台集成 - 支持 Telegram、WhatsApp、Discord 等 10+ 聊天平台
-- 浏览器控制 - 自动浏览网页、填写表单、提取数据
-- 系统级访问 - 读写文件、运行命令、执行脚本
-- 技能扩展 - 通过 ClawHub 安装社区技能
-- 持久化记忆 - 记住所有对话和偏好
-- 语音交互 - macOS/iOS/Android 支持语音唤醒
-
-**系统要求**
-- 操作系统: macOS 12+、Windows 10+ (WSL2)、Linux (Ubuntu 20.04+)
-- Node.js: 22.0 或更高版本
-- 内存: 4GB RAM（推荐 8GB+）
-- 磁盘: 2GB 可用空间
 
 ## 安装
 
@@ -49,32 +34,143 @@ curl -fsSL https://openclaw.ai/install.sh | bash
 # 重启终端或运行
 source ~/.zshrc  # 或 source ~/.bashrc
 
-# 验证安装
+# 检查版本
 openclaw --version
-openclaw status
 ```
 
-## 首次运行
+## 与 openclaw 交互
+
+与 openclaw 连接交互有以下方式（要先配好网关）：
+1. terminal：`openclaw tui --url ws://127.0.0.1:<gateway_port> --token <gateway_token>`
+2. browser：`http:127.0.0.1:<gateway_port>`，然后到“控制-概览”填写网关 token
+3. 配置频道，使用不同 app 进行交互。
+
+先看看下面的初始化设置
+
+## 初始化设置
+
+### 一键设置
+
+```shell
+# 运行安装向导（关键！！）
+openclaw onboard --install-daemon
+# 第一次初始化的话 Onboarding mode 可以选择 Manual 模式进行详细配置
+```
+
+### 网关
+
+```shell
+openclaw gateway --port 18789 --verbose
+# 一些网关命令
+openclaw gateway install   # 安装为系统服务
+openclaw gateway start     # 启动
+openclaw gateway status    # 查看状态
+openclaw gateway stop      # 停止
+openclaw gateway restart   # 重启
+```
+
+### 模型配置
 
 ```bash
-openclaw
+openclaw configure
+# 选择 `Model` -> `Custom Provider`，然后填写：
+# 1. API Base URL（如 `https://api.anthropic.com/v1`）
+# 2. API Key
+# 3. 类型（OpenAI / Anthropic / Other）
+# 4. Model ID（如 `claude-sonnet-4-5-20250929`）
+# OpenClaw 对未知模型默认限制为 4096 tokens，需手动修改 `contextWindow`。
+
+# 查看模型配置
+openclaw models
 ```
 
-首次运行时，AI 会引导你完成初始化：
-1. 设置 AI 的名字和性格
-2. 填写你的基本信息
-3. 选择时区和偏好
+### channels 配置
 
-完成后，`BOOTSTRAP.md` 会自动删除，你的 AI 助手就准备好了。
+```shell
+# 一些参考命令
+openclaw channels list
+openclaw channels status
+```
+
+**telegram 配置**
+
+1. 找 [@BotFather](https://t.me/BotFather) 创建机器人
+2. 发送 `/newbot` 并按提示操作
+3. 获取 Bot Token
+4. 运行 `openclaw configure` → `Channels` → `Telegram`
+5. 输入 Token
+6. 在 Telegram 中搜索你的机器人并发送 `/start`
+
+**首次配对**
+第一次发送消息会收到配对请求，在终端运行：
+```bash
+openclaw pairing approve telegram <配对码>
+```
+
+**配对管理**
+```bash
+openclaw pairing list                    # 查看所有配对请求
+openclaw pairing approve telegram <码>   # 批准
+openclaw pairing reject telegram <码>    # 拒绝
+```
+
+## 使用
+
+```shell
+# 在终端进入交互
+openclaw tui
+# 第一次对话会询问你是否需要给他人设等，可以花点时间设置好
+```
+
+### 会话管理
+
+子会话用于异步执行任务，有两种模式：
+- **run 模式** - 一次性任务，执行完自动结束
+- **session 模式** - 持久会话，可多次交互
+
+**创建子会话**
+
+在对话中直接说（但是好像终端不可以，只能在飞书）：
+
+```shell
+"创建一个子会话来分析这个日志"
+"用子会话帮我处理这个数据"
+"创建持久子会话来监控服务器状态"
+```
+
+**切换子会话**
+
+```shell
+/session
+/sessions
+```
+
+**重要特性**
+- 异步执行，不阻塞主会话
+- 任务完成自动通知
+- 独立上下文和历史
+
+### agent 管理
+
+**创建 agent**
+
+跟创建会话一样
+
+**切换 agent**
+
+```shell
+/agent
+/agents
+```
+
 
 ## 基本命令
 
 ```bash
-openclaw                   # 启动对话
+openclaw tui               # 启动对话
 openclaw status            # 查看状态
 openclaw configure         # 修改配置
 openclaw sessions          # 查看所有会话
-openclaw gateway start     # 启动网关（Web 界面）
 openclaw --help            # 帮助
 ```
 
@@ -84,74 +180,6 @@ openclaw --help            # 帮助
 /reasoning   # 切换推理模式
 /new         # 清空历史
 Ctrl+C       # 退出
-```
-
-## 核心概念
-
-**Session（会话）**
-Session 是你与 AI 的一次对话实例。分为三种类型：
-- 主会话 - 直接对话，可访问所有记忆，日常使用
-- 子会话 - 独立的后台任务，用于并行处理、隔离上下文
-- 线程会话 - 绑定到消息线程，用于群聊、Discord
-
-**Agent（代理）**
-Agent 是具有特定能力的 AI 实例。一个 Agent 可以运行多个 Session。
-
-内置 Sub-Agent：
-- `context-gatherer` - 探索代码库，识别相关文件
-- `general-task-execution` - 执行独立子任务
-- `subagent-creator` - 创建新的专用 Agent
-
-**Skill（技能）**
-Skill 是预定义的专业能力模块。
-
-常用技能：
-- `coding-agent` - 委托编码任务
-- `weather` - 获取天气信息
-- `tmux` - 远程控制 tmux 会话
-- `skill-creator` - 创建自定义技能
-
-技能位置：
-- 系统技能: `/opt/homebrew/lib/node_modules/openclaw/skills/`
-- 自定义技能: `~/.openclaw/skills/`
-
-## 子会话详解
-
-子会话用于异步执行任务，有两种模式：
-- **run 模式** - 一次性任务，执行完自动结束
-- **session 模式** - 持久会话，可多次交互
-
-**创建子会话**
-在对话中直接说：
-```
-"创建一个子会话来分析这个日志"
-"用子会话帮我处理这个数据"
-"创建持久子会话来监控服务器状态"
-```
-
-**管理子会话**
-```
-"列出所有子会话"
-"向子会话 xxx 发送消息：..."
-"终止子会话 xxx"
-```
-
-**重要特性**
-- ✅ 异步执行，不阻塞主会话
-- ✅ 任务完成自动通知
-- ✅ 独立上下文和历史
-- ❌ 不支持交互式"进入"（子会话是后台任务，不是交互式终端）
-
-**使用场景**
-```
-# 并行处理
-"创建 3 个子会话分别分析这 3 个日志文件"
-
-# 代码审查
-"用 coding-agent 子会话审查这个 PR"
-
-# 长期监控
-"创建持久子会话来监控服务器，每小时报告一次"
 ```
 
 ## 目录结构
@@ -203,83 +231,6 @@ Skill 是预定义的专业能力模块。
 ├── canvas/                # Canvas 界面资源
 ├── delivery-queue/        # 消息投递队列
 └── exec-approvals.json    # 命令执行审批记录
-```
-
-## 模型配置
-
-**方法一：交互式配置（推荐）**
-```bash
-openclaw configure
-```
-选择 `Model` → `Custom Provider`，然后填写：
-1. API Base URL（如 `https://api.anthropic.com/v1`）
-2. API Key
-3. 类型（OpenAI / Anthropic / Other）
-4. Model ID（如 `claude-sonnet-4-5-20250929`）
-
-**方法二：手动编辑**
-编辑 `~/.openclaw/openclaw.json`：
-```json
-{
-  "models": {
-    "providers": {
-      "my-provider": {
-        "type": "anthropic",
-        "baseURL": "https://api.anthropic.com/v1",
-        "apiKey": "sk-ant-xxxxx",
-        "models": {
-          "claude-sonnet-4-5-20250929": {
-            "id": "claude-sonnet-4-5-20250929",
-            "contextWindow": 200000,
-            "maxTokens": 8192
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-⚠️ **重要**: OpenClaw 对未知模型默认限制为 4096 tokens，需手动修改 `contextWindow`。
-
-**本地模型（Ollama）**
-```bash
-ollama serve
-openclaw configure
-# Base URL: http://localhost:11434/v1
-# Model ID: llama2
-```
-
-## Telegram 配置
-
-1. 找 [@BotFather](https://t.me/BotFather) 创建机器人
-2. 发送 `/newbot` 并按提示操作
-3. 获取 Bot Token
-4. 运行 `openclaw configure` → `Channels` → `Telegram`
-5. 输入 Token
-6. 在 Telegram 中搜索你的机器人并发送 `/start`
-
-**首次配对**
-第一次发送消息会收到配对请求，在终端运行：
-```bash
-openclaw pairing approve telegram <配对码>
-```
-
-**配对管理**
-```bash
-openclaw pairing list                    # 查看所有配对请求
-openclaw pairing approve telegram <码>   # 批准
-openclaw pairing reject telegram <码>    # 拒绝
-```
-
-## 网关使用
-
-网关提供 Web 界面访问：
-```bash
-openclaw gateway start     # 启动
-openclaw gateway status    # 查看状态
-openclaw gateway stop      # 停止
-openclaw gateway restart   # 重启
 ```
 
 首次启动会提示配置端口、密码、HTTPS。默认访问地址：`http://localhost:3000`
