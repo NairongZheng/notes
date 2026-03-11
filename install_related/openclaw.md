@@ -6,21 +6,23 @@
   - [模型配置](#模型配置)
   - [channels 配置](#channels-配置)
 - [使用](#使用)
-  - [会话管理](#会话管理)
   - [agent 管理](#agent-管理)
+  - [skill 管理](#skill-管理)
 - [基本命令](#基本命令)
 - [目录结构](#目录结构)
 - [记忆系统](#记忆系统)
 - [常见问题](#常见问题)
 - [进阶技巧](#进阶技巧)
 - [资源链接](#资源链接)
+- [附录](#附录)
+  - [skills](#skills)
 
 
 > 开源的个人 AI 助手平台，运行在你自己的设备上
 > 
 > 官网: https://openclaw.ai/
 > 
-> 中文文档: https://openclawcn.cn/docs.html
+> 文档: https://docs.openclaw.ai/zh-CN
 > 
 > 社区: https://discord.com/invite/clawd
 
@@ -122,7 +124,7 @@ openclaw tui
 # 第一次对话会询问你是否需要给他人设等，可以花点时间设置好
 ```
 
-### 会话管理
+<!-- ### 会话管理
 
 子会话用于异步执行任务，有两种模式：
 - **run 模式** - 一次性任务，执行完自动结束
@@ -148,20 +150,125 @@ openclaw tui
 **重要特性**
 - 异步执行，不阻塞主会话
 - 任务完成自动通知
-- 独立上下文和历史
+- 独立上下文和历史 -->
 
 ### agent 管理
 
 **创建 agent**
 
-跟创建会话一样
+```shell
+openclaw agents add
+```
 
-**切换 agent**
+- 需要配置，比较繁琐
+- 可以用 skill 的方式让 openclaw 自己直接复制创建
+
+**查看所有 agents**
+
+```shell
+openclaw agents
+```
+
+**在 tui 中切换 agent**
 
 ```shell
 /agent
 /agents
 ```
+
+**删除 agent**
+
+```shell
+openclaw agents delete <agent_id>
+```
+
+### skill 管理
+
+OpenClaw 有三种 skill 位置：
+
+**1. Built-in Skills（内置）**
+```
+~/.nvm/versions/node/<version>/lib/node_modules/openclaw/skills/
+```
+- 官方提供的 50+ 个内置 skills
+- 随 OpenClaw 安装自动提供
+- 例如：coding-agent, healthcheck, session-logs, skill-creator, tmux, weather 等
+
+**2. Workspace Skills（工作区）**
+```
+~/.openclaw/workspace/skills/
+```
+- 用户自定义的 skills（推荐位置）
+- 例如：create-agent, cluster-analyzer, memsense 等
+
+**3. Extra Skills（扩展）**
+```
+~/.nvm/versions/node/<version>/lib/node_modules/openclaw/extensions/*/skills/
+```
+- 通过扩展包安装的 skills
+- 例如：feishu/skills/ - 飞书集成相关 skills
+
+**Skill 目录结构**
+
+每个 skill 是一个独立的文件夹，基本结构：
+
+```
+skill-name/
+├── SKILL.md           # 必需：skill 定义和使用说明
+└── references/        # 可选：参考文档、示例等
+    └── *.md
+```
+
+**SKILL 格式**
+
+SKILL 文件包含两部分：
+
+1. **Front Matter（YAML 头部）**
+```yaml
+---
+name: skill-name                    # skill 名称
+description: |                      # 描述（何时使用、功能说明）
+  详细描述内容...
+metadata:                           # 可选：元数据
+  {
+    "openclaw": {
+      "emoji": "🧩",               # 显示图标
+      "requires": {                 # 依赖要求
+        "anyBins": ["command1"]     # 需要的命令行工具
+      }
+    }
+  }
+---
+```
+
+2. **Markdown 正文**
+   - 详细的使用说明
+   - 示例代码
+   - 配置说明
+   - 注意事项等
+
+**示例：最小 skill**
+
+```markdown
+---
+name: my-skill
+description: 'Simple skill description'
+---
+
+# My Skill
+
+Usage instructions here...
+```
+
+**注意事项**
+- Workspace skills 是推荐的自定义 skill 存放位置
+- SKILL.md 的 front matter 必须正确（YAML 格式）
+- `name` 字段应与文件夹名称一致
+- 如果 TUI 中看不到自定义 skill，检查：
+  1. SKILL.md 格式是否正确（特别是 YAML front matter）
+  2. 是否需要重启 OpenClaw
+  3. skill 目录结构是否完整
+- 例子可见：[附录 skills](#skills)
 
 
 ## 基本命令
@@ -198,6 +305,7 @@ Ctrl+C       # 退出
 │   ├── TOOLS.md          # 本地工具配置
 │   ├── BOOTSTRAP.md      # 首次运行引导（自动删除）
 │   ├── WORKFLOW_AUTO.md  # 自动化工作流配置
+│   ├── skills/           # 用户自定义 skills（推荐位置）
 │   └── memory/
 │       ├── YYYY-MM-DD.md         # 每日记录
 │       ├── heartbeat-state.json  # 心跳状态
@@ -232,8 +340,6 @@ Ctrl+C       # 退出
 ├── delivery-queue/        # 消息投递队列
 └── exec-approvals.json    # 命令执行审批记录
 ```
-
-首次启动会提示配置端口、密码、HTTPS。默认访问地址：`http://localhost:3000`
 
 ## 记忆系统
 
@@ -320,6 +426,70 @@ cat ~/.openclaw/workspace/memory/$(date +%Y-%m-%d).md
 - 技能市场: https://clawhub.com
 - 本地文档: `/opt/homebrew/lib/node_modules/openclaw/docs`
 
+## 附录
+
+### skills
+
+<details>
+<summary>create-agent</summary>
+
+````shell
+---
+name: create-agent
+description: "创建新的 OpenClaw agent 会话。自动复制目录结构、配置文件，并注册到 openclaw.json。"
+metadata: { "openclaw": { "emoji": "🤖" } }
 ---
 
-最后更新: 2026-03-05
+# Create Agent Skill
+
+创建新的 OpenClaw agent 会话的自动化流程。
+
+## 使用场景
+
+当用户需要创建一个新的 agent 会话时，自动完成以下操作：
+1. 复制现有 agent 目录结构
+2. 复制必要的配置文件
+3. 在 openclaw.json 中注册新 agent
+
+## 操作步骤
+
+### 1. 创建 agent 目录
+
+```bash
+cp -r ~/.openclaw/agents/main ~/.openclaw/agents/<new-agent-id>
+```
+
+### 2. 复制配置文件
+
+```bash
+cp ~/.openclaw/agents/main/agent/models.json ~/.openclaw/agents/<new-agent-id>/agent/models.json
+cp ~/.openclaw/agents/main/agent/auth-profiles.json ~/.openclaw/agents/<new-agent-id>/agent/auth-profiles.json
+```
+
+### 3. 注册到配置文件
+
+编辑 `~/.openclaw/openclaw.json`，在 `agents.list` 数组中添加：
+
+```json
+{
+  "id": "<new-agent-id>",
+  "name": "<Agent Display Name>",
+  "workspace": "/mnt/afs_toolcall/jarvis/.openclaw/workspace",
+  "agentDir": "/mnt/afs_toolcall/jarvis/.openclaw/agents/<new-agent-id>/agent"
+}
+```
+
+### 4. 验证
+
+```bash
+openclaw agents list
+```
+
+## 注意事项
+
+- agent-id 使用小写字母和连字符
+- 确保 agent 目录权限正确
+- 配置文件必须是有效的 JSON 格式
+````
+
+</details>

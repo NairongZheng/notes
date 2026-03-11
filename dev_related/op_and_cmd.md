@@ -110,7 +110,7 @@ cpan App::clocpm
 2. 安装tree（直接下载编译好的，缺点是没办法更新，但是也无所谓
 
 ```shell
-mkdir -p ~/.local/bin
+mkdir -p ~/.local/{bin,lib,include,src}
 wget https://mirrors.edge.kernel.org/ubuntu/pool/universe/t/tree/tree_2.0.2-1_amd64.deb
 dpkg-deb -x tree_2.0.2-1_amd64.deb tmp
 mv tmp/usr/bin/tree ~/.local/bin/
