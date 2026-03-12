@@ -8,6 +8,7 @@
 - [使用](#使用)
   - [agent 管理](#agent-管理)
   - [skill 管理](#skill-管理)
+  - [plugins 管理](#plugins-管理)
 - [基本命令](#基本命令)
 - [目录结构](#目录结构)
 - [记忆系统](#记忆系统)
@@ -16,6 +17,7 @@
 - [资源链接](#资源链接)
 - [附录](#附录)
   - [skills](#skills)
+  - [plugins](#plugins)
 
 
 > 开源的个人 AI 助手平台，运行在你自己的设备上
@@ -184,15 +186,36 @@ openclaw agents delete <agent_id>
 
 ### skill 管理
 
+**查看 skills**
+
+```shell
+# 查看所有 skills
+openclaw skills list
+# 查看某个 skill
+openclaw skills info <skill_name>
+```
+
 OpenClaw 有三种 skill 位置：
 
 **1. Built-in Skills（内置）**
-```
+```shell
+# linux node
 ~/.nvm/versions/node/<version>/lib/node_modules/openclaw/skills/
+# macos homebrew
+/opt/homebrew/lib/node_modules/openclaw/skills/
 ```
 - 官方提供的 50+ 个内置 skills
 - 随 OpenClaw 安装自动提供
 - 例如：coding-agent, healthcheck, session-logs, skill-creator, tmux, weather 等
+
+安装 build-in skills
+
+```shell
+# build-in skills: 已经都安装好了，只是有些依赖需要设置
+# 比如 web 上的 video-frames 有一个提示“Missing: bin:ffmpeg”，安装即可
+brew install ffmpeg
+# 然后需要重启一下 openclaw gateway restart
+```
 
 **2. Workspace Skills（工作区）**
 ```
@@ -201,12 +224,24 @@ OpenClaw 有三种 skill 位置：
 - 用户自定义的 skills（推荐位置）
 - 例如：create-agent, cluster-analyzer, memsense 等
 
-**3. Extra Skills（扩展）**
+安装 workspace skills
+
+```shell
+# 可以直接跟 openclaw 交互完之后让它直接生成
+# 也可以直接自己编辑好文件放到 ~/.openclaw/workspace/skills/xxx
+# 具体格式可参考下文
 ```
+
+**3. Extra Skills（扩展）**
+```shell
+# linux node
 ~/.nvm/versions/node/<version>/lib/node_modules/openclaw/extensions/*/skills/
+# macos homebrew
+/opt/homebrew/lib/node_modules/openclaw/extensions/*/skills
 ```
 - 通过扩展包安装的 skills
 - 例如：feishu/skills/ - 飞书集成相关 skills
+- 一般都不需要自己安装，**这些本质是 plugins 里面自带的 skills**
 
 **Skill 目录结构**
 
@@ -270,6 +305,247 @@ Usage instructions here...
   3. skill 目录结构是否完整
 - 例子可见：[附录 skills](#skills)
 
+### plugins 管理
+
+> 其实就是 tools
+
+**查看 plugins**
+
+```shell
+# 查看所有插件
+openclaw plugins list
+# 查看某个插件详情
+openclaw plugins info <plugin-id>
+# 诊断插件问题
+openclaw plugins doctor
+```
+
+OpenClaw 有两种 plugin 位置：
+
+**1. Stock Plugins（官方内置）**
+```shell
+# linux node
+~/.nvm/versions/node/<version>/lib/node_modules/openclaw/extensions/
+# macos homebrew
+/opt/homebrew/lib/node_modules/openclaw/extensions/
+```
+- 官方提供的扩展插件
+- 随 OpenClaw 安装自动提供
+- 例如：feishu（飞书集成）、open-prose（OpenProse VM）等
+
+**2. Global Plugins（用户安装）**
+```
+~/.openclaw/extensions/
+```
+- 用户自己开发或从外部安装的插件
+- 通过 `openclaw plugins install` 安装
+- **OpenClaw 从这里加载插件**
+
+**Plugin 和 Skill 的区别**
+
+| 特性 | Plugin | Skill |
+|------|--------|-------|
+| **定义** | 代码模块，扩展系统功能 | Markdown 文档，定义 AI 行为 |
+| **语言** | TypeScript/JavaScript | Markdown + YAML |
+| **能力** | 注册工具、命令、服务、HTTP 接口 | 指导 AI 何时/如何使用工具 |
+| **加载** | 在 Gateway 启动时加载 | 在 AI 推理时读取 |
+| **权限** | 在 Gateway 进程中运行（可信代码） | 只影响 AI 行为，无代码执行 |
+
+**安装插件**
+
+```shell
+# 从本地目录安装
+openclaw plugins install /path/to/plugin
+
+# 从 npm 包安装
+openclaw plugins install package-name
+
+# 从 Git 仓库安装
+openclaw plugins install git+https://github.com/xxx/xxx.git
+```
+
+**管理插件**
+
+```shell
+# 卸载插件
+openclaw plugins uninstall <plugin-id>
+
+# 启用/禁用插件（通过配置文件）
+# 编辑 ~/.openclaw/openclaw.json
+{
+  "plugins": {
+    "entries": {
+      "plugin-id": {
+        "enabled": false  # 禁用插件
+      }
+    }
+  }
+}
+
+# 重启 Gateway 使配置生效
+openclaw gateway restart
+```
+
+**Plugin 目录结构**
+
+每个 plugin 是一个 npm 包，基本结构：
+
+```
+simple-plugin/
+├── package.json              # npm 包信息（必需）
+├── openclaw.plugin.json      # 插件元数据（必需）
+└── index.ts                  # 插件代码（主入口）
+```
+
+**说明**：
+- `package.json` - 定义 npm 包信息和 `openclaw.extensions` 入口
+- `openclaw.plugin.json` - 定义插件 ID、名称、版本、配置 schema
+- `index.ts` - 导出 `register(api)` 函数，注册工具、命令等
+
+**📁 插件开发工作流**
+
+```
+1. 开发目录（编辑代码）
+   ~/.openclaw/workspace/your-plugin/
+   ├── package.json
+   ├── openclaw.plugin.json
+   └── index.ts
+
+2. 安装命令（复制文件）
+   openclaw plugins install ~/.openclaw/workspace/your-plugin
+
+3. 安装目录（OpenClaw 加载）
+   ~/.openclaw/extensions/your-plugin/
+   ├── package.json
+   ├── openclaw.plugin.json
+   └── index.ts
+```
+
+**注意**：
+- 开发时在 `~/.openclaw/workspace/` 编辑代码
+- 安装后文件被复制到 `~/.openclaw/extensions/`
+- OpenClaw 从 `~/.openclaw/extensions/` 加载插件
+- 修改代码后需要重新安装（或直接修改 extensions 目录下的文件）
+
+**最小 Plugin 示例（已验证可用）**
+
+可见[附录 plugins](#plugins)
+
+**安装和测试**
+
+```shell
+# 1. 在开发目录创建插件
+mkdir -p ~/.openclaw/workspace/simple-plugin
+cd ~/.openclaw/workspace/simple-plugin
+# 创建三个文件：package.json, openclaw.plugin.json, index.ts
+
+# 2. 安装插件（复制到 extensions 目录）
+openclaw plugins install ~/.openclaw/workspace/simple-plugin
+# 文件会被复制到: ~/.openclaw/extensions/simple-plugin/
+
+# 3. 检查安装状态（应显示 loaded）
+openclaw plugins list | grep simple
+# 输出示例：
+# │ Simple Plugin │ simple-plugin │ loaded │ global:simple-plugin/index.ts │ 1.0.0 │
+
+# 4. 验证文件位置
+ls -la ~/.openclaw/extensions/simple-plugin/
+# 应该看到三个文件
+
+# 5. 重启 Gateway（让插件生效）
+openclaw gateway restart
+
+# 6. 在对话中测试
+# "请使用 echo_message 工具，发送一条测试消息"
+# 应返回：📢 收到消息：测试消息
+```
+
+**开发迭代流程**
+
+方法1：修改源码后重新安装
+```shell
+# 1. 修改开发目录的代码
+vim ~/.openclaw/workspace/simple-plugin/index.ts
+
+# 2. 重新安装（覆盖旧版本）
+openclaw plugins install ~/.openclaw/workspace/simple-plugin
+
+# 3. 重启 Gateway
+openclaw gateway restart
+```
+
+方法2：直接修改已安装的插件
+```shell
+# 1. 直接编辑安装目录的文件
+vim ~/.openclaw/extensions/simple-plugin/index.ts
+
+# 2. 重启 Gateway
+openclaw gateway restart
+
+# 注意：这种方法修改不会同步回开发目录
+```
+
+**验证插件是否可用**
+
+```shell
+# 方法1: 检查插件状态
+openclaw plugins list | grep <plugin-name>
+# 期望输出：插件状态显示 "loaded"
+# 示例：│ Simple Plugin │ simple-plugin │ loaded │ global:simple-plugin/index.ts │ 1.0.0 │
+
+# 方法2: 查看插件详细信息
+openclaw plugins info <plugin-id>
+# 期望输出：显示版本、描述、配置等详细信息
+
+# 方法3: 检查加载日志
+openclaw gateway logs | grep -i "<plugin-name>" | tail -10
+# 期望输出：看到 "✅ Plugin loaded" 和工具注册成功的消息
+
+# 方法4: 测试工具功能（最重要）
+# 在对话中让 AI 调用插件提供的工具
+# 示例：对于 simple-plugin，可以说：
+#   "请使用 echo_message 工具，发送一条测试消息"
+# 期望返回：📢 收到消息：测试消息
+
+# 方法5: 检查文件位置
+ls -la ~/.openclaw/extensions/<plugin-name>/
+# 期望输出：看到 package.json, openclaw.plugin.json, index.ts 等文件
+```
+
+**完整验证清单**
+
+| 验证项 | 命令 | 期望结果 |
+|--------|------|---------|
+| 插件状态 | `openclaw plugins list \| grep <name>` | 状态为 `loaded` |
+| 插件详情 | `openclaw plugins info <id>` | 显示正确的版本和描述 |
+| 加载日志 | `openclaw gateway logs \| grep <name>` | 看到成功加载的消息 |
+| 文件存在 | `ls ~/.openclaw/extensions/<name>/` | 包含所需的三个文件 |
+| 功能测试 | 在对话中调用工具 | 工具正常执行并返回结果 |
+
+**⚠️ 关键点（避免错误）**
+
+✅ **正确的 API**：
+- 使用 `parameters` 而不是 `inputSchema`
+- 使用 `async execute(_id, params)` 而不是 `handler`
+- 返回格式：`{ content: [{ type: "text", text: "..." }] }`
+- `configSchema` 必须存在（至少是空对象）
+
+❌ **错误写法会导致系统崩溃**：
+```typescript
+// ❌ 不要这样写！会导致 "Cannot read properties of undefined" 错误
+api.registerTool({
+  inputSchema: { ... },  // 错误
+  handler: async () => { ... }  // 错误
+})
+```
+
+**注意事项**
+- 修改插件代码后必须重启 Gateway
+- 插件在 Gateway 进程中运行，视为可信代码
+- 工具命名使用下划线（`echo_message`），不要用驼峰命名
+- 错误的插件会导致整个 AI 系统无法响应
+- 插件状态显示 `error` 时，用 `openclaw gateway logs` 查看错误
+
 
 ## 基本命令
 
@@ -295,7 +571,8 @@ Ctrl+C       # 退出
 ~/.openclaw/
 ├── openclaw.json          # 主配置文件
 ├── openclaw.json.bak*     # 配置文件备份（自动生成）
-├── workspace/             # AI 工作区
+├── workspace-*/           # 其他 agent 工作区
+├── workspace/             # main agent 工作区
 │   ├── SOUL.md           # AI 的性格、行为准则
 │   ├── IDENTITY.md       # AI 的名字、emoji
 │   ├── USER.md           # 你的信息、偏好
@@ -303,15 +580,20 @@ Ctrl+C       # 退出
 │   ├── MEMORY.md         # 长期记忆（仅主会话加载）
 │   ├── HEARTBEAT.md      # 定期检查任务
 │   ├── TOOLS.md          # 本地工具配置
-│   ├── BOOTSTRAP.md      # 首次运行引导（自动删除）
+│   ├── BOOTSTRAP.md      # 首次运行引导
 │   ├── WORKFLOW_AUTO.md  # 自动化工作流配置
 │   ├── skills/           # 用户自定义 skills（推荐位置）
+│   │   └── hello-skill/   # 示例 skill
+│   ├── simple-plugin/     # 示例插件开发目录
 │   └── memory/
 │       ├── YYYY-MM-DD.md         # 每日记录
 │       ├── heartbeat-state.json  # 心跳状态
 │       └── main.sqlite           # 记忆数据库
+├── extensions/            # 用户安装的插件（Global Plugins）
+│   └── simple-plugin/     # 已安装的插件
 ├── agents/                # Agent 实例数据
-│   └── main/             # 主 Agent 数据
+├── ├── main/              # 主 Agent 数据
+│   └── xxx/               # xxx Agent 数据
 ├── credentials/           # 凭证和配对信息
 │   ├── telegram-pairing.json
 │   └── telegram-default-allowFrom.json
@@ -491,5 +773,86 @@ openclaw agents list
 - 确保 agent 目录权限正确
 - 配置文件必须是有效的 JSON 格式
 ````
+
+图跟上面的不匹配，示例而已：
+
+![openclaw_skills](../images/2026/20260313_openclaw_skills.png)
+
+</details>
+
+### plugins
+
+<details>
+<summary>simple-plugin</summary>
+
+`package.json`:
+```json
+{
+  "name": "simple-plugin",
+  "version": "1.0.0",
+  "description": "最简单的 OpenClaw 插件示例",
+  "openclaw": {
+    "extensions": ["./index.ts"]
+  }
+}
+```
+
+`openclaw.plugin.json`:
+```json
+{
+  "id": "simple-plugin",
+  "name": "Simple Plugin",
+  "version": "1.0.0",
+  "description": "最简单的插件示例 - 提供一个回显工具",
+  "configSchema": {
+    "type": "object",
+    "properties": {}
+  }
+}
+```
+
+`index.ts`:
+```typescript
+/**
+ * 最简单的 OpenClaw 插件示例
+ * 按照官方文档规范编写
+ */
+
+export default function register(api) {
+  console.log('✅ Simple Plugin 已加载！');
+
+  // 工具：回显输入内容
+  api.registerTool({
+    name: "echo_message",
+    description: "回显用户输入的消息，用于测试插件功能",
+    parameters: {
+      type: "object",
+      properties: {
+        message: {
+          type: "string",
+          description: "要回显的消息内容"
+        }
+      },
+      required: ["message"]
+    },
+    async execute(_id, params) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `📢 收到消息：${params.message}`
+          }
+        ]
+      };
+    }
+  });
+
+  console.log('✨ Simple Plugin 工具已注册：echo_message');
+}
+```
+
+同理，可以在 agent 的 tools 里面看到这个 plugin
+
+![openclaw_plugins](../images/2026/20260313_openclaw_plugins.png)
 
 </details>
