@@ -4,6 +4,7 @@
 - [cURL](#curl)
 - [wscat](#wscat)
 - [nc (netcat)](#nc-netcat)
+- [gdu](#gdu)
 
 # shell 登陆介绍
 
@@ -518,4 +519,34 @@ nc ${server_ip} ${port}
     # <hr>
     # </body>
     # </html>
+```
+
+# gdu
+
+**安装**
+
+```shell
+# linux 下安装
+mkdir -p ~/.local/{bin,lib,include,src}
+cd ~/.local/src
+curl -L https://github.com/dundee/gdu/releases/latest/download/gdu_linux_amd64.tgz | tar xz
+chmod +x gdu_linux_amd64
+mv gdu_linux_amd64 ~/.local/bin/gdu
+# macos 下安装
+brew install gdu
+```
+
+**使用**
+
+```shell
+# linux 使用 `gdu` 命令
+# macos 使用 `gdu-go` 命令（因为与别的命令冲突了）
+# 下面用 `gdu` 举例说明
+gdu -H -i <ignore_dir>
+    # -H: --no-hidden & --no-prefix
+    # -i: --ignore-dirs
+# 在里面还可以使用以下按键传递命令：
+    # d: 删除文件夹
+    # r: 重新扫描
+    # q: 退出
 ```
