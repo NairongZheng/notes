@@ -9,6 +9,7 @@
   - [git lfs](#git-lfs)
   - [其他](#其他)
     - [commit规范](#commit规范)
+    - [gitignore 参考](#gitignore-参考)
     - [回退](#回退)
     - [merge和rebase](#merge和rebase)
     - [clone部分仓库](#clone部分仓库)
@@ -530,6 +531,10 @@ git commit -m "feat: add new feature" \
 4. 格式必须严格遵守：`Co-authored-by: Name <email@example.com>`
    1. 也可以使用 github 提供的隐私邮箱格式：`Co-authored-by: username <username@users.noreply.github.com>`
 
+
+### gitignore 参考
+
+官方 gitignore 推荐：[https://github.com/github/gitignore](https://github.com/github/gitignore)
 
 ### 回退
 

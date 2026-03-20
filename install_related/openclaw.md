@@ -152,11 +152,10 @@ openclaw tui
 **创建 agent**
 
 ```shell
-openclaw agents add
+# 可以使用命令创建
+openclaw agents add <agent_id> --non-interactive --workspace <workspace_dir> --json
+# 也可以使用 skill 让他自己创建
 ```
-
-- 需要配置，比较繁琐
-- 可以用 skill 的方式让 openclaw 自己直接复制创建
 
 **查看所有 agents**
 
