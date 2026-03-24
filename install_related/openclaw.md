@@ -66,12 +66,27 @@ openclaw onboard --install-daemon
 
 ```shell
 openclaw gateway --port 18789 --verbose
-# 一些网关命令
+
+# 一些网关命令（系统 systemctl）
 openclaw gateway install   # 安装为系统服务
 openclaw gateway start     # 启动
 openclaw gateway status    # 查看状态
 openclaw gateway stop      # 停止
 openclaw gateway restart   # 重启
+
+# 如果没有系统权限，没办法 install，就直接：
+nohup openclaw gateway run > ~/.openclaw-gateway.log 2>&1 &
+```
+
+启动的时候如果是在容器中，可能会有名字超长的报错。只是本地使用的话可以在设置中添加：
+
+```shell
+# ~/.openclaw/openclaw.json
+"discovery": {
+    "mdns": {
+        "mode": "off"
+    }
+}
 ```
 
 ### 模型配置

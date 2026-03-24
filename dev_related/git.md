@@ -1,21 +1,20 @@
-- [git命令](#git命令)
-  - [配置相关](#配置相关)
-    - [换行符说明与配置](#换行符说明与配置)
-  - [仓库相关](#仓库相关)
-  - [分支相关](#分支相关)
-  - [标签相关](#标签相关)
-  - [子模块相关](#子模块相关)
-  - [git worktree](#git-worktree)
-  - [git lfs](#git-lfs)
-  - [其他](#其他)
-    - [commit规范](#commit规范)
-    - [gitignore 参考](#gitignore-参考)
-    - [回退](#回退)
-    - [merge和rebase](#merge和rebase)
-    - [clone部分仓库](#clone部分仓库)
-    - [git-filter-repo](#git-filter-repo)
-
-# git命令
+- [配置相关](#配置相关)
+  - [换行符说明与配置](#换行符说明与配置)
+- [仓库相关](#仓库相关)
+- [分支相关](#分支相关)
+- [标签相关](#标签相关)
+- [子模块相关](#子模块相关)
+- [git worktree](#git-worktree)
+- [git lfs](#git-lfs)
+- [其他](#其他)
+  - [commit规范](#commit规范)
+  - [gitignore 参考](#gitignore-参考)
+  - [gitattributes](#gitattributes)
+  - [回退](#回退)
+  - [merge和rebase](#merge和rebase)
+  - [pr 提交与 review](#pr-提交与-review)
+  - [clone部分仓库](#clone部分仓库)
+  - [git-filter-repo](#git-filter-repo)
 
 ## 配置相关
 
@@ -80,7 +79,7 @@ git config --global credential.helper manager        # Windows
 
 ### 换行符说明与配置
 
-最好是仓库中直接用`.gitattributes`文件来控制（该文件不止可以控制换行符，用处很广泛）
+团队项目优先使用 `.gitattributes`文件来控制（该文件不止可以控制换行符，用处很广泛，详见[其他 -> gitattributes](#gitattributes)）
 
 [参考链接1!!!](https://juejin.cn/post/6942320745494085669)
 
@@ -89,33 +88,6 @@ git config --global credential.helper manager        # Windows
 [官方示例](https://github.com/gitattributes/gitattributes)
 
 [huggingface示例](https://huggingface.co/datasets/damonzheng/AIR-MDSAR-Map/blob/main/.gitattributes)
-
-
-```bash
-* text=auto
-
-# 确保脚本文件（如 Shell、Python、Perl 等）使用 LF
-*.sh text eol=lf
-*.py text eol=lf diff=python
-*.cc text eol=lf
-*.pl text eol=lf
-
-# Git diff 语法高亮（也可以写在上面同一行，用空格分隔）
-*.py diff=python
-*.cc diff=cpp
-
-# Windows 执行文件不转换换行符
-*.bat text eol=crlf
-*.cmd text eol=crlf
-
-# 二进制文件保持原样，不转换换行符
-*.jpg binary
-*.png binary
-*.zip binary
-*.exe binary
-*.dll binary
-```
-
 
 或者设置`core.autocrlf`：
 1. 在`Linux/macOS`上：`git config [--global || --local] core.autocrlf input`
@@ -220,7 +192,7 @@ git checkout -b <new_branch_name> <base_branch_or_tag_version>
 详细流程可以查看[rebase和merge应用示例](#rebase和merge应用示例)
 
 ```shell
-git merge [--no-commit] <branch_name>
+git merge [--no-commit] [--no-ff] <branch_name>
 # 这里merge的时候，需要选择好分支，使用前面配置的`git-log`是一目了然的。
 # 是合并更新下来的`origin/branch_name`（远端的）还是`branch_name`（本地的）。
 # 如果多人开发的话，大概率远端跟本地是不同步的，且很有可能是有冲突的。具体怎么做还是看开发需求。
@@ -536,6 +508,51 @@ git commit -m "feat: add new feature" \
 
 官方 gitignore 推荐：[https://github.com/github/gitignore](https://github.com/github/gitignore)
 
+### gitattributes
+
+`.gitattributes` 是按路径配置 Git 行为的文件，最常用就是：换行符、diff、GitHub 统计。
+
+**1. 换行符**
+
+1. `text=auto`：自动识别文本并统一入库换行。
+2. `eol=lf` / `eol=crlf`：控制检出到本地时的换行。
+3. `binary` 或 `-text`：二进制文件禁用文本归一化。
+
+如果是老仓库，新增规则后建议：
+
+```bash
+git add --renormalize .
+git commit -m "chore: normalize line endings with .gitattributes"
+```
+
+**2. diff 相关**
+
+1. `diff=<name>`：指定 diff 驱动（如 `python`、`cpp`）。
+2. `-diff`：不显示文本 diff（适合二进制/中间产物）。
+
+**3. GitHub `linguist-generated`（没试过）**
+
+```shell
+# 标记为“生成文件”
+**/dist/**                 linguist-generated=true
+**/*.min.js                linguist-generated=true
+docs/api/generated/**      linguist-generated=true
+```
+
+**作用**：
+
+1. 在 GitHub PR 的 `Files changed` 里通常默认折叠生成文件。
+2. 减少语言统计被构建产物干扰。
+
+补充：也可用 `linguist-vendored=true` 标记第三方依赖代码（如 `vendor/**`）。
+
+**4. 常用命令**
+
+```bash
+# 看某文件最终命中的属性
+git check-attr -a -- /path/to/file
+```
+
 ### 回退
 
 1. 放弃本地未提交的修改：
@@ -559,6 +576,54 @@ git commit -m "feat: add new feature" \
 ### merge和rebase
 
 查看[git_usage](../install_related/git_usage.md)
+
+### pr 提交与 review
+
+下面以 feat 分支到 main 分支为例
+
+**1. 开发并推送远程**
+
+```shell
+# 1. 检出分支
+git checkout -b feat origin/main
+# 2. 开发后进行提交
+git add .
+git commit -m "<commit_message>"
+# 3. 推送远程
+git push --set-upstream origin feat
+```
+
+**2. 提交pr**
+
+```shell
+1. 在 github 点击 `Compare & pull request`，或者 `New pull request`
+2. 选择 `base: main` 和 `compare: feat` 并点击 `Create pull request`
+3. 填写 `title` 跟 `description`，就是 commit 的那种格式，然后点击 `Create pull request`
+```
+
+**3. review 提出进一步修改建议（若有）**
+
+```shell
+在 conversation 里面可以 comment
+```
+
+**4. 修改后再提交（若需）**
+
+```shell
+1. 修改后再进行提交（跟最开始的开发并推送远程一样的流程）
+2. 提完后会在原来的 pr **自动更新**，无需重新创建
+```
+
+**5. 合并 pr**
+
+```shell
+通过后进行 pr 合并有三种可选项：
+1. Create a merge commit: 保留所有历史 commit（hash 不变），并额外生成一个 merge commit（跟平常自己用命令 merge 一样）
+2. Squash and merge: 将所有 commit 压缩成一个新的 commit
+3. Rebase and merge: rebase 所有 commit（hash 变了）
+
+所有的方式的 commit 内容都可以重新改一下，一样写 title 跟 description
+```
 
 **git diff**
 
