@@ -5,6 +5,7 @@
 - [wscat](#wscat)
 - [nc (netcat)](#nc-netcat)
 - [gdu](#gdu)
+- [socat](#socat)
 
 # shell 登陆介绍
 
@@ -550,3 +551,54 @@ gdu -H -i <ignore_dir>
     # r: 重新扫描
     # q: 退出
 ```
+
+# socat
+
+**基本命令**
+
+```shell
+socat [全局选项] 地址1,地址选项 地址2,地址选项
+```
+
+本质就是：`数据流 A  <====>  数据流 B`
+
+全局选项跟地址选项有很多，下面只给出一点示例：
+
+**地址解释**
+
+| 类型        | 示例              |
+| ----------- | ----------------- |
+| TCP         | TCP:host:port     |
+| 监听        | TCP-LISTEN:port   |
+| UDP         | UDP:host:port     |
+| 文件        | FILE:path         |
+| 标准输入    | STDIN             |
+| 标准输出    | STDOUT            |
+| Unix socket | UNIX-CONNECT:path |
+| 执行程序    | EXEC:/bin/bash    |
+
+**地址选项解释**
+
+```shell
+reuseaddr: 允许端口快速复用，避免 Address already in use
+fork: 每个连接派生一个子进程处理，实现多客户端并发
+```
+
+**几个例子**
+
+```shell
+# 1. 端口转发
+socat TCP-LISTEN:8080,reuseaddr,fork TCP:example.com:80   # 访问本地 8080，实际访问的是 example.com:80
+
+# 2. 监听端口
+socat TCP-LISTEN:1234 STDOUT
+
+# 3. 简单通信（两个终端）
+socat TCP-LISTEN:1234 STDOUT    # 服务端监听1234端口
+socat STDIN TCP:127.0.0.1:1234  # 客户端往1234端口发消息
+
+# 4. 双向通信（两个终端）
+socat TCP-LISTEN:1234,reuseaddr,fork STDIO  # 终端1
+socat STDIO TCP:127.0.0.1:1234  # 终端2
+```
+

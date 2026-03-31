@@ -66,6 +66,7 @@ apt install -y git                  # git
 apt install -y ssh                  # ssh，客户端
 apt install -y openssh-server       # sshd，服务端
 apt install -y screen               # screen
+apt install -y tmux                 # tmux
 apt install -y htop                 # htop
 apt install -y lsof                 # lsof
 apt install -y tree                 # tree

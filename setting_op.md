@@ -93,6 +93,7 @@ set -g destroy-unattached off
 - 设置-鼠标：自然滚动
 - 设置-辅助功能-指针控制-触控板选项：使用触控板进行拖移-三指拖移
 - 访达-设置-边栏
+- `caffeinate -i`可以让 mac 保持不睡眠状态
 
 ## shell
 
