@@ -2,7 +2,7 @@
 - [调试配置](#调试配置)
   - [基础说明](#基础说明)
   - [go示例](#go示例)
-
+- [同步扩展到 cursor](#同步扩展到-cursor)
 
 # 调试配置
 
@@ -352,3 +352,10 @@ launch.json 例子：
 
 ![vscode调试](../images/2025/20250808_vscode调试.png)
 
+# 同步扩展到 cursor
+
+1. 在环境变量中安装code或者cursor命令：ctrl+shift+p，shell commond: install ....
+2. 导出vscode扩展：code --list-extensions > vscode-extensions.txt
+3. 在cursor下载vscode一样的扩展：
+   1. Linux/macos：cat vscode-extensions.txt | xargs -L 1 cursor --install-extension
+   2. windows的cmd：for /f "tokens=*" %i in (vscode-extensions.txt) do cursor --install-extension %i

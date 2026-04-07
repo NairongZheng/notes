@@ -23,8 +23,12 @@ conda remove -n <env_name> --all
 使用miniconda，可以到[清华大学镜像网站](https://mirrors.tuna.tsinghua.edu.cn/)找相应的 [miniconda](https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/) 版本
 
 ```shell
+# linux
 wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
-bash Miniconda3-py38_4.12.0-Linux-x86_64.sh -b -p ~/miniconda3
+# macos
+wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py312_24.9.2-0-MacOSX-arm64.sh
+# 安装
+bash <conda_installation>.sh -b -p ~/miniconda3
 ```
 
 **初始化 conda**

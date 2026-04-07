@@ -919,7 +919,7 @@
 
 ## 大模型相关
 
-[大模型微调](../LLM/大模型微调.md)
+[大模型微调](../LLM/fine_tuning.md)
 
 [RLHF](../RL/RLHF.md)
 

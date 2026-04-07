@@ -7,4 +7,3 @@ markdown数学公式和符号表：[参考链接1](https://zhuanlan.zhihu.com/p/
 2. dev_related：开发过程中的笔记
 3. install_related：安装或编译某些软件工具、某些工具的使用教程
 4. other：以前的一些笔记
-5. setting_op.md：一些设置跟操作

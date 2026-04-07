@@ -1,6 +1,7 @@
-- [linux操作相关](#linux操作相关)
+- [Linux](#linux)
   - [Linux目录结构](#linux目录结构)
-  - [安装与设置](#安装与设置)
+  - [安装](#安装)
+  - [shell 配置](#shell-配置)
   - [查看信息](#查看信息)
   - [文件操作](#文件操作)
   - [网络端口操作](#网络端口操作)
@@ -10,15 +11,20 @@
     - [组管理](#组管理)
     - [权限管理](#权限管理)
   - [其他操作或问题](#其他操作或问题)
-- [windows操作相关](#windows操作相关)
+- [MacOS](#macos)
+  - [设置](#设置)
+  - [安装](#安装-1)
+  - [iterm2](#iterm2)
+- [Windows](#windows)
   - [windows目录结构](#windows目录结构)
   - [查看信息](#查看信息-1)
   - [网络端口操作](#网络端口操作-1)
   - [其他操作](#其他操作)
-- [环境相关](#环境相关)
+  - [MobaXterm](#mobaxterm)
+- [APPs](#apps)
 
 
-# linux操作相关
+# Linux
 
 ## Linux目录结构
 
@@ -54,14 +60,15 @@
 │   └── cache/          # 应用程序缓存（如 /var/cache/apt）
 ```
 
-## 安装与设置
+## 安装
 
-**安装**
+**安装常用命令行工具**
 
-```bash
+```shell
 apt install -y curl                 # curl
 apt install -y wget                 # wget
 apt install -y vim                  # vim
+apt install -y less                 # less
 apt install -y git                  # git
 apt install -y ssh                  # ssh，客户端
 apt install -y openssh-server       # sshd，服务端
@@ -79,8 +86,11 @@ apt install -y net-tools            # ifconfig、netstat等
 apt install -y iproute2             # 网络工具如ip（iproute2已取代了net-tools）
 apt install -y socat                # 端口转发（docker容器可以临时用用挺好用）
 apt install -y cloc                 # 统计代码量的工具
+```
 
+**安装 nvm**
 
+```shell
 # 安装nvm (Node Version Manager)
 git clone https://github.com/nvm-sh/nvm.git ~/.nvm
 echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.bashrc
@@ -96,69 +106,7 @@ nvm alias default 18.18.2
     # npm -v: 查看npm版本
 ```
 
-**没有root权限安装包**
-
-1. 安装cloc
-
-```shell
-# 确认系统有 perl
-perl --version
-
-# 如果有 perl，就用 cpanm 安装
-cpan App::clocpm
-```
-
-2. 安装tree（直接下载编译好的，缺点是没办法更新，但是也无所谓
-
-```shell
-mkdir -p ~/.local/{bin,lib,include,src}
-wget https://mirrors.edge.kernel.org/ubuntu/pool/universe/t/tree/tree_2.0.2-1_amd64.deb
-dpkg-deb -x tree_2.0.2-1_amd64.deb tmp
-mv tmp/usr/bin/tree ~/.local/bin/
-export PATH=$HOME/.local/bin:$PATH    # 可以直接加到～/.zshrc
-tree --version
-```
-
-3. 安装rsync（能安装成功，但是在使用的时候会报错，还不知道怎么解决。。。）
-
-```shell
-# 下载包
-cd ~/tmp
-wget -O rsync-3.3.0.tar.gz https://sourceforge.net/projects/immortalwrt/files/sources/rsync-3.3.0.tar.gz/download
-tar -xzf rsync-3.3.0.tar.gz
-cd rsync-3.3.0
-
-# 配置安装路径，禁用不必要依赖（因为没有且懒得一个个装，哈哈哈）
-./configure --prefix=$HOME/.local \
-            --disable-openssl \
-            --disable-xxhash \
-            --disable-zstd \
-            --disable-lz4
-
-# 编译并安装
-make
-make install
-
-# 添加环境变量
-export PATH=$HOME/.local/bin:$PATH    # 可以直接添加到~/.zshrc
-rsync --version
-```
-
-**配置**
-
-`~/.bashrc`部分配置：
-
-```bash
-# 设置终端提示符样式
-PS1="\n\e[1;37m[\e[m\e[1;32m\u\e[m\e[1;33m@\e[m\e[1;35m\h\e[m:\e[m\$PWD\e[m\e[1;37m]\e[m\e[1;36m\e[m\n$ "
-# 禁止分页显示
-export PAGER=cat
-export MANPAGER=cat
-export GIT_PAGER=cat
-# 设置编码
-export LANG=C.UTF-8 # zh_CN.UTF-8为中文，en_US.UTF-8为英文
-export LC_ALL=C.UTF-8
-```
+## shell 配置
 
 **环境变量语法**
 
@@ -166,6 +114,54 @@ export LC_ALL=C.UTF-8
 # export PATH=$PATH:<new_path>    # 无引号，带空格路径会出错
 # export PATH=$PATH:"<new_path>"  # 没错，但是自定义的在最后，使用的时候还是用到了前面的版本
 export PATH="<new_path>:$PATH"    # 推荐将自定义工具路径加到 PATH 前面
+```
+
+**bash 配置**
+
+```shell
+# 如果只用 bash 的话，～/.bashrc 可以直接 copy
+cp /etc/skel/.bashrc ~/.bashrc
+```
+
+**zsh 配置**
+
+```shell
+# 安装 oh-my-zsh (会自动生成 ～/.zshrc)
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# 安装自动补全增强
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+# 安装语法高亮
+git clone https://github.com/zsh-users/zsh-syntax-highlighting ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+
+# 然后在 ～/.zshrc 里面添加以下配置
+# plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+
+# 想把命令提示符改成绝对路径的话，可以到 oh-my-zsh 使用的主题里面改，如：
+# vim ~/.oh-my-zsh/themes/$ZSH_THEME.zsh-theme
+PROMPT="%(?:%{$fg_bold[green]%}%1{➜%} :%{$fg_bold[red]%}%1{➜%} ) %{$fg[cyan]%}%d%{$reset_color%}"
+# 这边本来是 `%c`，改成 `%d` 就是绝对路径了
+```
+
+**初始化文件追加示例**
+
+```shell
+# 一些设置可以放在单独的文件，然后在 ~/.zshrc 等 dotfiles 里面 source 防止误删
+
+# 添加环境变量
+export PATH=$HOME/.local/bin:$PATH
+# 设置终端提示符样式
+PS1="\n\e[1;37m[\e[m\e[1;32m\u\e[m\e[1;33m@\e[m\e[1;35m\h\e[m:\e[m\$PWD\e[m\e[1;37m]\e[m\e[1;36m\e[m\n$ "
+# 设置中文编码
+export LANG=C.UTF-8
+export LC_ALL=C.UTF-8
+# 禁止分页显示
+export PAGER=cat
+export MANPAGER=cat
+export GIT_PAGER=cat
+# 设置 alias
+alias git-log='git log --pretty=oneline --all --graph --abbrev-commit'
+# 其他操作
+conda activate dev
 ```
 
 ## 查看信息
@@ -311,27 +307,6 @@ rsync -av --exclude="<subfolder1>" --exclude="<subfolder2>" <source_dir> <destin
     # -a：归档模式，表示递归复制并保持文件属性
     # -v：详细模式，显示复制过程中的详细信息
 # 如：rsync -av --exclude="*.T" --exclude="znr" --exclude=".git" ../up/bwy_v4/bwy ./
-```
-
-**文件传输scp**
-
-具体查看[ssh配置部分](./ssh.md/#scp服务器间拷贝文件)
-
-```bash
-# 本地传到服务器：
-scp -P <port> <filepath_windows> root@<remote_ip>:<filepath_linux>
-# 服务器传到本地：
-scp -P <port> root@<remote_ip>:<filepath_linux> <filepath_windows>
-```
-
-**文件传输sz/rz**
-
-以mobaXterm为例：
-
-```bash
-# 1. 本地上传到服务器：`rz` && `ctrl + 鼠标右键` && `Send file using Z-modem` && `选择文件`
-# 2. 服务器下载到本地：`sz filename` && `ctrl + 鼠标右键` && `Receive file using Z-modem`
-# 3. 中途取消操作：`ctrl + x`按4到5次
 ```
 
 **文件校验**
@@ -553,7 +528,7 @@ find ${base_path} -name "*.log" -print0 | xargs -0 rm -f
 
 Linux的用户和组信息存储在以下文件中：
 ```bash
-# /etc/passwd：存储所有用户的信息（用户名、UID、GID、主目录、Shell）。
+# /etc/passwd：存储所有用户的信息（用户名、UID、GID、主目录、启动Shell）。
     # 如damonzheng:x:1003:1003:damonzheng:/home/damonzheng:/bin/bash
     # damonzheng：用户名
     # x：密码占位符（真实密码存储在/etc/shadow）
@@ -721,7 +696,108 @@ sudo chown [-R] <new_owner>:<new_group> <file_or_dir>
 2. [linux中按上下左右键为什么变成\^\[\[A\^\[\[B\^\[\[C\^\[\[D](https://www.zhihu.com/question/31429658)：输入`reset`解决
 
 
-# windows操作相关
+
+# MacOS
+
+## 设置
+
+```shell
+- 设置-触控板-光标与点按：轻点来点按
+- 设置-鼠标：自然滚动
+- 设置-辅助功能-指针控制-触控板选项：使用触控板进行拖移-三指拖移
+- 访达-设置-边栏
+- `caffeinate -i`可以让 mac 保持不睡眠状态
+```
+
+## 安装
+
+**安装brew**
+
+```shell
+# 安装brew（中间是需要输入mac的密码的，安装也是需要等一会儿的
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# 然后会提示“Next steps”，按照执行即可，我这里是
+echo >> /Users/zhengnairong/.zprofile
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/zhengnairong/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+```
+
+**安装常用命令行工具**
+
+```shell
+brew install wget        # wget
+brew install tmux        # tmux
+brew install bash        # bash # 自带的/bin/bash版本低，可以使用这个命令安装新的bash，然后在～/.zshrc里面添加 export PATH="/opt/homebrew/bin:$PATH" 来使用新安装的bash
+```
+
+**安装docker**
+
+```shell
+# 安装
+brew install --cask docker # --cask: 用于安装带有图形界面的桌面应用程序。macos需要使用这个来启动docker的守护进程
+# 启动
+open /Applications/Docker.app # 或者在电脑双击打开也行
+```
+
+## iterm2
+
+1. 在选项卡之间进行切换：command+箭头
+
+**option+箭头移动一个字词**
+
+```shell
+# 1. iTerm2 → Settings → Profiles → Keys → Key Bindings
+# 2. 添加新的 Key Mapping（左下角的加号）
+#     1. Keyboard Shortcut：Option+Left
+#     2. Action：Send Escape Sequence
+#     3. Esc+Sequence：输入 b
+# 3. 同理 Option+Right → Esc+Sequence → f
+# 4. 但是这种方式在vim下面会跟vim有冲突（主要是向右），就需要配置~/.vimrc，如下：
+
+" 设置超时时间
+set timeout
+set timeoutlen=200
+
+" 插入模式下按词移动
+inoremap <Esc>b <C-o>b
+inoremap <Esc>f <C-o>w
+
+" 普通模式下也可以
+nnoremap <Esc>b b
+nnoremap <Esc>f w
+```
+
+**左键复制右键粘贴**
+
+```shell
+# 1. 左键复制到剪切板上，默认功能，具体在：Settings-General-Selection里面
+# 2. 右键粘贴到剪切板：Settings-Pointer-Bindings，左下角点击添加，然后自己选择
+```
+
+**tmux**
+
+由于iterm2比较灵活，这么设置完了之后，在tmux里面也是可以使用这些功能的。
+
+我的tmux配置：
+
+```shell
+# 编辑文件: vim  ~/.tmux.conf
+
+# 启用鼠标支持（选择文本、调整面板、切换窗口等）
+set -g mouse on
+
+# 自定义状态栏显示内容
+set -g status-left "Session: #S | Windows: #W"
+set -g status-right "Time: %H:%M:%S | Date: %Y-%m-%d"
+
+# 设置xterm-keys
+set -g xterm-keys on
+
+# 保留会话，关闭时不会销毁
+set -g destroy-unattached off
+```
+
+# Windows
 
 ## windows目录结构
 
@@ -776,7 +852,75 @@ C:\                                 # 系统盘（默认），存储 Windows 操
 
 1. 开启WSL功能：管理员模式在`PowerShell`中运行`dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart`
 
-# 环境相关
+## MobaXterm
 
-1. [python项目自动生成环境配置文件requirements.txt](https://blog.csdn.net/pearl8899/article/details/113877334)：`pipreqs .`
-2. 导出conda环境配置：`conda env export > environment.yml`
+**使用本机的conda**
+
+[mobaXterm使用本机conda](https://www.cnblogs.com/AnonymousDestroyer/p/17258702.html)：在`~/.bashrc`中添加以下代码：
+
+```bash
+export PATH=/drives/d/app/anaconda/install/Scripts:$PATH
+export PYTHONIOENCODING=utf-8
+if [[ "${OSTYPE}" == 'cygwin' ]]; then
+    set -o igncr
+    export SHELLOPTS
+fi
+```
+
+**tmux**
+
+mobaxterm非常好地支持了鼠标左键选中复制，右键粘贴（需要勾选一下
+
+但是在使用tmux的时候，鼠标的功能会遇到两难：
+1. 如果需要用mobaxterm一模一样的”左键复制，右键粘贴“，那么就用不了tmux的鼠标，选中窗口切换等功能，就需要使用快捷键比较麻烦
+2. 如果需要使用鼠标滚轮以及tmux直接鼠标切换窗口，那么就没办法”左键复制，右键粘贴“
+
+那么根据我的习惯，最终采用比较能接受的方式，也就是上面的2
+
+`~/.tmux.conf`配置如下：
+
+```shell
+# 编辑文件: vim  ~/.tmux.conf
+
+set -g default-terminal "xterm-256color"
+
+# 让tmux可以捕获鼠标活动
+set -g mouse on
+set -ga terminal-overrides ',xterm*:smcup@:rmcup@'
+
+# 自定义状态栏显示内容
+set -g status-left "Session: #S | Windows: #W"
+set -g status-right "Time: %H:%M:%S | Date: %Y-%m-%d"
+
+# 保留会话，关闭时不会销毁
+set -g destroy-unattached off
+
+# 激活配置: tmux source-file ~/.tmux.conf
+```
+
+这样的话就需要使用shift来配合鼠标的左右键了
+
+
+# APPs
+
+**Generals**
+
+1. sinpaste：[https://zh.snipaste.com/](https://zh.snipaste.com/)
+2. 飞书：[https://www.feishu.cn/download](https://www.feishu.cn/download)
+3. vscode：[https://code.visualstudio.com/](https://code.visualstudio.com/)
+4. cursor：[https://cursor.com/cn](https://cursor.com/cn)
+5. todesk：[https://www.todesk.com/](https://www.todesk.com/)
+
+**MacOS**
+
+1. Mos：[https://mos.caldis.me/](https://mos.caldis.me/)（支持触控板跟鼠标都自然滚动）
+2. AppCleaner：[https://freemacsoft.net/appcleaner/](https://freemacsoft.net/appcleaner/)（卸载清理软件）
+3. iterm2：[https://iterm2.com/](https://iterm2.com/)
+4. notepad--：[https://github.com/cxasm/notepad--](https://github.com/cxasm/notepad--)
+5. keka：[https://www.keka.io/zh-cn/](https://www.keka.io/zh-cn/)（压缩与解压缩）
+
+**Windows**
+
+1. winrar：[https://www.rarlab.com/download.htm](https://www.rarlab.com/download.htm)
+2. mobaxterm：[https://mobaxterm.mobatek.net/](https://mobaxterm.mobatek.net/)
+3. notepad++：[https://notepad-plus-plus.org/downloads/](https://notepad-plus-plus.org/downloads/)
