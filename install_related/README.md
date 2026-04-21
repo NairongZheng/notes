@@ -10,7 +10,7 @@
 6. es_usage：elastic search的使用
 7. git_usage：git使用
 8. gitbook_and_github
-9. github
+9. github_and_gitlab
 10. gpg：文件加解密
 11. hugging_face
 12. llama_factory：llama_factory的使用
