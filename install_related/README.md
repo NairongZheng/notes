@@ -22,9 +22,10 @@
 18. postgresql_usage：PostgreSQL使用
 19. ray_usage：ray的使用
 20. rclone_usage：rclone的使用
-21. redis_usage：redis使用
-22. tmux_and_screen_usage：tmux跟screen的使用
-23. uv_usage：uv环境的使用
-24. vim配置
-25. vscode：vscode的配置
-26. WSL
+21. hermes_agent：hermes使用
+22. redis_usage：redis使用
+23. tmux_and_screen_usage：tmux跟screen的使用
+24. uv_usage：uv环境的使用
+25. vim配置
+26. vscode：vscode的配置
+27. WSL

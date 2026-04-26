@@ -35,10 +35,11 @@ bash <conda_installation>.sh -b -p ~/miniconda3
 
 ```shell
 # 有时候找不到 conda 命令，是因为没有 conda init
-# 需要查看 ～/.bashrc 或者 ～/.zshrc 中是否有：
-. <path_to_conda_install>/etc/profile.d/conda.sh
-# 然后再运行：
 conda init [zsh | bash]
+# 就能看到 ～/.zshrc 或者 ～/.bashrc 中有 conda 初始化代码块，其中有：
+. <path_to_conda_install>/etc/profile.d/conda.sh
+# 然后执行：
+source ~/.zshrc # 或者 source ~/.bashrc
 
 # 正常来说经过上面的步骤就不需要下面这个了（这是老版的安装方式了）
 # echo "export PATH=~/miniconda3/bin:$PATH" >> ~/.bashrc
