@@ -8,34 +8,18 @@
     - [移动光标（很关键）](#移动光标很关键)
     - [删除、复制、粘贴、撤销](#删除复制粘贴撤销)
     - [搜索与替换](#搜索与替换)
+  - [vim 窗口操作](#vim-窗口操作)
+  - [vim tab 操作](#vim-tab-操作)
   - [vimdiff](#vimdiff)
 - [vim 配置](#vim-配置)
-  - [linux](#linux)
-  - [windows的mobaXterm](#windows的mobaxterm)
+  - [现在用的简单配置](#现在用的简单配置)
+    - [Basic](#basic)
+    - [Awesome](#awesome)
+  - [以前用的稍微的复杂配置](#以前用的稍微的复杂配置)
+    - [linux](#linux)
+    - [windows的mobaXterm](#windows的mobaxterm)
 
 # CMD
-
-**vim 分屏**
-
-```shell
-# 垂直分屏
-:vsplit <filename> # 或者 :vsp <filename>
-# 水平分屏
-:split <filename> # 或者 :sp <filename>
-# 切换分屏
-Ctrl-w + "w/h/j/k/l"
-    # w: 在不同的分屏之间循环切换
-    # h: 切换到左边的分屏。
-    # j: 切换到下面的分屏。
-    # k: 切换到上面的分屏。
-    # l: 切换到右边的分屏。
-# 调整分屏大小
-Ctrl-w + "+/-/>/<"
-    # +: 增加当前分屏的高度
-    # -: 减少当前分屏的高度
-    # >: 增加当前分屏的宽度
-    # <: 减少当前分屏的宽度
-```
 
 **行号**
 
@@ -49,7 +33,6 @@ Ctrl-w + "+/-/>/<"
 # 关闭相对行号
 :set norelativenumber
 ```
-
 
 # vim使用
 
@@ -193,6 +176,53 @@ s：替换
 g：全局
 ```
 
+## vim 窗口操作
+
+所有窗口操作的快捷基础都是：`Ctrl + w`
+
+**分屏**
+
+```shell
+Ctrl + w + s    # 水平分屏，或者 :split <filename>，或者 :sp <filename>
+Ctrl + w + v    # 垂直分屏，或者 :vsplit <filename>，或者 :vsp <filename>
+```
+
+**窗口切换**
+
+```shell
+Ctrl + w + "w/h/j/k/l"
+    # w: 在不同的分屏之间循环切换
+    # h: 切换到左边的分屏。← 左
+    # j: 切换到下面的分屏。↓ 下
+    # k: 切换到上面的分屏。↑ 上
+    # l: 切换到右边的分屏。→ 右
+```
+
+**窗口大小调整**
+
+```shell
+Ctrl + w + "+/-/>/</="
+    # +: 增加当前分屏的高度
+    # -: 减少当前分屏的高度
+    # >: 增加当前分屏的宽度
+    # <: 减少当前分屏的宽度
+    # =: 平均分
+```
+
+**关闭窗口**
+
+```shell
+Ctrl + w + c    # 只关当前窗口
+Ctrl + w + o    # 关闭其他窗口（很常用）
+```
+
+## vim tab 操作
+
+```shell
+:tabnew     # 新 tab
+gt / gT     # tab 间切换
+```
+
 
 ## vimdiff
 
@@ -218,11 +248,45 @@ vimdiff的一些设置：
 
 # vim 配置
 
-可以直接参考 repo：[https://github.com/amix/vimrc](https://github.com/amix/vimrc)
+## 现在用的简单配置
 
-下面给一些我之前用的配置（需要插件），没必要其实。
+直接参考 repo：[https://github.com/amix/vimrc](https://github.com/amix/vimrc)
 
-## linux
+### Basic
+
+直接[复制这个](https://github.com/amix/vimrc/blob/master/vimrcs/basic.vim)到本地的 `~/.vimrc`
+
+### Awesome
+
+**安装**
+
+```shell
+git clone --depth=1 https://github.com/amix/vimrc.git ~/.vim_runtime
+sh ~/.vim_runtime/install_awesome_vimrc.sh
+```
+
+**使用**
+
+1. 文件树 NERDTreeToggle
+
+```shell
+,nn     # 打开/关闭文件树，也可以用命令 :NERDTreeToggle
+?       # 在 NERDTree 窗口内查看帮助
+o       # 打开文件/展开目录，也可以用 Enter
+s       # 垂直分屏打开文件
+i       # 水平分屏打开文件
+t       # 在新 Tab 打开文件
+```
+
+2. 文件/Buffer 模糊查找
+
+```shell
+Ctrl+F
+```
+
+## 以前用的稍微的复杂配置
+
+### linux
 
 1. 创建文件`~/.vimrc`（里面有些地方可以改的，看看注释）
 
@@ -432,7 +496,7 @@ def PythonSysPath( **kwargs ):
    3. 切换到YCM路径：`cd ~/.vim/bundle/YouCompleteMe`
    4. 安装：`python install.py [--force-sudo]`
 
-## windows的mobaXterm
+### windows的mobaXterm
 
 1. 流程是一样的，但是在mobaXterm操作的时候，会出现错误`E492: 不是编辑器的命令: ^M`，这是因为linux和windows文件换行的区别，需要将这些文件从dos装成unix，采用以下命令（有些系统的dos2unix工具不一样，看看下面哪个能用就用哪个）：
    1. `dos2unix -o -r /path/to/your/folder`
