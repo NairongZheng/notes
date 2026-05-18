@@ -20,24 +20,50 @@
 [参考链接1](https://blog.csdn.net/wang_qiu_hao/article/details/127902007)
 
 # CMD
-1. ssh服务：
-   1. 启动ssh服务：`sudo systemctl start ssh`（老版用`service ssh start`）
-   2. 停止ssh服务：`sudo systemctl stop ssh`（老版用`service ssh stop`）
-   3. 重启ssh服务：`sudo systemctl restart ssh`（老版用`service ssh restart`）
-   4. 查看ssh服务状态：`sudo systemctl status ssh`（老版用`service ssh status`）
-   5. 设置ssh开机自启：`sudo systemctl enable ssh`
-   6. 取消ssh开机自启：`sudo systemctl disable ssh`
-2. 已有私钥生成公钥：`ssh-keygen -y -f ${/path/to/private_key} > ${/path/to/gen_pub_key} -C <some tag such as email>`
-   1. `-y`：从私钥提取公钥
-3. 生成密钥对：`ssh-keygen -t rsa [-f </path/to/private_key> | -C <some tag such as email>]`
-   1. `-t rsa`：生成RSA密钥对
-   2. `-f </path/to/private_key>`：指定私钥或公钥文件
-   3. `-C <some tag such as email>`：添加注释（例如邮箱）
-4. 连接命令：
-   1. 密码登录：`ssh <user_name>@<remote_ip> -p <remote_port> [-o HostKeyAlgorithms=+ssh-rsa]` 
-   2. 密钥登录：`ssh <user_name>@<remote_ip> -p <remote_port> -i <private_key_path>`
-   3. 密钥通过跳板机登录开发机：`ssh <user_name>@<dev_ip> -i <private_key_path> -o ProxyCommand="ssh <user_name>@<jumpserver_ip> -p <jumpserver_port> -i <private_key_path> -q -W <dev_ip>:<dev_port>"`
-   4. 使用第三种有可能需要先在远程主机的`authorized_keys`中添加客户端的公钥
+
+**ssh 服务**
+
+```shell
+systemctl start ssh         # 启动ssh服务，或用 service ssh start
+systemctl stop ssh          # 停止ssh服务，或用 service ssh stop
+systemctl restart ssh       # 重启ssh服务，或用 service ssh restart
+systemctl status ssh        # 查看ssh服务状态，或用 service ssh status
+systemctl enable ssh        # 设置ssh开机自启
+systemctl disable ssh       # 取消ssh开机自启
+```
+
+**已有私钥生成公钥**
+
+```shell
+ssh-keygen -y -f ${/path/to/private_key} > ${/path/to/gen_pub_key} -C <some tag such as email>
+    # `-y`: 从私钥提取公钥
+```
+
+**生成密钥对**
+
+```shell
+ssh-keygen -t rsa [-f </path/to/private_key> | -C <some tag such as email>]
+    # -t rsa: 生成RSA密钥对
+    # -f </path/to/private_key>: 指定私钥或公钥文件
+    # -C <some tag such as email>: 添加注释（例如邮箱）
+```
+
+**重置host key**
+
+```shell
+ssh-keygen -R "[ip]:port"
+```
+
+**连接命令**
+
+```shell
+# 密码登录
+ssh <user_name>@<remote_ip> -p <remote_port> [-o HostKeyAlgorithms=+ssh-rsa]
+# 密钥登录
+ssh <user_name>@<remote_ip> -p <remote_port> -i <private_key_path>
+# 密钥通过跳板机登录开发机，有可能需要先在远程主机的`authorized_keys`中添加客户端的公钥
+ssh <user_name>@<dev_ip> -i <private_key_path> -o ProxyCommand="ssh <user_name>@<jumpserver_ip> -p <jumpserver_port> -i <private_key_path> -q -W <dev_ip>:<dev_port>"
+```
 
 # ssh config配置
 

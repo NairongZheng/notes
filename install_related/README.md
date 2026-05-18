@@ -26,6 +26,6 @@
 22. redis_usage：redis使用
 23. tmux_and_screen_usage：tmux跟screen的使用
 24. uv_usage：uv环境的使用
-25. vim配置
+25. vim_usage
 26. vscode：vscode的配置
 27. WSL
