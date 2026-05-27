@@ -83,20 +83,20 @@
 }
 ```
 
-| 字段                    | 含义                                                                    |
-| ----------------------- | ----------------------------------------------------------------------- |
-| architectures           | 模型对应的类名（Transformers 自动加载时使用）。例如 "QwenForCausalLM"。 |
-| model_type              | 模型家族类型（如 "qwen3", "llama", "gpt2"），决定加载逻辑。             |
-| hidden_size             | 每层 Transformer 的隐藏维度。                                           |
-| intermediate_size       | FFN 层（前馈层）的中间维度。                                            |
-| num_attention_heads     | 注意力头数量。                                                          |
-| num_hidden_layers       | Transformer 层数。                                                      |
-| vocab_size              | 词表大小，对应 tokenizer。                                              |
-| max_position_embeddings | 最大序列长度。                                                          |
-| rms_norm_eps            | RMSNorm 中的 epsilon。                                                  |
-| rope_scaling            | 对于 RoPE（旋转位置编码）的扩展方式。                                   |
-| use_cache               | 是否在生成时使用 KV cache。                                             |
-| torch_dtype             | 权重数据类型（如 bfloat16、float16）。                                  |
+| 字段                    | 含义                                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------ |
+| architectures           | 模型对应的类名（Transformers 自动加载时使用）。例如 "QwenForCausalLM"。                          |
+| model_type              | 模型家族类型（如 "qwen3", "llama", "gpt2"），决定加载逻辑。                                      |
+| hidden_size             | 每层 Transformer 的隐藏维度。                                                                    |
+| intermediate_size       | FFN 层（前馈层）的中间维度。                                                                     |
+| num_attention_heads     | 注意力头数量。                                                                                   |
+| num_hidden_layers       | Transformer 层数。                                                                               |
+| vocab_size              | 词表大小，对应 tokenizer。                                                                       |
+| max_position_embeddings | 最大序列长度，模型最多支持多少个位置编码 <br> 也就是**模型理论最大上下文长度**，是模型结构硬上限 |
+| rms_norm_eps            | RMSNorm 中的 epsilon。                                                                           |
+| rope_scaling            | 对于 RoPE（旋转位置编码）的扩展方式。                                                            |
+| use_cache               | 是否在生成时使用 KV cache。                                                                      |
+| torch_dtype             | 权重数据类型（如 bfloat16、float16）。                                                           |
 
 </details>
 
@@ -289,18 +289,18 @@
 }
 ```
 
-| 字段                         | 含义                                                                                                                                                                          |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| add_bos_token                | 是否自动在 序列开头加入 BOS                                                                                                                                                   |
-| add_prefix_space             | 是否在文本开头自动添加一个空格                                                                                                                                                |
-| added_tokens_decoder         | HuggingFace 将 tokenizer.json 中的 "added_tokens" 反向映射到一个 dict <br> decoder 需要知道 ID → token 的映射 <br> 包含特殊符号如 "<\|im_start\|>"、视觉 token 等             |
-| additional_special_tokens    | 列出了所有额外添加的特殊 token（不属于 BPE vocabulary）                                                                                                                       |
-| chat_template                | 将对话结构转换为模型 input 格式，`tokenizer.apply_chat_template()` 时使用                                                                                                     |
-| clean_up_tokenization_spaces | 是否在 decode 时清理多余空格                                                                                                                                                  |
-| eos_token                    | 模型遇到该 token 将停止生成。                                                                                                                                                 |
-| errors                       | 这是 Python 的字符串错误处理策略：tokenizer 在 decode 时遇到非法字节 → 替换为 "�"                                                                                             |
-| model_max_length             | 模型能够处理的最大上下文长度（token 数）。用于 tokenizer 层面做截断检查，这是硬上限，即你不能给模型输入长度超过这个数，否则会报错。（注意与max_length跟max_new_tokens的区别） |
-| split_special_tokens         | 是否允许对特殊 token 进行拆分，必须为 false，否则 "<\|im_end\|>" 会被拆坏成 "<" "\|" "im_end" ...                                                                             |
+| 字段                         | 含义                                                                                                                                                              |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| add_bos_token                | 是否自动在 序列开头加入 BOS                                                                                                                                       |
+| add_prefix_space             | 是否在文本开头自动添加一个空格                                                                                                                                    |
+| added_tokens_decoder         | HuggingFace 将 tokenizer.json 中的 "added_tokens" 反向映射到一个 dict <br> decoder 需要知道 ID → token 的映射 <br> 包含特殊符号如 "<\|im_start\|>"、视觉 token 等 |
+| additional_special_tokens    | 列出了所有额外添加的特殊 token（不属于 BPE vocabulary）                                                                                                           |
+| chat_template                | 将对话结构转换为模型 input 格式，`tokenizer.apply_chat_template()` 时使用                                                                                         |
+| clean_up_tokenization_spaces | 是否在 decode 时清理多余空格                                                                                                                                      |
+| eos_token                    | 模型遇到该 token 将停止生成。                                                                                                                                     |
+| errors                       | 这是 Python 的字符串错误处理策略：tokenizer 在 decode 时遇到非法字节 → 替换为 "�"                                                                                 |
+| model_max_length             | tokenizer建议/允许的最大token长度，通常：`model_max_length <= max_position_embeddings` <br> 但有时它是假的，会设置成无限长度占位符。这两个参数都要看，都是硬上限  |
+| split_special_tokens         | 是否允许对特殊 token 进行拆分，必须为 false，否则 "<\|im_end\|>" 会被拆坏成 "<" "\|" "im_end" ...                                                                 |
 
 </details>
 
