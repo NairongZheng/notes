@@ -2,6 +2,7 @@
 
 > rclone 是通用云存储同步工具，支持 70+ 后端（s3 / 阿里 oss / google drive / ftp / webdav 等），适合**跨云搬数据、多种存储统一管理**。
 > 如果只操作 AWS S3，推荐用 aws cli（见 `tools/aws_s3.md`），命令更贴近 s3 语义，文档也更全。
+> rclone 操作 s3 后端时，也会自动读取 `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` 等环境变量（rclone.conf 没配的情况下），见 `aws_s3.md` 的「凭据来源与优先级」。
 
 # 安装与配置
 

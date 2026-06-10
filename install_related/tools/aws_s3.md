@@ -64,6 +64,35 @@ aws_access_key_id = xxxx                region = us-east-1
 aws_secret_access_key = xxxx
 ```
 
+**凭据来源与优先级**
+
+aws cli / boto3 都按下面的顺序查找凭据，**前面的覆盖后面的**：
+
+1. 命令行 / 代码里显式传的参数（`--profile`、`aws_access_key_id=...`）
+2. 环境变量（见下表）
+3. `~/.aws/credentials` + `~/.aws/config`
+4. EC2 / ECS / Lambda 上的 IAM 角色（元数据服务自动注入）
+
+| 环境变量                | 作用                                      |
+| ----------------------- | ----------------------------------------- |
+| `AWS_ACCESS_KEY_ID`     | access key                                |
+| `AWS_SECRET_ACCESS_KEY` | secret key                                |
+| `AWS_SESSION_TOKEN`     | 临时凭据用的 token（STS / SSO）           |
+| `AWS_PROFILE`           | 等价于 `--profile NAME`                   |
+| `AWS_REGION`            | region（boto3 优先认这个）                |
+| `AWS_DEFAULT_REGION`    | region（aws cli 认这个）                  |
+| `AWS_ENDPOINT_URL`      | 自定义 endpoint（兼容 s3 存储用，新版支持）|
+
+```shell
+# 典型用法：CI / 容器里临时注入，无需写配置文件
+export AWS_ACCESS_KEY_ID=xxxx
+export AWS_SECRET_ACCESS_KEY=xxxx
+export AWS_DEFAULT_REGION=ap-southeast-1
+aws s3 ls   # 直接就能用
+```
+
+> ！！！rclone 操作 s3 后端时，**也会自动读取上面这些 `AWS_*` 环境变量**（在 rclone.conf 里没配的情况下），所以一套环境变量三个工具通吃。
+
 # 基本概念
 
 - **bucket**：桶，名字全局唯一（所有 AWS 账户共享命名空间），属于某个 region
@@ -270,7 +299,7 @@ s3 = boto3.client("s3")
 # 指定 profile
 s3 = boto3.Session(profile_name="myprofile").client("s3")
 
-# 显式传 aksk（不推荐写死在代码）
+# 显式传 aksk（不推荐写死在代码，优先用环境变量或 profile，见「凭据来源与优先级」）
 s3 = boto3.client(
     "s3",
     aws_access_key_id="xxxx",
