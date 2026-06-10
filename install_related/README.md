@@ -23,18 +23,19 @@
 ## tools/ — 通用开发工具
 
 1. ansible_test
-2. conda：conda 的使用
-3. git_usage：git 使用
-4. gitbook_and_github
-5. github_and_gitlab
-6. gpg：文件加解密
-7. ray_usage：ray 的使用
-8. rclone_usage：rclone 的使用
-9. tmux_and_screen_usage：tmux 跟 screen 的使用
-10. uv_usage：uv 环境的使用
-11. vim_usage
-12. vscode：vscode 的配置
-13. WSL
+2. aws_s3：aws s3 的使用（aws cli）
+3. conda：conda 的使用
+4. git_usage：git 使用
+5. gitbook_and_github
+6. github_and_gitlab
+7. gpg：文件加解密
+8. ray_usage：ray 的使用
+9. rclone_usage：rclone 的使用
+10. tmux_and_screen_usage：tmux 跟 screen 的使用
+11. uv_usage：uv 环境的使用
+12. vim_usage
+13. vscode：vscode 的配置
+14. WSL
 
 ## deprecated/ — 已弃用
 
