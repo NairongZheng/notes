@@ -180,7 +180,7 @@ docekr restart es01
 GET /_cat/plugins?v
 ```
 
-![es分词器](../images/2025/20250723_es分词器.jpg)
+![es分词器](../../images/2025/20250723_es分词器.jpg)
 
 ## Elasticsearch的使用
 
@@ -473,11 +473,11 @@ curl --cacert http_ca.crt -u elastic:$ELASTIC_PASSWORD \
 
 在web的 `management - Stack Management - Index Manegemant`中 create_index 之后，进入：
 
-![](../images/2025/20250723_index创建.jpg)
+![](../../images/2025/20250723_index创建.jpg)
 
 就可以看到以下页面：
 
-![](../images/2025/20250723_index界面.jpg)
+![](../../images/2025/20250723_index界面.jpg)
 
 ## 常用查询语句
 

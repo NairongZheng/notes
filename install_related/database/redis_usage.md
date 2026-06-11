@@ -267,7 +267,7 @@ docker run -d --name redisinsight -p 5540:5540 redislabs/redisinsight:latest
 # 然后访问 http://localhost:5540
 ```
 
-![redis连接](../images/2025/20250724_redis连接.png)
+![redis连接](../../images/2025/20250724_redis连接.png)
 
 
 ## redis数据备份

@@ -173,7 +173,7 @@ llamafactory-cli webchat /root/code/LLaMA-Factory/examples/inference/llama3.yaml
 
 因为我是在远程服务器跑的，所以需要做个本地端口转发才可以在windows的网页访问，结果如图：
 
-![llamafactory的web](../images/2025/20250624_llamafactory的web.jpg)
+![llamafactory的web](../../images/2025/20250624_llamafactory的web.jpg)
 
 
 ## 自定义数据集构建
@@ -360,7 +360,7 @@ CUDA_VISIBLE_DEVICES=0 llamafactory-cli train \
 
 其中结果图像：
 
-![training loss](../images/2025/20250626_llama_sft_lora_training_loss.png)
+![training loss](../../images/2025/20250626_llama_sft_lora_training_loss.png)
 
 终端输出：
 
@@ -581,7 +581,7 @@ CUDA_VISIBLE_DEVICES=0 llamafactory-cli webui
 CUDA_VISIBLE_DEVICES=0 GRADIO_SHARE=1 GRADIO_SERVER_PORT=7860 llamafactory-cli webui
 ```
 
-![llamafactory的webui](../images/2025/20250626_llamafactory的webui.png)
+![llamafactory的webui](../../images/2025/20250626_llamafactory的webui.png)
 
 
 ## 其他

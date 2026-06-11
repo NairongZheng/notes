@@ -261,7 +261,7 @@ docker run -p 5050:80 \
 - postgresql那个容器的ip(用`docker inspect`查看)跟端口(5432)
 - 用本机的ip跟端口（应该也可以，忘记了，可以试试）
 
-![](../images/2025/20250808_postgresql可视化连接.jpg)
+![](../../images/2025/20250808_postgresql可视化连接.jpg)
 
 
 **连接 PostgreSQL 数据库**

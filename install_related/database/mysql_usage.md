@@ -148,4 +148,4 @@ docker run --rm --name myadmin -d -e PMA_HOST=<docker_ip> -e PMA_PORT=3306 -p 82
 # 运行成功后，就可以在 localhost:8282 查看到页面（需要输入mysql的用户名跟密码）
 ```
 
-![mysql可视化](../images/2025/20250808_mysql可视化.png)
+![mysql可视化](../../images/2025/20250808_mysql可视化.png)

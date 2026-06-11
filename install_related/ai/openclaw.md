@@ -783,7 +783,7 @@ openclaw agents list
 
 图跟上面的不匹配，示例而已：
 
-![openclaw_skills](../images/2026/20260313_openclaw_skills.png)
+![openclaw_skills](../../images/2026/20260313_openclaw_skills.png)
 
 </details>
 
@@ -860,6 +860,6 @@ export default function register(api) {
 
 同理，可以在 agent 的 tools 里面看到这个 plugin
 
-![openclaw_plugins](../images/2026/20260313_openclaw_plugins.png)
+![openclaw_plugins](../../images/2026/20260313_openclaw_plugins.png)
 
 </details>

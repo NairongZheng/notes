@@ -62,6 +62,7 @@ claude install 2.1.17
         "ANTHROPIC_AUTH_TOKEN": "xxx",
         "API_TIMEOUT_MS": "3000000",
         "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1,
+        "ANTHROPIC_MODEL": "xxx",
         "ANTHROPIC_DEFAULT_HAIKU_MODEL": "xxx",
         "ANTHROPIC_DEFAULT_SONNET_MODEL": "xxx",
         "ANTHROPIC_DEFAULT_OPUS_MODEL": "xxx"
@@ -112,7 +113,7 @@ claude
 
 下面给一个 制作 homepage 的交互过程来举例
 
-![20260205_claudecode_1](../images/2026/20260205_claudecode_1.png)
+![20260205_claudecode_1](../../images/2026/20260205_claudecode_1.png)
 
 **使用 `shift+tab` 来切换交互模式（很关键）**，先用 plan mode 来交互说清楚需求！
 

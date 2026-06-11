@@ -131,4 +131,4 @@ docker run --name milvus-insight --network milvus -d -p 8000:3000 -e HOST_URL=ht
 
 **查看数据**
 
-![milvus-insight](../images/2025/20250630_milvus-insight.png)
+![milvus-insight](../../images/2025/20250630_milvus-insight.png)

@@ -368,7 +368,7 @@ launch.json 例子：
 
 四、就可以在`运行和调试`部分选择要调试的配置进行调试了
 
-![vscode调试](../images/2025/20250808_vscode调试.png)
+![vscode调试](../../images/2025/20250808_vscode调试.png)
 
 # 同步扩展到 cursor
 
