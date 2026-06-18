@@ -4,6 +4,7 @@
   - [终端使用](#终端使用)
   - [vscode 使用 claudecode 插件](#vscode-使用-claudecode-插件)
 - [claudecode 上下文管理](#claudecode-上下文管理)
+- [claudecode worktree](#claudecode-worktree)
 
 
 claudecode 官网：[https://code.claude.com/docs/zh-CN/overview](https://code.claude.com/docs/zh-CN/overview)
@@ -203,5 +204,19 @@ plans.md, analysis.txt, etc.
 /compact    # 压缩历史对话
 /clear      # 清空历史对话
 ```
+
+# claudecode worktree
+
+**创建 worktree 开发**
+
+```shell
+claude --worktree <worktree_name>
+```
+
+会在 `.claude/worktrees/<worktree_name>` 创建 worktree，也会在这边开发，开发完后记得分别 commit
+
+**合并修改**
+
+直接在 main 让 claudecode 帮忙合并即可
 
 

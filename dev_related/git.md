@@ -8,6 +8,7 @@
 - [git lfs](#git-lfs)
 - [其他](#其他)
   - [commit规范](#commit规范)
+  - [git diff](#git-diff)
   - [gitignore 参考](#gitignore-参考)
   - [gitattributes](#gitattributes)
   - [回退](#回退)
@@ -502,6 +503,26 @@ git commit -m "feat: add new feature" \
 3. GitHub 会将 Co-author 也计入该提交的贡献者
 4. 格式必须严格遵守：`Co-authored-by: Name <email@example.com>`
    1. 也可以使用 github 提供的隐私邮箱格式：`Co-authored-by: username <username@users.noreply.github.com>`
+
+### git diff
+
+想在终端可以像 vscode 一样，左右对比查看两文件，可以使用 [delta](https://github.com/dandavison/delta)：
+
+```shell
+# 1. 下载安装工具
+wget https://github.com/dandavison/delta/releases/latest/download/git-delta_0.19.2_amd64.deb
+sudo dpkg -i git-delta_0.19.2_amd64.deb
+# 2. 配置 git
+git config --global core.pager delta    # 使用分页器
+git config --global interactive.diffFilter 'delta --color-only'
+git config --global delta.navigate true
+git config --global delta.side-by-side true # 左右分栏显示
+# git config --global diff.context 20     # 默认显示修改前后 20 行，想显示全文件可以改成 999999
+# 3. 使用
+git diff [-U9999] <diff_file>             # 没有配置 diff.context 也可以在这里设置
+# 4. 可以直接用 delta 查看配置
+delta --show-config
+```
 
 
 ### gitignore 参考

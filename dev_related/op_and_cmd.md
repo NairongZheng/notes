@@ -295,8 +295,9 @@ ln -s [options] <目标文件/目录> <链接名>
 # 1. zip文件解压：unzip <filename>
 # 2. tar文件解压：tar -xvf <filename>
 # 3. tar.gz文件解压：tar -zxvf <filename>
-# 4. rar文件解压：unrar x <filename>
-# 5. 7z文件解压：7za x <filename>
+# 4. gz文件解压：gzip -kd <filename>
+# 5. rar文件解压：unrar x <filename>
+# 6. 7z文件解压：7za x <filename>
 ```
 
 **文件复制**
