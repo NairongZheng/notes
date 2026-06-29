@@ -26,6 +26,12 @@ brew upgrade codex
 
 ## 终端使用
 
+**登陆**
+
+```shell
+codex login --device-auth
+```
+
 **进入 codex**
 
 ```shell
@@ -35,16 +41,44 @@ codex -h
 # 直接进入
 codex
 
-# 进入某个回话
+# 进入某个会话
 codex resume
 ```
 
-**一些命令**
+# codex AGENTS
 
 ```shell
-# 状态检查
-/status
+~/.codex/AGENTS.md      # 全局偏好
+项目根目录/AGENTS.md      # 项目规则
+src/AGENTS.md           # 子目录规则
+```
 
-# 权限管理
-/approvals  # 里面有个 read-only 可以当作类似 claudecode 的 plan 模式使用
+示例 AGENTS.md
+
+```shell
+# General
+
+- 默认使用中文回答。
+- 修改代码前先简单说明计划。
+- 优先修改最少的代码。
+- 不要无意义重构。
+- 不要修改无关文件。
+- 新增依赖前先询问。
+
+# Coding Style
+
+- Python 使用 type hints。
+- 函数尽量保持简短。
+- 函数需要写注释
+- 优先标准库。
+
+# Git
+
+- commit 信息要英文，用标准的格式，如 `feat: xxx` 等，可以分点。
+- 不主动 commit。
+- 不主动 push。
+
+# Testing
+
+- 修改代码后说明应该如何验证。
 ```

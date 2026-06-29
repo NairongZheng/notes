@@ -194,6 +194,8 @@ git checkout -b <new_branch_name> <base_branch_or_tag_version>
 
 ```shell
 git merge [--no-commit] [--no-ff] <branch_name>
+    # --no-commit: 是否自动 commit（默认自动commit，建议）
+    # --no-ff: 是否 Fast-Forward（建议加上，整个 git 历史好查）
 # 这里merge的时候，需要选择好分支，使用前面配置的`git-log`是一目了然的。
 # 是合并更新下来的`origin/branch_name`（远端的）还是`branch_name`（本地的）。
 # 如果多人开发的话，大概率远端跟本地是不同步的，且很有可能是有冲突的。具体怎么做还是看开发需求。
