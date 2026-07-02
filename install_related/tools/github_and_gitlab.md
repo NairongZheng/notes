@@ -270,3 +270,101 @@ Run pipeline：
 | Runner      | GitHub 提供             | GitLab Runner（需配置） |
 | Docker 支持 | 可选                    | 默认强依赖              |
 | 上手难度    | 简单                    | 稍复杂但更强大          |
+
+## glab cli
+
+**登陆**
+
+```shell
+(dev) ➜  /mnt/afs_toolcall/zhengnairong git:(main) glab auth login
+? What GitLab instance do you want to log into? GitLab Self-hosted Instance
+? GitLab hostname: gitlab.xxx.com
+? API hostname: gitlab.xxx.com
+- Logging into gitlab.xxx.com
+? How would you like to login? Token
+
+Tip: you can generate a Personal Access Token here https://gitlab.xxx.com/-/profile/personal_access_tokens?scopes=api,write_repository
+The minimum required scopes are 'api' and 'write_repository'.
+? Paste your authentication token: ********************
+? Choose default git protocol HTTPS
+? Authenticate Git with your GitLab credentials? Yes
+? Choose host API protocol HTTPS
+- glab config set -h gitlab.xxx.com git_protocol https
+✓ Configured git protocol
+- glab config set -h gitlab.xxx.com api_protocol https
+✓ Configured API protocol
+✓ Logged in as zhengnairong
+```
+
+**查看登陆状态**
+
+```shell
+(dev) ➜  /mnt/afs_toolcall/zhengnairong git:(main) glab auth status
+gitlab.com
+  x gitlab.com: api call failed: GET https://gitlab.com/api/v4/user: 401 {message: 401 Unauthorized}
+  ✓ Git operations for gitlab.com configured to use ssh protocol.
+  ✓ API calls for gitlab.com are made over https protocol
+  ✓ REST API Endpoint: https://gitlab.com/api/v4/
+  ✓ GraphQL Endpoint: https://gitlab.com/api/graphql/
+  x No token provided
+gitlab.xxx.com
+  ✓ Logged in to gitlab.xxx.com as zhengnairong (/mnt/xxx/zhengnairong/.config/glab-cli/config.yml)
+  ✓ Git operations for gitlab.xxx.com configured to use https protocol.
+  ✓ API calls for gitlab.xxx.com are made over https protocol
+  ✓ REST API Endpoint: https://gitlab.xxx.com/api/v4/
+  ✓ GraphQL Endpoint: https://gitlab.xxx.com/api/graphql/
+  ✓ Token: **************************
+```
+
+### glab mr
+
+**常用命令**
+
+```shell
+# 查看 MR 列表
+glab mr list
+
+# 查看 MR 详情
+glab mr view <MR编号>
+
+# 在浏览器中打开
+glab mr view <MR编号> --web
+
+# 创建 MR
+glab mr create
+
+# 根据当前分支信息快速创建
+glab mr create --fill
+
+# 拉取并切换到 MR 分支
+glab mr checkout <MR编号>
+
+# 查看代码差异
+glab mr diff <MR编号>
+
+# 添加评论
+glab mr note <MR编号> -m "评论内容"
+
+# 更新标题、描述、标签等
+glab mr update <MR编号>
+
+# 批准 MR
+glab mr approve <MR编号>
+
+# 撤销批准
+glab mr revoke <MR编号>
+
+# 合并 MR
+glab mr merge <MR编号>
+
+# 触发 rebase
+glab mr rebase <MR编号>
+
+# 关闭/重新打开
+glab mr close <MR编号>
+glab mr reopen <MR编号>
+
+# 删除 MR
+glab mr delete <MR编号>
+```
+
