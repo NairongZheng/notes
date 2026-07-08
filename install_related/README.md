@@ -24,18 +24,19 @@
 
 1. ansible_test
 2. aws_s3：aws s3 的使用（aws cli）
-3. conda：conda 的使用
-4. git_usage：git 使用
-5. gitbook_and_github
-6. github_and_gitlab
-7. gpg：文件加解密
-8. ray_usage：ray 的使用
-9. rclone_usage：rclone 的使用
-10. tmux_and_screen_usage：tmux 跟 screen 的使用
-11. uv_usage：uv 环境的使用
-12. vim_usage
-13. vscode：vscode 的配置
-14. WSL
+3. cloudflared：临时公网
+4. conda：conda 的使用
+5. git_usage：git 使用
+6. gitbook_and_github
+7. github_and_gitlab
+8. gpg：文件加解密
+9. ray_usage：ray 的使用
+10. rclone_usage：rclone 的使用
+11. tmux_and_screen_usage：tmux 跟 screen 的使用
+12. uv_usage：uv 环境的使用
+13. vim_usage
+14. vscode：vscode 的配置
+15. WSL
 
 ## deprecated/ — 已弃用
 
