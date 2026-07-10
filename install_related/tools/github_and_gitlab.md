@@ -368,3 +368,59 @@ glab mr reopen <MR编号>
 glab mr delete <MR编号>
 ```
 
+
+## runner
+
+**配置 runner**
+
+```shell
+# Settings -> CI/CD -> Runners -> New project runner
+# tag 填一下
+```
+
+**安装部署 runner**
+
+```shell
+mkdir -p ~/.local/bin
+curl -L -o ~/.local/bin/gitlab-runner https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64
+chmod +x ~/.local/bin/gitlab-runner
+
+gitlab-runner register \
+  --url https://gitlab.xxx.com \
+  --token '<runner token>' \
+  --executor shell \
+  --name tj-doublecheck-runner
+```
+
+成功会有 log：
+
+```shell
+gitlab-runner register \
+  --url https://gitlab.xxx.com \
+  --token xxx \
+  --executor shell \
+  --name tj-doublecheck-runner
+Runtime platform                                    arch=amd64 os=linux pid=412228 revision=24b9b726 version=19.1.1
+WARNING: Running in user-mode.
+WARNING: The user-mode requires you to manually start builds processing:
+WARNING: $ gitlab-runner run
+WARNING: Use sudo for system-mode:
+WARNING: $ sudo gitlab-runner...
+
+Enter the GitLab instance URL (for example, https://gitlab.com/):
+[https://gitlab.xxx.com]:
+Verifying runner... is valid                        correlation_id=01KX5Q8F4EM3960RMNPZFWW1MK runner=yRy8Skv5R runner_name=tj-doublecheck-runner
+Enter a name for the runner. This is stored only in the local config.toml file:
+[tj-doublecheck-runner]:
+Enter an executor: instance, docker, docker-windows, docker+machine, docker-autoscaler, kubernetes, ssh, parallels, virtualbox, shell, custom:
+[shell]:
+Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded!
+
+Configuration (with the authentication token) was saved in "/mnt/afs_toolcall/zhengnairong/.gitlab-runner/config.toml"
+```
+
+**运行 runner**
+
+```shell
+gitlab-runner run
+```
