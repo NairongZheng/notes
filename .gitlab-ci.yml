@@ -1,0 +1,51 @@
+# 仅允许用户从 GitLab 页面创建流水线，push 和 MR 不会自动触发。
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - when: never
+
+# 在 Run pipeline 页面可以修改这个参数。
+variables:
+  RUN_ENVIRONMENT:
+    description: "选择运行环境"
+    value: "test"
+    options:
+      - "test"
+      - "production"
+
+stages:
+  - build
+  - test
+  - deploy
+
+build_project:
+  stage: build
+  image: alpine:3.20
+  script:
+    # 打印页面中选择的参数。
+    - echo "Selected environment is ${RUN_ENVIRONMENT}"
+    # 创建简单文本文件，模拟项目构建产物。
+    - mkdir -p dist
+    - echo "Build for ${RUN_ENVIRONMENT}" > dist/build.txt
+  artifacts:
+    # 后续 Stage 会自动下载这个构建产物。
+    paths:
+      - dist/
+    expire_in: 1 day
+
+test_project:
+  stage: test
+  image: alpine:3.20
+  script:
+    # 检查源文件与上一个 Stage 的构建产物。
+    - test -f README.md
+    - test -s dist/build.txt
+    - echo "Tests passed"
+
+deploy_project:
+  stage: deploy
+  image: alpine:3.20
+  script:
+    # 读取同一份构建产物，模拟部署到所选环境。
+    - cat dist/build.txt
+    - echo "Deploy to ${RUN_ENVIRONMENT} completed"

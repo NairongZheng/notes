@@ -1,0 +1,88 @@
+# 这个工作流只允许从 GitHub Actions 页面手动触发。
+name: Manual CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "选择运行环境"
+        required: true
+        default: test
+        type: choice
+        options:
+          - test
+          - production
+
+# 示例只需要读取仓库内容。
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      # 先把当前仓库代码下载到 Runner。
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 通过环境变量传递输入，避免把页面输入直接拼进 Shell 命令。
+      - name: Show input
+        env:
+          RUN_ENVIRONMENT: ${{ inputs.environment }}
+        run: echo "Selected environment is ${RUN_ENVIRONMENT}"
+
+      # 创建一个简单文本文件，模拟项目构建产物。
+      - name: Build project
+        env:
+          RUN_ENVIRONMENT: ${{ inputs.environment }}
+        run: |
+          mkdir -p dist
+          echo "Build for ${RUN_ENVIRONMENT}" > dist/build.txt
+
+      # 保存构建产物，供后续 Job 下载使用。
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: dist/
+
+  test:
+    name: Test
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      # 测试阶段需要仓库代码和前一个 Job 的构建产物。
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: dist/
+
+      # 检查源文件与构建产物是否存在且非空。
+      - name: Run tests
+        run: |
+          test -f README.md
+          test -s dist/build.txt
+
+  deploy:
+    name: Deploy
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      # 重新下载构建产物，模拟将相同产物部署到目标环境。
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: dist/
+
+      - name: Deploy project
+        env:
+          RUN_ENVIRONMENT: ${{ inputs.environment }}
+        run: |
+          cat dist/build.txt
+          echo "Deploy to ${RUN_ENVIRONMENT} completed"
