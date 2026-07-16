@@ -361,28 +361,89 @@ glab mr delete <MR编号>
 
 ## runner
 
-**配置 runner**
+GitLab Runner 是实际执行 CI job 的进程。项目中的 job 通过 `tags` 选择可用 runner；多个在线 runner 使用相同 tag 时，GitLab 会自动把任务交给其中有空闲容量的 runner，不保证严格轮询。
+
+### 创建 Project Runner
+
+在项目页面创建 runner：
 
 ```shell
-# Settings -> CI/CD -> Runners -> New project runner
-# tag 填一下
+Settings -> CI/CD -> Runners -> Create project runner
 ```
 
-**安装部署 runner**
+常用配置：
+
+- Tags：填写 `.gitlab-ci.yml` 中 job 使用的 tag，例如 `project-ci`
+- Run untagged：通常不勾选，避免接收未指定 tag 的任务
+- Description：使用能区分机器的名称，例如 `ci-runner-node-1`
+
+创建后会得到以 `glrt-` 开头的 authentication token。token 只在注册时使用，不要提交到仓库或写入普通日志。
+
+### 安装 Runner
 
 ```shell
 mkdir -p ~/.local/bin
 curl -L -o ~/.local/bin/gitlab-runner https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64
 chmod +x ~/.local/bin/gitlab-runner
-
-gitlab-runner register \
-  --url https://gitlab.xxx.com \
-  --token '<runner token>' \
-  --executor shell \
-  --name tj-doublecheck-runner
 ```
 
-成功会有 log：
+### 规划目录
+
+单机可以直接使用默认的 `~/.gitlab-runner/config.toml`。如果多台机器共享同一个 Home 或共享存储，每台机器必须使用独立父目录：
+
+```text
+/mnt/afs_toolcall/zhengnairong/gitlab-runners/
+├── node-1/
+│   ├── config/config.toml
+│   ├── builds/
+│   ├── cache/
+│   └── logs/gitlab-runner.log
+└── node-2/
+    ├── config/config.toml
+    ├── builds/
+    ├── cache/
+    └── logs/gitlab-runner.log
+```
+
+`config`、`builds`、`cache` 和 `logs` 可以放在同一个父目录下，但必须使用不同子目录。不要让多台机器共用同一份 `config.toml`、`.runner_system_id`、builds 目录或日志文件。
+
+以其中一台机器为例：
+
+```shell
+export RUNNER_ROOT="/mnt/afs_toolcall/zhengnairong/gitlab-runners/node-2"
+export RUNNER_CONFIG="${RUNNER_ROOT}/config/config.toml"
+export RUNNER_BUILDS="${RUNNER_ROOT}/builds"
+export RUNNER_CACHE="${RUNNER_ROOT}/cache"
+export RUNNER_LOG="${RUNNER_ROOT}/logs/gitlab-runner.log"
+
+mkdir -p \
+  "${RUNNER_ROOT}/config" \
+  "${RUNNER_BUILDS}" \
+  "${RUNNER_CACHE}" \
+  "${RUNNER_ROOT}/logs"
+```
+
+### 注册 Runner
+
+每台机器推荐在 GitLab 页面分别创建 Project Runner，获得不同的 `glrt-` token，不要复制另一台机器的 `config.toml`。
+
+```shell
+export RUNNER_TOKEN='<glrt-token>'
+
+gitlab-runner register \
+  --config "${RUNNER_CONFIG}" \
+  --non-interactive \
+  --url https://gitlab.xxx.com \
+  --token "${RUNNER_TOKEN}" \
+  --executor shell \
+  --description ci-runner-node-2
+
+unset RUNNER_TOKEN
+```
+
+注册完成后，token 会自动保存在指定的 `config.toml` 中。
+
+注册成功时会看到类似日志：
 
 ```shell
 gitlab-runner register \
@@ -409,8 +470,98 @@ Runner registered successfully. Feel free to start it, but if it's running alrea
 Configuration (with the authentication token) was saved in "/mnt/afs_toolcall/zhengnairong/.gitlab-runner/config.toml"
 ```
 
-**运行 runner**
+### 配置并发和工作目录
+
+编辑 `${RUNNER_CONFIG}`：
+
+```toml
+concurrent = 2
+check_interval = 0
+shutdown_timeout = 0
+
+[[runners]]
+  name = "ci-runner-node-2"
+  url = "https://gitlab.xxx.com"
+  token = "注册后自动写入，保持不变"
+  executor = "shell"
+  builds_dir = "/mnt/afs_toolcall/zhengnairong/gitlab-runners/node-2/builds"
+  cache_dir = "/mnt/afs_toolcall/zhengnairong/gitlab-runners/node-2/cache"
+  limit = 2
+  request_concurrency = 2
+```
+
+参数含义：
+
+| 参数 | 作用 |
+|------|------|
+| `concurrent` | 当前 runner 进程允许同时执行的 job 总数 |
+| `limit` | 当前 `[[runners]]` 注册项允许同时执行的 job 数 |
+| `request_concurrency` | 同时向 GitLab 请求新 job 的请求数 |
+| `builds_dir` | checkout 和 job 工作目录，多机器必须隔离 |
+| `cache_dir` | runner 缓存目录，多机器建议隔离 |
+
+不要盲目提高并发。单个 job 如果会大量占用 CPU、磁盘、模型接口或网络，应该从较小值开始观察。
+
+### 验证并启动
 
 ```shell
-gitlab-runner run
+gitlab-runner list --config "${RUNNER_CONFIG}"
+gitlab-runner verify --config "${RUNNER_CONFIG}"
+```
+
+前台启动适合调试：
+
+```shell
+gitlab-runner run \
+  --config "${RUNNER_CONFIG}" \
+  --working-directory "${RUNNER_ROOT}"
+```
+
+用户模式下可以后台运行：
+
+```shell
+nohup gitlab-runner run \
+  --config "${RUNNER_CONFIG}" \
+  --working-directory "${RUNNER_ROOT}" \
+  >> "${RUNNER_LOG}" 2>&1 < /dev/null &
+```
+
+检查进程和日志：
+
+```shell
+pgrep -af gitlab-runner
+tail -n 50 "${RUNNER_LOG}"
+```
+
+### 多机器自动路由
+
+多台机器的 runner 使用相同 tag 后，GitLab 会自动调度：
+
+```yaml
+test_job:
+  tags:
+    - project-ci
+  script:
+    - python -m pytest
+```
+
+多机器运行时还需要保证：
+
+- 每台机器都安装了 job 所需的运行环境和依赖
+- 凭证、网络和数据访问权限一致
+- 配置、builds、cache 和日志目录相互隔离
+- 共享业务输出使用 job、pipeline 或 commit 维度的独立目录
+- 不要在多个进程中直接运行同一份 runner 配置
+
+### 常用维护命令
+
+```shell
+gitlab-runner list --config "${RUNNER_CONFIG}"
+gitlab-runner verify --config "${RUNNER_CONFIG}"
+
+# 优雅停止用户模式 runner，等待当前 job 结束
+kill -QUIT <runner_pid>
+
+# 查看日志
+tail -f "${RUNNER_LOG}"
 ```

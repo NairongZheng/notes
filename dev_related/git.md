@@ -32,10 +32,20 @@ alias git-log='git log --pretty=oneline --all --graph --abbrev-commit'
 
 **文件权限与系统换行**
 
-
 [忽略文件权限导致的diff](https://www.jianshu.com/p/3b8ba804c47b)：`git config [--global || --local] core.filemode false`
 
 处理系统换行导致的diff：具体查看下一节[换行符说明与配置](#换行符说明与配置)
+
+**一些基础配置**
+
+```shell
+# 初始化分支默认为 main
+git config --global init.defaultBranch main
+# 自动删除远端已经不存在的分支引用
+git config --global fetch.prune true
+# 忽略文件权限变化
+git config --global core.fileMode false
+```
 
 **配置查看与删除**
 
