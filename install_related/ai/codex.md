@@ -1,6 +1,8 @@
 - [环境配置](#环境配置)
   - [安装和更新](#安装和更新)
-  - [登录](#登录)
+  - [登录（openai）](#登录openai)
+  - [第三方 api](#第三方-api)
+  - [使用配置](#使用配置)
 - [Linux 使用](#linux-使用)
   - [本机终端](#本机终端)
 - [常用终端操作](#常用终端操作)
@@ -37,19 +39,13 @@ brew install codex
 brew upgrade codex
 ```
 
-Linux 和 WSL2 建议安装 `bubblewrap`，Codex 使用它提供 Linux 沙箱：
-
-```shell
-# Ubuntu / Debian
-sudo apt update
-sudo apt install bubblewrap
-```
-
-## 登录
+## 登录（openai）
 
 Codex CLI 支持使用 ChatGPT 账号或 OpenAI API Key。个人交互使用一般直接登录 ChatGPT；脚本和 CI 更适合使用 API Key。
 
 ```shell
+# linux 直接输入 codex 就有引导了
+
 # 普通电脑：会拉起浏览器完成登录
 codex login
 
@@ -63,7 +59,49 @@ codex login status
 codex logout
 ```
 
-如果设备码登录不可用，可以先在有浏览器的可信电脑登录，再把 `~/.codex/auth.json` 复制到服务器。该文件包含访问令牌，必须像密码一样保管，不能提交到 Git 或发到聊天中。
+## 第三方 api
+
+```shell
+# 使用第三方直接先写最小配置，注意 codex 用的是 /v1/responses
+# vim ~/.codex/config.toml
+
+model = "你的模型名"
+model_provider = "thirdparty"
+
+[model_providers.thirdparty]
+name = "Third Party such as openrouter"
+base_url = "https://你的服务地址/v1"
+env_key = "OURNROUTER_API_KEY"
+wire_api = "responses"
+
+# 可以把 key 写进环境变量
+# export OURNROUTER_API_KEY="sk-or-v1-xxx"
+```
+
+## 使用配置
+
+配置文件主要是 `~/.codex/config.toml`。如果只想临时试一下，也可以直接在启动命令里覆盖：
+
+```shell
+codex --model gpt-5.6
+codex --profile fast
+codex --config model_reasoning_effort='"high"'
+```
+
+常见优先级（高 -> 低）：
+
+1. 启动命令里的参数，如 `--model`、`--profile`、`--config`
+2. 项目内的 `.codex/config.toml`
+3. `--profile` 对应的配置文件
+4. 全局 `~/.codex/config.toml`
+5. Codex 默认值
+
+补充：
+
+- 项目内的 `.codex/config.toml` 只有在该目录**被标记为 trusted 后才会生效**。
+- 想长期生效就改 `~/.codex/config.toml`；想只试一次就用启动参数。
+- app、CLI、IDE extension 共用同一套 `config.toml` 层级；但命令行临时参数只影响当前这一次启动。
+
 
 # Linux 使用
 
