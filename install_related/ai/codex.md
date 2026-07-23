@@ -2,13 +2,15 @@
   - [安装和更新](#安装和更新)
   - [登录（openai）](#登录openai)
   - [第三方 api](#第三方-api)
-  - [使用配置](#使用配置)
+  - [配置\&使用](#配置使用)
+    - [config.toml](#configtoml)
+    - [Codex AGENTS.md](#codex-agentsmd)
+    - [skill](#skill)
 - [Linux 使用](#linux-使用)
   - [本机终端](#本机终端)
 - [常用终端操作](#常用终端操作)
 - [macOS App 使用](#macos-app-使用)
   - [连接远程 SSH 主机](#连接远程-ssh-主机)
-- [Codex AGENTS.md](#codex-agentsmd)
 
 
 Codex 官方文档：[https://developers.openai.com/codex/](https://developers.openai.com/codex/)
@@ -33,7 +35,7 @@ codex --version
 **使用 Homebrew 安装（macOS）**
 
 ```shell
-brew install codex
+brew install --cask codex
 
 # 更新
 brew upgrade codex
@@ -78,9 +80,20 @@ wire_api = "responses"
 # export OURNROUTER_API_KEY="sk-or-v1-xxx"
 ```
 
-## 使用配置
+## 配置&使用
 
-配置文件主要是 `~/.codex/config.toml`。如果只想临时试一下，也可以直接在启动命令里覆盖：
+### config.toml
+
+配置文件常见位置：
+
+```shell
+~/.codex/config.toml            # 个人全局配置
+<project>/.codex/config.toml    # 项目配置
+codex -c key=value              # 临时覆盖
+# 优先级是：命令行参数 > 项目配置 > Profile > 个人配置 > Codex 默认值。
+```
+
+配置文件主要还是用 `~/.codex/config.toml`。如果只想临时试一下，也可以直接在启动命令里覆盖：
 
 ```shell
 codex --model gpt-5.6
@@ -88,20 +101,105 @@ codex --profile fast
 codex --config model_reasoning_effort='"high"'
 ```
 
-常见优先级（高 -> 低）：
-
-1. 启动命令里的参数，如 `--model`、`--profile`、`--config`
-2. 项目内的 `.codex/config.toml`
-3. `--profile` 对应的配置文件
-4. 全局 `~/.codex/config.toml`
-5. Codex 默认值
-
 补充：
 
 - 项目内的 `.codex/config.toml` 只有在该目录**被标记为 trusted 后才会生效**。
 - 想长期生效就改 `~/.codex/config.toml`；想只试一次就用启动参数。
 - app、CLI、IDE extension 共用同一套 `config.toml` 层级；但命令行临时参数只影响当前这一次启动。
 
+### Codex AGENTS.md
+
+Codex 每次启动时会读取 `AGENTS.md`。全局规则先加载，项目目录中越靠近当前工作目录的规则越后加载，因此可以覆盖上层规则。
+
+```shell
+~/.codex/AGENTS.md              # 个人全局偏好
+<project>/AGENTS.md             # 项目规则，建议提交到仓库
+<project>/src/AGENTS.md         # src 目录及其子目录的补充规则
+<project>/src/AGENTS.override.md # 临时覆盖同目录的 AGENTS.md
+```
+
+可以使用 `/init` 在当前项目生成初始文件。示例：
+
+```markdown
+# General
+
+- 默认使用中文回答。
+- 修改代码前先简单说明计划。
+- 每次需求的添加不要都创建一个冗余的文档，可以给予原来的文档进行调整，如有必要再新增。
+- 优先修改最少的代码。
+- 单一代码文件不能太长，需要做好模块化，但是不要无意义重构。
+- 不要修改无关文件。
+- 新增依赖前先询问。
+- 如果需要运行 python 脚本，可以使用 conda 下的 dev 环境。
+
+# Coding Style
+
+- Python 使用 type hints。
+- 函数尽量保持简短。
+- 函数需要写注释，函数内部关键逻辑也需要添加注释。
+- 优先使用标准库。
+
+# Git
+
+- commit 信息使用英文和 Conventional Commits 格式，如 `feat: xxx`。
+- 不主动 commit。
+- 不主动 push。
+
+# Testing
+
+- 修改代码后运行相关测试，并说明验证结果。
+```
+
+规则较多时，可以把通用约定放在项目根目录，把某个模块特有的规则放到对应子目录，不要把所有细节都堆在一个文件中。
+
+### skill
+
+**skill 格式**
+
+```shell
+my-skill/
+├── SKILL.md
+├── scripts/          # 可选脚本
+├── references/       # 可选参考资料
+├── assets/           # 可选图片、模板
+└── agents/
+    └── openai.yaml   # 可选 App 展示信息
+```
+
+其中 SKILL.md 格式是：
+
+```shell
+---
+name: my-skill
+description: 当用户需要检查项目结构和质量时使用。
+---
+
+# 项目检查 Skill
+
+1. 阅读项目目录。
+2. 检查 Git 状态。
+3. 查找测试与构建命令。
+4. 输出中文检查报告。
+```
+
+**安装 skill**
+
+```shell
+~/.codex/skills/.system/    # 系统内置，不要修改
+~/.agents/skills/           # 个人全局 skill，可以直接复制到这里
+<project>/.agents/skills/   # 项目 skill，适合提交到项目仓库
+~/.codex/plugins/cache/     # Plugin 提供，由 Plugin 管理，不要直接修改
+```
+
+**查看 skill**
+
+```shell
+# 1. app 对话框
+$skill_name
+# 2. app 界面 -> plugins -> skills
+# 3. cli
+/skills
+```
 
 # Linux 使用
 
@@ -179,46 +277,3 @@ SSH 别名已经配置好时，只需：
 1. 打开 Codex App 的 `Settings > Connections`。
 2. 添加或启用对应主机，例如 `tj`。
 3. 重启 App，然后选择该主机上的项目目录。
-
-# Codex AGENTS.md
-
-Codex 每次启动时会读取 `AGENTS.md`。全局规则先加载，项目目录中越靠近当前工作目录的规则越后加载，因此可以覆盖上层规则。
-
-```shell
-~/.codex/AGENTS.md              # 个人全局偏好
-<project>/AGENTS.md             # 项目规则，建议提交到仓库
-<project>/src/AGENTS.md         # src 目录及其子目录的补充规则
-<project>/src/AGENTS.override.md # 临时覆盖同目录的 AGENTS.md
-```
-
-可以使用 `/init` 在当前项目生成初始文件。示例：
-
-```markdown
-# General
-
-- 默认使用中文回答。
-- 修改代码前先简单说明计划。
-- 优先修改最少的代码。
-- 不要无意义重构。
-- 不要修改无关文件。
-- 新增依赖前先询问。
-
-# Coding Style
-
-- Python 使用 type hints。
-- 函数尽量保持简短。
-- 函数需要写注释。
-- 优先使用标准库。
-
-# Git
-
-- commit 信息使用英文和 Conventional Commits 格式，如 `feat: xxx`。
-- 不主动 commit。
-- 不主动 push。
-
-# Testing
-
-- 修改代码后运行相关测试，并说明验证结果。
-```
-
-规则较多时，可以把通用约定放在项目根目录，把某个模块特有的规则放到对应子目录，不要把所有细节都堆在一个文件中。
