@@ -50,6 +50,31 @@ chmod +x ~/.docker/cli-plugins/docker-compose
 docker compose version
 ```
 
+**macOS 安装docker**
+
+```shell
+# 这个方法是不需要 docker-desktop 提供守护进程的
+
+# 先卸载暂留的 docker-desktop 组建
+brew uninstall --cask docker --ignore-dependencies || true
+brew uninstall --ignore-dependencies docker-completion || true
+brew uninstall --ignore-dependencies docker-compose colima || true
+brew uninstall --ignore-dependencies docker || true
+
+# 安装 CLI + 引擎桥接（colima）
+brew install docker docker-compose colima
+
+# 启动 colima
+colima start
+# 也可以设置开机自启动
+brew services start colima
+
+# 然后就可以使用 docker 了，用 docker compose 还需要：
+mkdir -p ~/.docker/cli-plugins
+ln -sfn "$(brew --prefix)/bin/docker-compose" ~/.docker/cli-plugins/docker-compose
+# 或者直接用 docker-compose
+```
+
 # 管理docker服务
 
 **管理docker服务**
