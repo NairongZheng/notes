@@ -19,12 +19,12 @@
 >     </tr>
 >     <tr  align='center'>
 >         <td>正例</td>
-> ||<td>TP(真正例)</td>
+>         <td>TP(真正例)</td>
 >         <td>FN(假反例)</td>
 >     </tr>
 >     <tr  align='center'>
 >         <td>反例</td>
-> ||<td>FP(假正例)</td>
+>         <td>FP(假正例)</td>
 >         <td>TN(真反例)</td>
 >     </tr>
 > </table>
