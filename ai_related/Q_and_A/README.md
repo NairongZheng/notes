@@ -53,6 +53,19 @@
 13. KV Cache
 ```
 
+### LLM 架构与推理效率
+
+```text
+1. Prefill 和 Decode 分别在做什么？为什么它们的性能瓶颈不同？
+2. TTFT、每 token 延迟、吞吐量分别衡量什么？为什么吞吐高不一定代表用户感觉快？
+3. FlashAttention 和 PagedAttention 分别优化什么？两者有什么区别？
+4. Continuous Batching、Chunked Prefill 和 Prefill/Decode 分离分别解决什么问题？
+5. Prefix Cache 如何复用计算？Agent 的提示词和工具列表变化为什么会影响缓存命中？
+6. 投机解码是什么？为什么可以保持目标模型的采样分布？MTP 与它有什么关系？
+7. 权重量化、激活量化和 KV Cache 量化有什么区别？为什么量化后不一定更快？
+8. 全注意力、滑动窗口注意力、线性注意力和混合架构有什么区别？
+```
+
 ## RAG相关
 
 [RAG相关](./rag_related.md)，包括以下几个问题：
