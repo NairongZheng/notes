@@ -1112,201 +1112,214 @@ class MoE(nn.Module):
 ### LLM 架构与推理效率
 
 <details>
-<summary>Prefill 和 Decode 分别在做什么？为什么它们的性能瓶颈不同？</summary>
+<summary>一段文本输入 Decoder-only Transformer 后，模型是怎样预测下一个 token 的？</summary>
 
 <br>
 
-**先处理已有输入，再逐步生成新内容**
+**从文字到下一个 token**
 
-> 以使用 KV Cache 的自回归 Transformer 为例：
+> 以输入“中国的首都是”为例，流程可以分成五步：
 >
-> | 阶段 | 在做什么 | 常见瓶颈 |
-> | --- | --- | --- |
-> | Prefill | 处理提示词中的 token，建立 KV Cache，并得到第一个输出 token 的分布 | 输入较长时计算量大，通常更偏算力瓶颈 |
-> | Decode | 每轮处理新 token，读取历史 KV，预测下一个 token | 小 batch 下往往更受显存带宽限制 |
+> 1. **分词**：Tokenizer 把文本转换成 token ID。一个 token 不一定对应一个汉字或一个单词。
+> 2. **转成向量**：通过 Embedding 查表得到向量，并在模型中引入位置信息，让模型能区分先后顺序。
+> 3. **经过多层 Transformer**：因果自注意力让每个位置结合自己和前文的信息，前馈网络进一步变换表示；层中还有归一化和残差连接。
+> 4. **得到候选分数**：取最后一个输入位置的最终表示，通过输出层（LM Head）得到词表中每个 token 的分数，即 logits。它还不是概率。
+> 5. **选出下一个 token**：可以选分数最高的 token，也可以经过 softmax 得到概率后采样。选出的 token 接到输入后面，再继续预测。
 >
-> Prefill 的输入 token 已经知道，可以在每一层并行计算多个位置；因果 mask 仍然保证各位置看不到后面的内容。Decode 的下一个 token 依赖上一步生成结果，普通自回归生成不能把后续所有位置一次算完。
-
-**为什么 Decode 容易“等数据”？**
-
-> 小 batch 时，每步只处理少量新 token，却需要访问大量权重和历史 KV，计算单元可能花很多时间等待数据搬运。Prefill 一次处理较多 token，同一批权重能用于更多计算，更容易充分利用算力。[参考：vLLM 对 Prefill 与 Decode 的说明](https://docs.vllm.ai/en/latest/configuration/optimization/#chunked-prefill)
->
-> 这不是绝对分类。batch 大小、上下文长度、模型结构和多卡通信都会改变瓶颈；不能只看到“Decode”就断定增加算力没有用。
+> 模型直接预测的是“下一个 token 的分布”，生成循环反复调用模型，才形成完整回答；遇到结束标记或长度限制等条件时停止。[参考：Transformer 结构](https://arxiv.org/abs/1706.03762)、[文本生成流程](https://huggingface.co/learn/llm-course/chapter1/8)
 
 </details>
 
 <details>
-<summary>TTFT、每 token 延迟、吞吐量分别衡量什么？为什么吞吐高不一定代表用户感觉快？</summary>
+<summary>为什么训练时可以并行计算多个 token，生成时却通常需要逐个生成？</summary>
 
 <br>
 
-**分别看“多久开始”“后面多快”“总共处理多少”**
+**训练时，正确的前文已经在样本里**
 
-> | 指标 | 含义 | 用户感受或用途 |
-> | --- | --- | --- |
-> | TTFT（Time To First Token） | 从请求开始到收到第一个 token 的时间 | 点发送后，要等多久才开始有输出 |
-> | TPOT（Time Per Output Token） | 首个 token 之后，平均每个输出 token 花多少时间 | 后续文字生成得快不快 |
-> | ITL（Inter-Token Latency） | 相邻输出之间的时间间隔 | 输出是否流畅，有没有突然卡住 |
-> | 吞吐量 | 系统每秒处理的 token 数或请求数 | 同一批硬件能服务多少工作量 |
->
-> TPOT 常按 `(总耗时 - TTFT) / (输出 token 数 - 1)` 计算，适用于输出多于一个 token 的请求。流式输出可能一次打包多个 token，此时观测到的 ITL 不能直接当作单 token 耗时。[参考：vLLM 指标定义](https://docs.vllm.ai/en/latest/design/metrics/)
-
-**吞吐高，单个请求仍可能慢**
-
-> 例如服务把更多请求组成 batch，GPU 利用率和总吞吐提高，但每个请求可能排队更久，输出间隔也可能变大。
->
-> 因此聊天服务要一起看 TTFT、生成速度和较慢请求的延迟。比较测试时还要统一输入输出长度、并发量，并说明吞吐统计的是输入 token、输出 token，还是两者之和；客户端与服务端测得的延迟也可能因网络开销不同而不同。
-
-</details>
-
-<details>
-<summary>FlashAttention 和 PagedAttention 分别优化什么？两者有什么区别？</summary>
-
-<br>
-
-**一个优化 Attention 的计算与搬运，一个优化 KV Cache 的存放与访问**
-
-> | 技术 | 主要问题 | 做法 |
-> | --- | --- | --- |
-> | FlashAttention | Attention 的中间矩阵很大，反复读写显存开销高 | 分块计算并融合操作，利用片上高速存储，避免把完整注意力矩阵存回显存 |
-> | PagedAttention | 不同请求的 KV Cache 长度不断变化，连续预留空间容易浪费 | 把 KV 分成固定大小的块，通过映射找到实际位置，让 Attention 能读取非连续存放的 KV |
->
-> 例如一条请求未来可能生成很多 token，PagedAttention 不必一开始就为它预留一整段最大长度空间，可以随生成增长分配块。[参考：FlashAttention 论文](https://arxiv.org/abs/2205.14135)、[PagedAttention 论文](https://arxiv.org/abs/2309.06180)
-
-**两者可以配合，不是二选一**
-
-> FlashAttention 主要让一次 Attention 算得更高效；PagedAttention 主要减少 KV 存储浪费，帮助服务容纳更多请求。能否组合要看具体 Attention kernel 是否支持相应的 KV 布局。
->
-> 两者都不是通过“少看一些历史 token”来实现上述优化。FlashAttention 是精确 Attention 算法，但浮点运算顺序可能带来微小数值差异；它也没有把全注意力的计算复杂度从平方级变成线性级。PagedAttention 同样不会自动减少每个 token 应保存的 KV 内容。
-
-</details>
-
-<details>
-<summary>Continuous Batching、Chunked Prefill 和 Prefill/Decode 分离分别解决什么问题？</summary>
-
-<br>
-
-**分别调整“哪些请求一起跑”“长输入怎么切”“两个阶段在哪里跑”**
-
-> | 方式 | 怎么做 | 主要收益与代价 |
-> | --- | --- | --- |
-> | Continuous Batching | 按生成迭代调整 batch：完成的请求退出，新请求可以加入 | 不用等整批最长请求结束，提高利用率；仍要处理排队和显存限制 |
-> | Chunked Prefill | 把长提示词的 Prefill 分成多块，和 Decode 工作穿插调度 | 避免一次长 Prefill 长时间阻塞其他请求的生成；块太小也可能拖慢该请求的首 token |
-> | Prefill/Decode 分离 | 将两个阶段放到不同实例或设备资源上，中间传递 KV Cache | 可以分别配置算力、并行方式和实例数量；增加 KV 传输与调度开销 |
->
-> 例如 A 正在生成回答，B 带着很长的输入到达：Continuous Batching 允许动态接纳 B；Chunked Prefill 可以分几次处理 B，让 A 有机会继续生成；P/D 分离则让 B 的 Prefill 在另一组资源上运行。
->
-> 三者可以组合，处理的是不同层面的问题。分离也不代表一定更快：如果 KV 传输成本很高或请求量很小，收益可能抵不过额外开销。[参考：vLLM 与迭代调度](https://arxiv.org/abs/2309.06180)、[Chunked Prefill](https://docs.vllm.ai/en/latest/configuration/optimization/#chunked-prefill)、[P/D 分离](https://docs.vllm.ai/en/latest/features/disagg_prefill/)
-
-</details>
-
-<details>
-<summary>Prefix Cache 如何复用计算？Agent 的提示词和工具列表变化为什么会影响缓存命中？</summary>
-
-<br>
-
-**复用相同前缀的 KV，省掉重复 Prefill**
-
-> 假设两次请求分别是：
+> 假设一条训练样本由四个 token 组成：`A B C D`。做下一 token 预测时，可以把输入和目标错开一位：
 >
 > ```text
-> 请求 1：固定系统说明 + 固定工具列表 + 用户问题 A
-> 请求 2：固定系统说明 + 固定工具列表 + 用户问题 B
+> 输入：A  B  C
+> 目标：B  C  D
 > ```
 >
-> 在模型和其他缓存条件一致、旧缓存仍可用时，公共前缀可以复用已有 KV，主要计算后面新加入的部分。它缓存的是中间计算结果，不是把上一次答案直接返回。[参考：vLLM Prefix Caching](https://docs.vllm.ai/en/latest/features/automatic_prefix_caching/)
+> 在一次前向计算中，同时训练三个预测：根据 `A` 预测 `B`，根据 `A B` 预测 `C`，根据 `A B C` 预测 `D`。每个位置的前文都来自真实样本，不需要等待模型先把前一个 token 猜出来，这叫 Teacher Forcing。
+>
+> **不会偷看答案吗？** 因果掩码会屏蔽未来位置。例如，负责预测 `B` 的位置只能看 `A`，不能看输入中后面的 `B C`。并行的是同一层中不同位置的计算，各层之间仍然有先后依赖。[参考：Transformer 的因果掩码与目标错位](https://arxiv.org/abs/1706.03762)
 
-**为什么前面改一点，后面也受影响？**
+**生成时，后面的输入还不知道**
 
-> 在因果 Transformer 中，一个位置的表示依赖前面的 token。若开头的工具描述或排列变了，后面即使文字相同，也不能简单复用旧 KV。
+> 用户只给了 `A`，模型要先生成 `B`，才能用 `A B` 生成 `C`。因此，普通自回归生成通常逐个 token 推进。
 >
-> 普通前缀缓存需要匹配实际 token 前缀，不是语义相似就行。修改靠后的位置，通常仍能复用前面未变化的部分；实际命中范围还受缓存块边界等实现影响。
->
-> 对 Agent 来说，可以保持稳定指令和工具顺序，把适合后放的动态信息放在后面。但不能为命中缓存而保留已经失效的规则；按需加载工具也需要权衡“输入变短”和“前缀发生变化”。
->
-> Prefix Cache 直接节省的是 Prefill 工作，不会省掉生成新答案所需的 Decode。历史已经压缩成另一段摘要，通常也不能继续复用被改写部分的旧前缀。
+> 这里说的训练并行，是已有文本上的前向计算和 loss 计算。如果训练流程中需要模型先生成回答，例如 RL 的 rollout，这个生成过程仍然有上述依赖。
 
 </details>
 
 <details>
-<summary>投机解码是什么？为什么可以保持目标模型的采样分布？MTP 与它有什么关系？</summary>
+<summary>Prefill 和 Decode 分别做什么？两个阶段的输入、输出有什么区别？</summary>
 
 <br>
 
-**先便宜地起草，再让目标模型批量验证**
+**Prefill 处理已知输入，Decode 继续生成**
 
-> 普通解码通常每次目标模型前向只推进一个新 token。投机解码先用较便宜的草稿模型或模块提出多个候选 token，再让目标模型一次前向计算它们的条件概率，按顺序决定接受到哪里。
+> 以下以使用 KV Cache 的普通自回归 Transformer 为例，先忽略已有前缀缓存的复用：
 >
-> 候选已经给出，所以验证可以并行计算；遇到拒绝，就丢弃该位置之后的草稿，并按校正规则采样，再开始下一轮。草稿被接受得越多，越可能减少目标模型的串行调用次数。
-
-**保持分布靠概率校正，不是“大模型觉得差不多就接受”**
-
-> 以经典采样算法为例，同一前缀下，草稿对 token x 的概率为 `q(x)`，目标模型的概率为 `p(x)`：
+> | 阶段 | 输入 | 做什么 | 输出 |
+> | --- | --- | --- | --- |
+> | Prefill | 整段 prompt 的 token | 计算输入各位置的表示，并建立各层 KV Cache | prompt 的 KV Cache，以及用于选择第一个输出 token 的 logits |
+> | Decode 的一步 | 刚生成的一个 token，加上已有 KV Cache | 计算这个新位置，读取历史 K、V，并把新 K、V 加入缓存 | 更新后的 KV Cache，以及用于选择下一个 token 的 logits |
 >
-> - 按 `min(1, p(x) / q(x))` 的概率接受候选。
-> - 拒绝时，从归一化后的 `max(p - q, 0)` 分布重新采样，补偿草稿分布与目标分布的差异。
+> ```text
+> Prefill：输入 x1 x2 x3 → 得到它们的缓存 → 选出 y1
+> Decode：输入 y1 + 已有缓存 → 更新缓存 → 选出 y2
+> Decode：输入 y2 + 已有缓存 → 更新缓存 → 选出 y3
+> ```
 >
-> 正确实现这套接受与校正规则，理论上可以保持目标模型的采样分布；不是直接保留全部草稿，也不是拒绝后随便从 p 重抽一次。这里说的是**分布一致**，不保证使用同一随机种子时逐字输出相同。[参考：Speculative Decoding 论文](https://proceedings.mlr.press/v202/leviathan23a/leviathan23a.pdf)
-
-**MTP 是草稿的一种来源，不等于投机解码本身**
-
-> MTP（Multi-Token Prediction）让模型在训练时学习预测多个未来位置。例如 DeepSeek-V3 的 MTP 模块可以在推理时用于提出草稿，再交给主模型验证；也可以不使用这些模块，正常逐 token 生成。[参考：DeepSeek-V3 的 MTP](https://arxiv.org/html/2412.19437v2#S2.SS2)
+> 注意：**第一个输出 token 可以根据 Prefill 的结果选出**。此时缓存里还没有这个新 token 的 K、V，要到下一步把它送入模型时才计算并加入。
 >
-> 是否加速还取决于接受率、草稿开销和 batch 大小。草稿经常被拒绝，或者额外计算太贵时，投机解码反而可能更慢。
+> 后续虽然只输入一个新 token，但历史仍通过 KV Cache 参与计算。缓存省去了历史表示的重复计算，并没有省去新 token 对历史的注意力计算。[参考：KV Cache 与逐步生成示例](https://huggingface.co/docs/transformers/main/en/cache_explanation)
 
 </details>
 
 <details>
-<summary>权重量化、激活量化和 KV Cache 量化有什么区别？为什么量化后不一定更快？</summary>
+<summary>首字延迟、每个输出 token 的耗时和吞吐量分别是什么？它们对应什么使用体验？</summary>
 
 <br>
 
-**先看压缩的是哪一类数据**
+**分别看多久开始、输出多快、总共能处理多少**
 
-> 量化用较低精度表示数值，通常还需要缩放系数等信息，目的是减少存储、搬运或计算开销。
->
-> | 类型 | 量化对象 | 主要作用 |
+> | 指标 | 含义 | 对应的体验 |
 > | --- | --- | --- |
-> | 权重量化 | 模型参数，例如线性层的权重 | 降低权重显存和读取带宽需求 |
-> | 激活量化 | 运行中产生的中间张量 | 配合低精度算子降低计算或数据搬运开销 |
-> | KV Cache 量化 | 为历史 token 保存的 K、V | 降低长上下文和高并发时的缓存占用 |
+> | 首字延迟（TTFT） | 从发出请求到收到第一个输出 token 的时间 | 点发送后，等多久开始出现回答 |
+> | 每个输出 token 的耗时（TPOT） | 首个 token 之后，平均生成一个 token 所花的时间 | 回答开始后，文字出来得快不快 |
+> | 吞吐量（Throughput） | 单位时间内系统总共完成的工作量，例如输出 token/s 或完成的请求数/s | 同样的机器能服务多少工作量 |
 >
-> `W4A16` 通常表示权重 4 bit、激活 16 bit，但不意味着 KV Cache 也是 4 bit，也不意味着所有算子和累加都用 4 bit。KV 的精度通常需要另看配置。[参考：量化概念](https://huggingface.co/docs/transformers/main/en/quantization/concept_guide)、[vLLM KV Cache 量化](https://docs.vllm.ai/en/latest/features/quantization/quantized_kvcache/)
-
-**省显存，不一定让单个请求更快**
-
-> - **算子和硬件是否支持**：没有高效的低精度 kernel，可能需要额外解包、转换或反量化。
-> - **瓶颈在哪里**：如果主要时间花在通信、调度或工具等待上，压缩权重未必明显降低总耗时。
-> - **输入和 batch 多大**：相同方案在小 batch、长输入、高并发下的收益可能不同。
+> “首字”是习惯叫法，实际通常统计 token。客户端 TTFT 包含网络、排队、Prefill 等耗时，不能直接等同于 Prefill 时间；看监控时要确认统计的是客户端还是服务端。
 >
-> 量化后的空间节省可能主要用于容纳更大 batch，从而提高总吞吐，而不是降低单次延迟。低精度还可能损失质量，因此要同时检查效果、显存、延迟和吞吐，不能只看模型文件变小了。
+> 假设一个请求 1 秒后收到首个 token，6 秒时收到最后一个，共输出 101 个 token，那么后续平均耗时为：`(6 - 1) / (101 - 1) = 0.05 秒/token`。这个 TPOT 算法要求输出至少两个 token。
+>
+> **吞吐高不代表每个人等得短**：系统同时服务更多请求，总产出可能增加，但单个请求可能排队更久。比较吞吐时也要统一口径，例如是否只统计输出 token。[参考：vLLM 延迟与吞吐指标](https://docs.vllm.ai/en/latest/design/metrics/)
 
 </details>
 
 <details>
-<summary>全注意力、滑动窗口注意力、线性注意力和混合架构有什么区别？</summary>
+<summary>什么是“计算受限”和“显存带宽受限”？为什么 Prefill 和 Decode 的瓶颈往往不同？</summary>
 
 <br>
 
-**核心区别是怎样保留和访问历史信息**
+**一个主要等计算，一个主要等数据搬运**
 
-> 以下以自回归模型为例：
+> - **计算受限**：要做的乘加运算很多，计算单元处理不过来。提高有效计算能力，通常更有帮助。
+> - **显存带宽受限**：计算需要的权重、KV 等数据来不及从显存送到计算单元。即使计算能力很强，也可能在等数据。
 >
-> | 方式 | 怎样看历史 | 优点与代价 |
-> | --- | --- | --- |
-> | 全注意力 | 当前 token 可以直接关注上下文内所有允许的历史位置 | 能灵活检索历史，但长序列的计算和 KV 开销大 |
-> | 滑动窗口注意力 | 每层主要关注最近一个窗口的 token | 限制每步访问量，缓存可保留窗口所需部分；窗口外信息不能在这一层直接读取 |
-> | 线性注意力 | 常见做法是将历史累积进固定大小的状态，再用当前 query 读取 | 随序列长度增长的开销较低，但有限状态需要压缩历史，精确回查某个 token 的能力可能受影响 |
-> | 混合架构 | 在不同层组合全注意力、窗口或线性注意力等机制 | 在效率和历史访问能力之间取折中，仍需处理不同层的状态与缓存 |
->
-> 滑动窗口可以通过多层间接传播更远的信息，但不等于每一层都能直接查看全部历史。线性注意力也不是“删掉 softmax 就行”，需要相应的计算结构。[参考：Mistral 滑动窗口](https://arxiv.org/abs/2310.06825)、[Linear Attention](https://arxiv.org/abs/2006.16236)
+> **显存容量和带宽是两回事**：容量决定能放多少数据，带宽决定单位时间能搬多少数据。“模型已经放在显存里”也不代表没有搬运开销，它仍需要被读取来参与计算。
 
-**为什么会用混合架构？**
+**为什么两个阶段往往不同？**
 
-> 可以让多数层以较低成本处理长历史，再用部分全注意力层保留直接访问历史的能力。例如 Qwen3-Next 组合了 Gated DeltaNet 与 Gated Attention。[参考：Qwen3-Next 模型说明](https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct)
+> - **Prefill 一次处理较多 token**：同一份权重可以用于多个位置的计算，容易形成较大的矩阵乘法，计算单元比较容易忙起来，因此常见瓶颈是计算。
+> - **Decode 在小 batch 下，每个请求一次只处理一个新 token**：仍需读取大量权重和历史 KV，但每次读取后能做的计算相对少，因此常见瓶颈是显存带宽。
 >
-> 这些属于模型结构选择，通常需要对应训练，不能把已训练的全注意力模型随意切换成线性注意力并期待效果不变。混合模型中保留的全注意力层仍可能有随上下文增长的 KV 开销，也不能简单称为“完全不需要 KV Cache”。
+> 这不是绝对分类。batch 变大、上下文变长或硬件变化后，瓶颈也会变化，不能只根据“Prefill / Decode”名称就下结论。[参考：vLLM 对两阶段瓶颈的说明](https://docs.vllm.ai/en/latest/configuration/optimization/#chunked-prefill)、[PyTorch 对 Decode 带宽瓶颈的分析](https://pytorch.org/blog/accelerating-generative-ai-2/)
 
 </details>
 
+<details>
+<summary>为什么把多个请求组成一个 batch，通常能提高吞吐量？为什么不一定让单个请求更快？</summary>
 
+<br>
+
+**同一批计算可以服务多个请求**
+
+> 多个请求使用同一个模型时，可以把它们的计算合在一起。矩阵运算更大，更容易利用 GPU 的并行能力，同一份权重的读取开销也能由更多 token 分摊。不同请求仍有各自的上下文和 KV Cache，不会互相看到对方的内容。
+>
+> 但 batch 增大也意味着这一轮要做更多计算、读取更多 KV，执行一轮的时间可能变长；如果系统为了凑 batch 等待请求，还会增加排队时间。吞吐不会随着 batch 无限增长，最终会受到计算、带宽或显存容量等限制。[参考：PyTorch 的小 batch Decode 分析](https://pytorch.org/blog/accelerating-generative-ai-2/)、[vLLM 的 batch 与延迟调优](https://docs.vllm.ai/en/latest/configuration/optimization/)
+
+**用一个假设数字区分吞吐和延迟**
+
+> 忽略其他开销，假设一轮 Decode 中，每个请求都生成一个 token：
+>
+> | batch 大小 | 一轮耗时 | 这一轮总产出 | 总吞吐 | 单个请求等待下一个 token 的时间 |
+> | --- | --- | --- | --- | --- |
+> | 1 | 20 ms | 1 个 token | 50 token/s | 20 ms |
+> | 4 | 30 ms | 4 个 token | 约 133 token/s | 30 ms |
+>
+> 第二种情况的总产出更多，但每个请求的输出间隔反而变长了。这只是说明两种指标可以朝不同方向变化，实际收益需要测量。
+
+</details>
+
+<details>
+<summary>权重量化、激活量化和 KV Cache 量化分别压缩什么？FP16、INT8、INT4 和 W4A16 这些名称怎么看？</summary>
+
+<br>
+
+**先区分压缩对象，再看表示精度**
+
+> 量化用更少的 bit 近似表示数值，通常还需要缩放系数等信息。
+>
+> | 类型 | 压缩对象 | 主要节省什么 |
+> | --- | --- | --- |
+> | 权重量化 | 训练得到的模型参数，例如线性层权重 | 权重存储和读取开销 |
+> | 激活量化 | 模型运行时产生的中间张量，例如线性层输入 | 中间数据的存储、搬运开销，也可能配合低精度算子加速计算 |
+> | KV Cache 量化 | 为历史 token 缓存的 K、V | 缓存占用，尤其适合关注长上下文或高并发的场景 |
+>
+> K、V 也来自中间计算，但 KV Cache 需要跨生成步骤保存，所以通常单独讨论它的量化。[参考：量化概念](https://huggingface.co/docs/transformers/main/en/quantization/concept_guide)、[KV Cache 量化](https://docs.vllm.ai/en/latest/features/quantization/quantized_kvcache/)
+
+**名称怎么看？**
+
+> - **FP16**：16 bit 浮点数，每个数占 2 字节。
+> - **INT8 / INT4**：8 bit / 4 bit 整数，分别只有 256 / 16 种编码值。量化通常用这些整数配合缩放系数来近似原来的数值，不是直接把小数部分扔掉。
+> - **W4A16**：W 表示权重、A 表示激活，即权重用 4 bit、激活用 16 bit。具体数值格式需要看方案，名称本身也不保证所有层和运算都采用这个精度。
+>
+> **W4A16 不代表 KV Cache 也是 4 bit，也不代表乘法和累加都用 4 bit。** 存储格式、计算格式和缓存格式需要分别确认。
+
+</details>
+
+<details>
+<summary>为什么量化后显存更省，却不一定更快？精度下降又可能影响什么？</summary>
+
+<br>
+
+**数据变小，只解决了部分开销**
+
+> 例如，权重从 16 bit 压到 4 bit，单看量化权重数据，大小可以降到约四分之一。但完整推理还需要缩放系数、未量化的层、激活、KV Cache 等，所以总显存不会直接变成四分之一。
+>
+> 速度还取决于三个问题：
+>
+> 1. **硬件和算子是否适配？** 有的方案以低精度保存权重，使用时仍要解包、反量化，再做较高精度计算。这些操作有额外成本。
+> 2. **省下的是不是主要瓶颈？** 如果主要卡在权重读取，权重量化可能明显提速；如果主要卡在长上下文的 KV 读取或其他开销，只压权重的收益就可能有限。
+> 3. **测的是什么场景？** 省下的显存可能让系统容纳更大 batch、提高总吞吐，却没有降低单个请求的延迟。[参考：PyTorch 的权重量化实例](https://pytorch.org/blog/accelerating-generative-ai-2/)、[vLLM KV Cache 量化](https://docs.vllm.ai/en/latest/features/quantization/quantized_kvcache/)
+
+**数值误差如何影响回答？**
+
+> 量化会让计算结果产生偏差，进而改变下一个 token 的分数。如果两个候选本来就很接近，输出选择可能改变，后续生成也可能随之变化。
+>
+> 误差不一定造成明显效果下降，但可能影响推理正确率、代码通过率或长上下文信息提取等能力。验证时应使用实际任务，同时比较效果、显存、延迟和吞吐，不能只确认模型“能正常说话”。[参考：量化中的精度与效率取舍](https://huggingface.co/docs/transformers/main/en/quantization/concept_guide)
+
+</details>
+
+<details>
+<summary>线性注意力是怎样保存历史信息的？它和保存完整 KV Cache 的方式有什么区别？</summary>
+
+<br>
+
+**完整 KV Cache 按位置保存，常见的线性注意力把历史合并进状态**
+
+> 全注意力保存每个历史位置的 K、V。新 token 到来时，用自己的 Q 与历史 K 计算匹配程度，再对 V 加权汇总。因此，历史越长，要保存和读取的 K、V 通常越多。
+>
+> 常见的因果线性注意力改用一个固定形状的状态矩阵保存历史：每来一个 token，就用它的 K、V 更新状态，再由当前 Q 从状态中读取信息。基础形式还会维护用于归一化的状态；不同变体也可能加入遗忘、门控等更新方式。
+>
+> ```text
+> 完整 KV Cache：保留 K1/V1、K2/V2、K3/V3……，新 Q 与这些历史位置进行匹配
+> 线性注意力：  已有状态 + 新 K/V → 更新后的状态；当前 Q 从状态中读取信息
+> ```
+>
+> 这里的“状态”是数值张量，不是让 LLM 写一段文字摘要。对于这类固定状态的线性注意力，在模型维度固定时，推理状态的大小和每步更新、读取的工作量不会随历史长度一直增长。[参考：Linear Attention 的递归状态](https://arxiv.org/abs/2006.16236)
+
+**节省了什么，代价是什么？**
+
+> 它省去了逐位置保存和扫描全部历史 KV 的开销，但历史信息被合并了，不能再用同样的方式直接访问某个历史位置的 K、V。例如，要从很久以前的多条记录中精确找出某一个编号，对有限状态的保存与读取能力就有更高要求；具体效果仍取决于模型和训练。
+>
+> 因此，线性注意力不等于“给原来的全注意力加一个更省空间的缓存”，而是改变了历史信息的组织和计算方式，通常需要相应的模型结构与训练。
+
+</details>
