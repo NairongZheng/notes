@@ -1181,6 +1181,8 @@
 >
 > 实际检查时，打印出“哪些 token 参与了 loss”：确认工具参数没有漏掉，工具返回没有误算进去，截断也没有留下半个调用。若拆成逐轮样本，每轮只提供当时已知的前文，不能把后续工具结果提前放进输入。TRL 的 `assistant_only_loss` 也需要模板提供正确的 assistant 区间。
 
+> Pretrain、Midtrain 与 SFT 的 loss 范围对比，见 [LLM 文档的“Pretrain、Midtrain 和 SFT 中，哪些 token 应该计算 loss？”](./llm_related.md#推理模型与后训练)。
+
 </details>
 
 <details>
