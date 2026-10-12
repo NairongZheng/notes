@@ -111,6 +111,17 @@
 5. 什么是间接 Prompt Injection？如何防止网页、文件或工具结果中的内容变成 Agent 的指令？
 ```
 
+### 多 Agent 协作
+
+```text
+1. 什么情况下值得使用多 Agent？为什么增加 Agent 数量不一定提升效果？
+2. 主 Agent 调用子 Agent、Agent 之间 handoff、多个 Agent 并行协作有什么区别？
+3. 如何拆分子任务，避免多个 Agent 重复工作或者相互依赖？
+4. 子 Agent 应该继承完整上下文，还是只接收精简任务说明？
+5. 多个 Agent 如何共享结果、处理冲突，并由主 Agent 验收？
+6. A2A 和 MCP 有什么区别？普通的子 Agent 调用一定需要 A2A 吗？
+```
+
 ### Agent 基础、工具与评估
 
 ```bash
