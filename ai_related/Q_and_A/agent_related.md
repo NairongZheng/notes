@@ -963,6 +963,20 @@
 > | 精简任务说明 + 必要资料 | 独立查资料、检查指定模块 | 说明漏了约束，子 Agent 就可能做偏 |
 > | 继承主 Agent 的历史上下文 | 接着排查一个已经调查很久的问题 | 输入更长，也会带入无关内容和先前的错误判断 |
 
+**Codex、Claude Code 和 DeepSeek Harness 分别怎么做？**
+
+> 以下按 2026-10-12 查阅的文档和接口整理，具体行为需要结合版本与运行方式看：
+>
+> | 框架 | 子 Agent 的上下文怎么来 |
+> | --- | --- |
+> | Codex（以提供 `fork_turns` 的多 Agent 接口为例） | 主 Agent 可以选择继承父对话（`all`），或不传父对话（`none`），再附上任务说明。后者仍有运行时提供的指令和工具，不是完全空白 |
+> | Claude Code | 普通子 Agent 使用自己的角色指令、主 Agent 写的任务说明，以及按配置加载的项目规则、Skills 等，不自动继承父对话；fork 子 Agent 则继承启动时的历史、系统提示词、工具和模型 |
+> | DeepSeek Harness | 由子 Agent provider 决定：进程内 `spawn` 从新任务启动，不复制父对话；`fork` 用父会话已完成的轮次初始化，再加入任务说明 |
+>
+> DeepSeek Harness 的 fork **不包含父 Agent 正在进行的这一轮**，因此本轮刚发现的重要信息要补进任务说明。另一个共同注意点是：**继承聊天历史与继承工具、权限配置是两回事**，不能只凭“fork”这个名字推断全部行为。
+>
+> 参考：[Codex 子 Agent 配置](https://learn.chatgpt.com/docs/agent-configuration/subagents)、[OpenAI 多 Agent 的上下文传递接口](https://developers.openai.com/api/docs/guides/responses-multi-agent)、[Claude Code 子 Agent 上下文](https://code.claude.com/docs/en/sub-agents#manage-subagent-context)、[DeepSeek Harness 子 Agent](https://deepseek-harness.github.io/deepseek-harness/reference/subsystems/subagent)。
+
 **精简不能省掉影响决策的信息**
 
 > 上面的调研任务中，用户可能早就说过“面向面试，简单易懂，先别改文件”。如果只传“研究 OpenHands”，子 Agent 就可能写得太复杂，或者直接修改文件。因此任务说明要带上这些相关约束。
