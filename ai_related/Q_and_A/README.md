@@ -76,6 +76,18 @@
 5. 长时间运行的 Agent 如何记录进度、恢复中断，并确认任务真的完成？
 ```
 
+### 主流 harness 的特点、优缺点与对比
+
+```text
+1. 主流 harness 各有什么设计特点？优缺点如何对比？
+2. Codex 和 Claude Code 的 harness 有什么异同？
+3. DeepSeek Harness 的插件化有什么特点？相比只接几个工具，好在哪里、代价是什么？
+4. OpenHands 为什么强调状态与执行环境分离？这种设计有什么优缺点？
+5. OpenCode 的多模型设计有什么优势？为什么换模型不只是换一个 API 地址？
+6. WorkBuddy 这类办公 Agent，与 Coding Agent 的 harness 有什么不同？
+7. 面试中如何回答“你会怎么选择和评估一个 harness”？
+```
+
 ### Agent 基础、工具与评估
 
 ```bash
