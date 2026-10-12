@@ -163,12 +163,12 @@
 
 > | harness | 设计特点 | 优点 | 缺点 / 代价 |
 > | --- | --- | --- | --- |
-> | [Codex](https://developers.openai.com/blog/codex-as-a-platform) | 将会话、工具执行、审批和事件流组织在可复用的运行时中 | 接入自己的界面或开发流程时，可以复用整套执行机制 | 深度集成需要适配其会话和事件协议；替换核心执行逻辑的改动更大 |
-> | [Claude Code](https://code.claude.com/docs/en/how-claude-code-works) | 在现成开发循环上，通过项目指令、Skills、hooks 和子 Agent 扩展 | 容易把项目规范和已有脚本接入日常开发；按需加载和委派可以控制上下文体积 | 摘要和子任务汇总可能丢失细节；复杂扩展需要处理指令与 hook 的相互影响 |
+> | [Codex](https://developers.openai.com/blog/codex-as-a-platform) | 开源核心运行时，通过 App Server / SDK 接入自己的应用 | 可以复用执行机制，也可以阅读和修改核心实现 | 自行修改后需要维护分支，并跟进上游变化 |
+> | [Claude Code](https://code.claude.com/docs/en/agent-sdk/overview) | 复用现成运行时，通过 Agent SDK、Skills、hooks 等扩展 | 可以接入项目规则、脚本和自己的应用，少写 Agent 循环 | 核心运行时不以开源项目提供，深度定制受公开扩展接口限制 |
 > | [DeepSeek Harness](https://deepseek-harness.github.io/deepseek-harness/develop/practice/) | 以插件、服务接口和可替换提供方组合能力 | 可以分别调整模型看到的工具与实际执行实现，便于定制 | 插件依赖和生命周期增加调试复杂度，接口兼容需要维护 |
 > | [OpenHands](https://docs.openhands.dev/sdk/arch/design) | 分离 Agent 组件、会话状态和执行环境 | 便于做执行环境切换、状态恢复和平台化部署 | 自建部署需要管理环境、依赖和持久化，工程投入更大 |
 > | [WorkBuddy](https://cloud.tencent.com/document/product/1831/134384) | 将专家、Skills、连接器和资料库组合成办公任务能力 | 接入业务知识和交付办公成果的门槛较低 | 定制依赖产品开放的能力；仅凭公开产品资料，无法细致比较其内部调度和压缩算法 |
-> | [OpenCode](https://opencode.ai/v2/docs/) | 开放模型接入，并提供 Agent、权限和插件配置 | 便于换模型、做组合实验和定制编程流程 | 模型与工具协议、上下文策略的兼容性需要额外验证 |
+> | [OpenCode](https://opencode.ai/v2/docs/providers/) | 为多家模型提供方提供适配，并统一管理模型配置 | 多种协议的接入工作已经部分做好，便于在同一工具体系中比较模型 | 内置适配不保证所有模型功能与任务效果一致；换模型也不是其独有能力 |
 >
 > 这里比较的是**设计带来的取舍**。这些能力并不互斥，例如 Codex 也支持 Skills，OpenCode 也有插件；表中的侧重点不能理解为某家独有。
 
@@ -179,28 +179,26 @@
 
 <br>
 
-**共同点**
+**日常写代码时，两者的基本工作方式很接近**
 
-> 两者都把模型放进“读取上下文 → 调用工具 → 观察结果 → 继续行动”的循环中，并提供项目规则、上下文管理和权限控制。仅说“一个会写代码，另一个会调用工具”无法区分它们。
+> 例如让它们“修复登录报错”：都会找相关文件、读取代码、修改、运行测试，再根据报错继续修复。项目规则、工具调用、上下文压缩和权限控制也都是共同需求。不能把“Codex 有沙箱、Claude Code 有 Skills”当成两者的本质区别。
 
-**值得比较的设计**
+**更明确的区别：能改多深，以及怎样接入自己的程序**
 
-> | 角度 | Codex | Claude Code |
-> | --- | --- | --- |
-> | 复用方式 | 可通过 App Server 接入会话、执行事件和审批，也可用 SDK 驱动任务 | 可通过 Agent SDK 复用运行循环，通过 Skills、hooks 等配置工作流 |
-> | 状态与交互 | App Server 明确组织 thread、turn、item，客户端可以跟踪和介入执行 | 会话保存消息、工具调用和结果；可以恢复会话，并让用户中途调整任务 |
-> | 执行控制 | 明确区分沙箱边界与审批策略：前者限制能做什么，后者控制何时确认 | 通过权限规则、hooks 等控制动作；文件 checkpoint 支持撤回相应编辑 |
-> | 上下文处理 | 运行时管理多轮上下文，支持压缩后继续执行 | 支持压缩、按需加载 Skills，以及将子任务放入独立上下文 |
+> | 需求 | Codex | Claude Code | 对使用者意味着什么 |
+> | --- | --- | --- | --- |
+> | 阅读或修改核心执行逻辑 | CLI / 核心运行时开源，可以阅读、修改和自行构建 | 核心运行时不以开源项目提供，主要通过公开接口扩展 | 研究内部实现或接口之外的改造时，Codex 更方便；自行修改也意味着要维护代码 |
+> | 在自己的程序中驱动 Agent | 可通过 App Server 发送任务、接收进度与审批事件，也可用 SDK | Agent SDK 在程序中驱动 Claude Code 运行时，接收消息并处理权限等事件 | 两者都能做应用集成，应比较接口是否适合自己的程序，不能说只有 Codex 能平台化 |
 >
-> 相关机制见 [Codex App Server](https://learn.chatgpt.com/docs/app-server)、[Codex 沙箱](https://learn.chatgpt.com/docs/sandboxing)和 [Claude Code 工作原理](https://code.claude.com/docs/en/how-claude-code-works)。这些是对照观察点，不表示另一方没有类似机制。
+> 参考：[Codex 源码与许可证](https://github.com/openai/codex)、[Claude Code 许可证](https://github.com/anthropics/claude-code/blob/main/LICENSE.md)、[Codex App Server](https://learn.chatgpt.com/docs/app-server)、[Claude Agent SDK](https://code.claude.com/docs/en/agent-sdk/overview)。这里的开源范围指 Codex CLI / 核心运行时，不代表模型权重或所有云端产品都开源。
 
-**优缺点怎么分析？**
+**用一个例子理解取舍**
 
-> - **Codex 的运行时复用**：适合把完整执行过程接进自己的应用；代价是客户端要正确处理流式事件、审批和任务状态，而不是只接收最终文本。
-> - **Claude Code 的工作流扩展**：适合通过项目规则、Skills 和 hooks 改造现有开发习惯；代价是要区分软约束和程序检查，避免以为写了提示词就一定执行。
-> - **两者的共同代价**：采用现成循环可以少写运行逻辑，但超出扩展接口的需求，仍可能需要改运行时或自建流程。
+> - **“接上公司的测试工具”**：先看已有工具扩展接口，两者通常都不需要修改核心。
+> - **“自己做一个页面，显示 Agent 正在改哪个文件，并让用户批准命令”**：两者都能集成，只是接入协议和编程接口不同。
+> - **“我要彻底重写内部的上下文裁剪算法”**：如果公开接口不够用，Codex 可以从源码入手；Claude Code 的定制需要受其开放接口约束。
 >
-> 例如“修改后必须检查格式”：Skill 可以说明怎么检查，hook 可以在适当事件上触发检查；最终是否允许交付，还应依据检查结果。这个问题比“哪家更聪明”更能考察对 harness 的理解。
+> 因此，面试中可以回答：**两者属于相近的 Coding Agent harness；清楚的差别在源码开放程度、集成接口和具体实现。谁修代码更好，还受模型、提示词、工具与配置影响，需要实际任务验证。**
 
 </details>
 
@@ -237,10 +235,25 @@
 
 <br>
 
-**两个关键设计**
+**先认识 OpenHands，再区分三个部分**
 
-> 1. **统一会话状态**：SDK 将 Agent、工具和配置等组件设计为不可变对象，把可变运行状态集中到 Conversation 中，减少各模块各记一份状态造成的不一致。[参考：OpenHands 设计原则](https://docs.openhands.dev/sdk/arch/design)
-> 2. **执行环境可替换**：同一套 Agent 逻辑可以搭配本地、Docker 或远程 Workspace。当前 SDK 的隔离是可选的，不能沿用“OpenHands 所有工具必定跑在 Docker 里”的旧印象。[参考：OpenHands 架构](https://docs.openhands.dev/sdk/arch/overview)
+> OpenHands 是开源的软件开发 Agent 项目，也提供 SDK，让开发者组装“读代码、改代码、执行命令、运行测试”的 Agent。下面讨论的是其 SDK 设计。
+>
+> 假设任务是“修复一个测试失败的问题”：
+>
+> | 部分 | 通俗理解 | 这个任务中的例子 |
+> | --- | --- | --- |
+> | Agent 与工具配置 | 怎么干活、能用什么工具 | 使用哪个模型，提供文件编辑器和终端工具 |
+> | 会话状态 | 干到哪一步了 | 已读哪些代码、执行过什么命令、上次测试报了什么错 |
+> | 执行环境 | 在哪里干活 | 存放仓库、Python 依赖和运行进程的本机或容器 |
+>
+> SDK 将可变会话状态集中管理，避免各组件各记一份进度；通过 Workspace 等边界管理执行环境，使同一套 Agent 逻辑可以在本地或隔离环境中使用。**这是职责上的分离，不要求三者一定在不同机器或进程里。** 当前 SDK 默认可以本地运行，隔离按需启用。[参考：设计原则](https://docs.openhands.dev/sdk/arch/design)、[架构](https://docs.openhands.dev/sdk/arch/overview)
+
+**为什么值得分开？**
+
+> 例如要同时修复 20 个仓库，可以复用一套 Agent 配置，为每个任务保存独立会话，并分配独立执行环境。这样不必为每个仓库重写 Agent，也能减少文件和依赖相互干扰。
+>
+> 再例如程序中断后，保存的会话可以告诉 Agent“已经改了哪些文件、测试失败在哪里”。但如果容器也被删了，代码修改和依赖不会因为恢复聊天记录而自动回来，还需要持久化文件或重建环境。**会话像工作记录，执行环境像工作现场；保存记录不等于保存现场。**
 
 **优缺点**
 
@@ -259,30 +272,40 @@
 </details>
 
 <details>
-<summary>OpenCode 的多模型设计有什么优势？为什么换模型不只是换一个 API 地址？</summary>
+<summary>OpenCode 的多模型设计有什么优势？什么时候只换 API 地址就够，什么时候不够？</summary>
 
 <br>
 
-**特点与优势**
+**有时改地址、密钥和模型名，确实就够了**
 
-> OpenCode 支持多个模型提供方，并允许配置 Agent 的提示词、模型、权限和子任务角色。这样可以保留工作界面和工具体系，测试不同模型的效果，降低对单个提供方的绑定。[参考：OpenCode 概览](https://opencode.ai/v2/docs/)、[Agent 配置](https://opencode.ai/v2/docs/agents/)
+> 前提是新服务与原服务兼容：接收同样的请求格式，返回同样的消息和工具调用格式，并支持当前任务用到的能力。如果公司网关已经处理了差异，使用者看到的就只是几个配置项。
 
-**灵活性带来的代价**
+**不够的情况，具体缺在哪里？**
 
-> | 差异 | 为什么会影响任务 |
+> | 情况 | 只改地址后会怎样 | 还需要做什么 |
+> | --- | --- | --- |
+> | 原来调用 Chat Completions，新服务只提供 Anthropic Messages | 请求路径和消息结构不匹配，服务无法按原协议处理 | 换 provider 适配器，或让网关转换请求、响应和工具结果 |
+> | 都声称 OpenAI 兼容，但新服务只认 `max_tokens`，原请求发的是 `max_completion_tokens` | 可能直接拒绝参数 | 调整参数映射；地址本身不能转换字段 |
+> | 新模型能聊天，但不支持所需的工具调用 | 能回答文字，却不能完成“读文件 → 改代码 → 跑测试”的循环 | 选择支持工具调用的模型，并确认适配配置正确 |
+> | 接口和工具调用都正常，但新模型上下文更小 | 长任务可能超限 | 调整上下文预算、裁剪和压缩策略 |
+>
+> 第二个例子是 DeepSeek Harness 官方文档列出的实际兼容问题，说明它并非 OpenCode 特有的问题。[参考：请求兼容性](https://deepseek-harness.github.io/deepseek-harness/guide/providers#请求兼容性)
+>
+> **地址决定“发到哪里”，协议适配决定“双方怎么交流”，模型能力决定“能不能完成任务”。** 换模型很简单时，通常是兼容条件已经满足，或适配层已经把工作做好了。
+
+**那为什么考虑 OpenCode？其他 harness 也能换模型吗？**
+
+> 可以，换模型并不是 OpenCode 独有的能力。它的便利之处在于内置多种 provider 适配，并统一管理模型配置；例如为 Chat Completions、Responses 和 Anthropic 等提供相应接入方式，减少自己写转换代码的工作。但新模型的工具调用、上下文和任务效果仍需要验证。[参考：OpenCode Providers](https://opencode.ai/v2/docs/providers/)
+>
+> | harness | 模型接入时需要知道的边界 |
 > | --- | --- |
-> | 工具调用协议与能力 | API 能返回文本，不代表工具参数、并行调用和结果回传都兼容 |
-> | 模型行为 | 相同工具描述，对不同模型可能需要不同提示和错误反馈 |
-> | 上下文与压缩 | 不同模型的窗口、预算和压缩机制不同，不能直接照搬配置 |
-> | 成本与速度 | 单次调用便宜，但重试和无效步骤增多后，总成本可能更高 |
+> | Codex | 支持自定义 model provider，但服务仍需符合所选接口和运行时要求，填入任意地址不等于兼容 |
+> | Claude Code | 可以选择 Claude 模型及配置网关；第三方兼容服务可能接入其他模型，但 Anthropic 官方不支持通过网关路由到非 Claude 模型 |
+> | DeepSeek Harness | 支持第三方提供商、自定义模型 API，并可选择不同协议；同样可以保留工具体系测试模型 |
 >
-> 例如 OpenCode 的摘要压缩会保留近期上下文、压缩较早历史；保留得越多，细节损失越少，但能留给新任务的空间也越小。[参考：OpenCode Compaction](https://opencode.ai/v2/docs/compaction/)
-
-**与其他 harness 的对比点**
-
-> OpenCode 适合研究“同一套工具与流程，换模型后表现如何”；DeepSeek Harness 的插件机制则可以进一步作为研究能力模块替换的切入口。两者都可扩展，差别应落到实际开放的接口和改造成本上。
+> 参考：[Codex 自定义 provider](https://learn.chatgpt.com/docs/config-file/config-advanced#custom-model-providers)、[Claude Code 网关说明](https://code.claude.com/docs/en/llm-gateway)、[DeepSeek Harness 模型配置](https://deepseek-harness.github.io/deepseek-harness/guide/providers)。
 >
-> 面试时可以强调：**模型接入兼容、功能兼容和任务效果相当，是三件不同的事。** 比较时应记录具体的模型与 harness 配置组合。
+> 因此，如果现有 harness 已经稳定接入想测试的模型，就没有必要仅为了“换模型”迁移到 OpenCode。应比较**目标模型是否兼容、要补多少适配工作、现有工具和工作习惯能否复用**。
 
 </details>
 
@@ -324,7 +347,7 @@
 > | 需求 | 优先考察什么 | 可以重点研究的对象 |
 > | --- | --- | --- |
 > | 在现有仓库中持续开发 | 上下文获取、修改反馈、测试与人工介入 | Codex、Claude Code |
-> | 保留工具体系，尝试不同模型 | 模型适配、工具调用兼容、上下文预算 | OpenCode，以及其他支持模型替换的 harness |
+> | 保留工具体系，尝试不同模型 | 目标模型与协议是否兼容、适配成本、上下文预算 | 先看现有 harness；再比较 OpenCode、DeepSeek Harness、Codex 等的具体接入支持 |
 > | 深度替换或组合能力模块 | 服务接口、插件依赖、生命周期管理 | DeepSeek Harness |
 > | 搭建批量软件任务执行平台 | 会话状态、隔离环境、部署与资源管理 | OpenHands |
 > | 面向业务人员交付报告和文件 | 业务工具、资料接入、成品验收 | WorkBuddy |
