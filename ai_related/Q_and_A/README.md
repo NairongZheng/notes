@@ -66,6 +66,18 @@
 
 [Agent相关](./agent_related.md)，包含以下几个问题：
 
+### Agent 与 harness 的基本概念
+
+```text
+1. 一个最小可用的 Agent loop 应该包含哪些步骤？什么时候应该停止？
+2. 固定 Workflow 和自主 Agent 各适合什么场景？应该如何选择？
+3. ReAct、先规划再执行、边执行边调整有什么区别？
+4. 为什么同一个模型换一个 harness，任务成功率可能差很多？
+5. 长时间运行的 Agent 如何记录进度、恢复中断，并确认任务真的完成？
+```
+
+### Agent 基础、工具与评估
+
 ```bash
 1. Agent关键技术与流程
 2. Agent中的tool use
