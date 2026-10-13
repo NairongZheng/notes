@@ -284,7 +284,7 @@ uv add "mcp[cli]" httpx
 touch weather.py
 ```
 
-然后在 [weather.py](./mcp/weather/weather.py) 中添加好代码。
+然后在 [weather.py](./weather/weather.py) 中添加好代码。
 
 然后就可以在 cline 的配置文件中添加（注意其中的路径要填对，建议用绝对路径）：
 

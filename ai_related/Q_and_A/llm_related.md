@@ -696,7 +696,7 @@ class TransformerEncoder(nn.Module):
 
 <br>
 
-在[大模型微调](../LLM/大模型微调.md)里面有详细介绍。
+在[大模型微调](../LLM/fine_tuning.md)里面有详细介绍。
 
 </details>
 
