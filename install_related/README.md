@@ -19,6 +19,7 @@
 3. mysql_usage：mysql 使用
 4. postgresql_usage：PostgreSQL 使用
 5. redis_usage：redis 使用
+6. [lance：基础概念与使用](database/lance.md)
 
 ## tools/ — 通用开发工具
 
