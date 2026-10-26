@@ -21,6 +21,7 @@
 8. probability_theory_in_LLM: 大语言模型中的概率论
 9. temperature_and_top_p: Temperature跟top_p的介绍
 10. tool_calls: 工具调用
+11. [on_policy_distillation](./on_policy_distillation.md): OPD 专题，包含 k1 策略梯度、top-k 概率对齐与 TA-OPD
 
 
 # basic
